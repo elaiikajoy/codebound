@@ -10,6 +10,7 @@ public class Coin : MonoBehaviour
        {
            Debug.Log("COIN COLLECTED!");
            PlayerManager.numberOfCoin++;
+           AudioManager.instance.Play("Coin");
            PlayerPrefs.SetInt("numberOfCoin", PlayerManager.numberOfCoin);
            Destroy(gameObject);
        }

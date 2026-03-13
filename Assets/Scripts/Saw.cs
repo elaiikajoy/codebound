@@ -4,25 +4,33 @@ using UnityEngine;
 
 public class Saw : MonoBehaviour
 {
-    public float speed = 5f;
-    int direction = 10;
+      public float speed = 3f;
+    public float moveDistance = 3f;
 
-    public Transform rightCheck;
-    public Transform leftCheck;
+    private Vector3 startPos;
+    private bool movingRight = true;
 
-    
-    void FixedUpdate()
+    void Start()
     {
-        transform.Translate(Vector2.right * speed * direction * Time.fixedDeltaTime);
+        startPos = transform.position;
+    }
 
-        if (Physics2D.Raycast(rightCheck.position, Vector2.down, 5) == false)
+    void Update()
+    {
+        if (movingRight)
         {
-            direction = -1;
+            transform.Translate(Vector2.right * speed * Time.deltaTime);
+
+            if (transform.position.x >= startPos.x + moveDistance)
+                movingRight = false;
         }
-
-        if (Physics2D.Raycast(leftCheck.position, Vector2.down, 5) == false)
+        else
         {
-            direction = 1;
+            transform.Translate(Vector2.left * speed * Time.deltaTime);
+
+            if (transform.position.x <= startPos.x - moveDistance)
+                movingRight = true;
         }
     }
-}
+    }
+

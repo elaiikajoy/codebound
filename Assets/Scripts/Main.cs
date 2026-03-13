@@ -7,19 +7,11 @@ using UnityEngine.Audio;
 
 public class Main : MonoBehaviour
 {
-    public Slider soundSlider;
-    public AudioMixer mixer;
-
     public void BackToMainMenuFromLevelPanel()
     {
         Debug.Log("BackToMainMenuFromLevelPanel called");
         SaveGameData();
         SceneManager.LoadSceneAsync("Main");
-    }
-
-    public void SetSound()
-    {
-        mixer.SetFloat("Volume", soundSlider.value);
     }
 
     void Start()
@@ -33,6 +25,13 @@ public class Main : MonoBehaviour
         // Save data before changing scenes
         SaveGameData();
         SceneManager.LoadSceneAsync("LevelPanel");
+    }
+
+    public void PlayLevel()
+    {
+        // Save data before changing scenes
+        SaveGameData();
+        SceneManager.LoadSceneAsync("Level1");
     }
 
     public void OpenShop()
