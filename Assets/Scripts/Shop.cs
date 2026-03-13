@@ -68,24 +68,53 @@ public class Shop : MonoBehaviour
         tokenText.text = "Tokens: " + playerTokens;
     }
 
+    /// <summary>
+    /// Called by the Buy button.
+    /// Character purchases are local-only in Unity.
+    /// Backend stores only the currently equipped character.
+    /// </summary>
     public void BuyCharacter()
     {
         Characters character = characterDB.GetCharacter(selectedOption);
 
-        // Check if player has enough tokens
-        if (playerTokens >= character.cost && !IsCharacterOwned(selectedOption))
+        if (playerTokens < character.cost || IsCharacterOwned(selectedOption))
+            return;
+
+        // 1. Deduct locally for instant feedback
+        playerTokens -= character.cost;
+        SaveTokens();
+
+        // 2. Mark as owned locally
+        PlayerPrefs.SetInt("Character_" + selectedOption, 1);
+        PlayerPrefs.Save();
+
+        // 3. Refresh UI
+        UpdateCharacterDisplay(selectedOption);
+    }
+
+    /// <summary>
+    /// Called by a Select/Equip button to set this character as the active one.
+    /// Syncs the equipped character to the backend so selection survives login restore.
+    /// </summary>
+    public void SelectCharacter()
+    {
+        Characters character = characterDB.GetCharacter(selectedOption);
+
+        // Save selection locally
+        PlayerPrefs.SetInt("SelectedCharacter", selectedOption);
+        PlayerPrefs.Save();
+
+        // Backend sync: equip character
+        if (SkinService.Instance != null && !string.IsNullOrEmpty(character.characterId))
         {
-            // Deduct tokens
-            playerTokens -= character.cost;
-            SaveTokens();
-
-            // Mark character as owned
-            PlayerPrefs.SetInt("Character_" + selectedOption, 1);
-            PlayerPrefs.Save();
-
-            // Update display
-            UpdateCharacterDisplay(selectedOption);
+            StartCoroutine(SkinService.Instance.EquipCharacter(
+                character.characterId,
+                onSuccess: equipped => Debug.Log($"[Shop] Character equipped: {equipped}"),
+                onError: err => Debug.LogWarning($"[Shop] Equip sync failed (offline?): {err}")
+            ));
         }
+
+        UpdateCharacterDisplay(selectedOption);
     }
 
     private bool IsCharacterOwned(int index)
