@@ -1,30 +1,57 @@
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+
 
 public class Music : MonoBehaviour
 {
-    [SerializeField] private AudioMixer audioMixer;
-    [SerializeField] private Slider musicSlider;
+    private const string MasterVolumePrefKey = "MasterVolume";
 
-    void Start()
+    public Slider volumeSlider;
+    public AudioMixer mixer;
+    [SerializeField] private string exposedVolumeParameter = "volume";
+
+    private void Awake()
     {
-        // Initialize slider value from mixer
-        if (musicSlider != null)
+        if (volumeSlider != null)
         {
-            musicSlider.onValueChanged.AddListener(SetMusicVolume);
-            // Set default slider value (1 = max volume)
-            musicSlider.value = 1f;
+            volumeSlider.onValueChanged.AddListener(delegate { SetVolume(); });
         }
     }
 
-    public void SetMusicVolume(float volume)
+    public void SetVolume()
     {
-        if (audioMixer != null)
+        if (mixer == null || volumeSlider == null)
         {
-            // Convert linear slider value (0-1) to decibels (-80 to 0)
-            float dB = volume > 0.0001f ? Mathf.Log10(volume) * 20f : -80f;
-            audioMixer.SetFloat("Music", dB);
+            return;
+        }
+
+        float sliderValue = Mathf.Clamp(volumeSlider.value, 0.0001f, 1f);
+        float dB = Mathf.Log10(sliderValue) * 20f;
+        mixer.SetFloat(exposedVolumeParameter, dB);
+        PlayerPrefs.SetFloat(MasterVolumePrefKey, volumeSlider.value);
+        PlayerPrefs.Save();
+    }
+
+    void Start()
+    {
+        if (mixer == null || volumeSlider == null)
+        {
+            return;
+        }
+
+        float savedSliderValue = PlayerPrefs.GetFloat(MasterVolumePrefKey, 1f);
+        volumeSlider.value = Mathf.Clamp(savedSliderValue, 0.0001f, 1f);
+        SetVolume();
+    }
+
+    private void OnDestroy()
+    {
+        if (volumeSlider != null)
+        {
+            volumeSlider.onValueChanged.RemoveAllListeners();
         }
     }
 }

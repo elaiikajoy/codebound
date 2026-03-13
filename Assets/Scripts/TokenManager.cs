@@ -30,6 +30,9 @@ public class TokenManager : MonoBehaviour
     public void ResetTokens()
     {
         PlayerPrefs.SetInt("PlayerTokens", 0);
+        PlayerPrefs.Save();
+    }
+
 
             // ─── Backend sync ──────────────────────────────────────────
             // Called by ProgressService after a successful /progress/update response.
@@ -40,4 +43,4 @@ public class TokenManager : MonoBehaviour
         PlayerPrefs.Save();
     }
 }
-}
+

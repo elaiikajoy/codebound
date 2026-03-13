@@ -46,11 +46,13 @@ public class Movement : MonoBehaviour
     {
         velocity.y = Mathf.Max(velocity.y, 0f);
         Jumping = velocity.y > 0f;
+        
 
         if (Input.GetButtonDown("Jump"))
         {
             velocity.y = jumpForce;
             Jumping = true;
+            AudioManager.instance.Play("Jump");
         }
     }
 

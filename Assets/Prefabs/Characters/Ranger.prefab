@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 4014238683259247014}
   - component: {fileID: 4929390761684451004}
   - component: {fileID: 3727901314035990663}
-  - component: {fileID: 2435836993150348548}
   - component: {fileID: 2106974850685714669}
+  - component: {fileID: 1834120694}
   m_Layer: 3
   m_Name: Ranger
   m_TagString: Player
@@ -103,8 +103,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.34561837, y: -0.76675886}
-  m_Size: {x: 12.385436, y: 17.46309}
+  m_Offset: {x: -0.34561837, y: -0.6803932}
+  m_Size: {x: 12.385436, y: 17.29036}
   m_Direction: 0
 --- !u!50 &4014238683259247014
 Rigidbody2D:
@@ -158,22 +158,6 @@ MonoBehaviour:
   maxJumpTime: 1
   velocity: {x: 0, y: 0}
   animator: {fileID: 0}
---- !u!114 &2435836993150348548
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025925460572891436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cf70ad73f8ff7b4ea2e41fdf59eff6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  idleSprite: {fileID: 21300000, guid: 83e5c35a1275f924b8d4eb04647b7a07, type: 3}
-  runSprite: {fileID: 0}
-  jumpSprite: {fileID: 0}
-  fallSprite: {fileID: 0}
 --- !u!95 &2106974850685714669
 Animator:
   serializedVersion: 4
@@ -194,3 +178,15 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1834120694
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025925460572891436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3613592a7dabad84eb2f63232ddbfec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
