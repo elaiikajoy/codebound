@@ -31,6 +31,8 @@ using UnityEngine.Networking;
 
 public class ApiClient : MonoBehaviour
 {
+    private const float CONFIG_WAIT_TIMEOUT_SECONDS = 8f;
+
     // ─── Singleton ────────────────────────────────────────────
     public static ApiClient Instance { get; private set; }
 
@@ -52,7 +54,10 @@ public class ApiClient : MonoBehaviour
         Action<string> onError,
         bool requiresAuth = false)
     {
-        yield return WaitForConfig();
+        bool configReady = false;
+        yield return StartCoroutine(WaitForConfigOrReport(onError, ready => configReady = ready));
+        if (!configReady)
+            yield break;
 
         string url = BuildUrl(endpoint);
 
@@ -75,7 +80,10 @@ public class ApiClient : MonoBehaviour
         Action<string> onError,
         bool requiresAuth = false)
     {
-        yield return WaitForConfig();
+        bool configReady = false;
+        yield return StartCoroutine(WaitForConfigOrReport(onError, ready => configReady = ready));
+        if (!configReady)
+            yield break;
 
         string url = BuildUrl(endpoint);
         string jsonBody = JsonUtility.ToJson(body);
@@ -104,7 +112,10 @@ public class ApiClient : MonoBehaviour
         Action<string> onError,
         bool requiresAuth = false)
     {
-        yield return WaitForConfig();
+        bool configReady = false;
+        yield return StartCoroutine(WaitForConfigOrReport(onError, ready => configReady = ready));
+        if (!configReady)
+            yield break;
 
         string url = BuildUrl(endpoint);
         string jsonBody = JsonUtility.ToJson(body);
@@ -130,7 +141,10 @@ public class ApiClient : MonoBehaviour
         Action<string> onError,
         bool requiresAuth = true)
     {
-        yield return WaitForConfig();
+        bool configReady = false;
+        yield return StartCoroutine(WaitForConfigOrReport(onError, ready => configReady = ready));
+        if (!configReady)
+            yield break;
 
         string url = BuildUrl(endpoint);
 
@@ -163,7 +177,16 @@ public class ApiClient : MonoBehaviour
     private void SetHeaders(UnityWebRequest req, bool requiresAuth)
     {
         // Required on every endpoint (public and protected)
-        req.SetRequestHeader("api-key", ApiConfig.Instance.Config.apiKey);
+        string apiKey = ApiConfig.Instance.Config.apiKey;
+        if (string.IsNullOrWhiteSpace(apiKey))
+        {
+            Debug.LogError("[ApiClient] API key is empty in game.config.json");
+        }
+        else
+        {
+            req.SetRequestHeader("api-key", apiKey);
+            req.SetRequestHeader("x-api-key", apiKey);
+        }
 
         if (requiresAuth)
         {
@@ -204,9 +227,25 @@ public class ApiClient : MonoBehaviour
     }
 
     /// <summary>Waits until ApiConfig has finished loading game.config.json.</summary>
-    private IEnumerator WaitForConfig()
+    private IEnumerator WaitForConfigOrReport(Action<string> onError, Action<bool> onComplete)
     {
-        while (ApiConfig.Instance == null || !ApiConfig.Instance.IsReady)
+        float elapsed = 0f;
+
+        while (ApiConfig.Instance == null || !ApiConfig.Instance.IsReady || ApiConfig.Instance.Config == null)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            if (elapsed >= CONFIG_WAIT_TIMEOUT_SECONDS)
+            {
+                string msg = "ApiConfig is not ready. Check GameAPI object and StreamingAssets/game.config.json.";
+                Debug.LogError("[ApiClient] " + msg);
+                onError?.Invoke(msg);
+                onComplete?.Invoke(false);
+                yield break;
+            }
+
             yield return null;
+        }
+
+        onComplete?.Invoke(true);
     }
 }

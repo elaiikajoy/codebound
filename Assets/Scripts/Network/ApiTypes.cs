@@ -28,7 +28,7 @@ public class ApiBaseResponse
 [System.Serializable]
 public class LoginRequest
 {
-    public string email;
+    public string identifier; // username or email
     public string password;
 }
 
@@ -36,8 +36,7 @@ public class LoginRequest
 public class RegisterRequest
 {
     public string username;
-    public string email;
-    public string password;
+    public string password; // email is optional — not sent from game
 }
 
 [System.Serializable]
@@ -83,6 +82,23 @@ public class SessionData
 
 [System.Serializable]
 public class SessionResponse
+{
+    public bool success;
+    public string message;
+    public SessionData data;
+}
+
+[System.Serializable]
+public class ProfileUpdateRequest
+{
+    public string username;
+    public string avatar;
+    public string currentPassword;
+    public string newPassword;
+}
+
+[System.Serializable]
+public class ProfileResponse
 {
     public bool success;
     public string message;

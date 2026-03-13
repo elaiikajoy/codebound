@@ -33,15 +33,19 @@ public class AuthService : MonoBehaviour
     // ─── Login ────────────────────────────────────────────────
     /// <summary>
     /// POST /auth/login
+    /// Accepts username OR email as the identifier.
     /// Calls onSuccess(UserData, token) or onError(message).
     /// </summary>
     public IEnumerator Login(
-        string email,
+        string identifier,
         string password,
         Action<UserData, string> onSuccess,
         Action<string> onError)
     {
-        var body = new LoginRequest { email = email, password = password };
+        var body = new LoginRequest { identifier = identifier, password = password };
+
+        if (ApiConfig.Instance != null && ApiConfig.Instance.IsReady && ApiConfig.Instance.Config != null && ApiConfig.Instance.Config.debugMode)
+            Debug.Log($"[AuthService] Sending login payload: identifier='{identifier}', passwordLength={password?.Length ?? 0}");
 
         yield return StartCoroutine(ApiClient.Instance.Post(
             "/auth/login",
@@ -52,7 +56,7 @@ public class AuthService : MonoBehaviour
                 if (resp != null && resp.success && resp.data != null)
                     onSuccess?.Invoke(resp.data.user, resp.data.token);
                 else
-                    onError?.Invoke(resp?.message ?? "Login failed. Check email and password.");
+                    onError?.Invoke(resp?.message ?? "Login failed. Check your username and password.");
             },
             onError: onError
         ));
@@ -61,11 +65,11 @@ public class AuthService : MonoBehaviour
     // ─── Register ─────────────────────────────────────────────
     /// <summary>
     /// POST /auth/register
+    /// Only requires username + password. Email is not sent.
     /// Calls onSuccess(UserData, token) or onError(message).
     /// </summary>
     public IEnumerator Register(
         string username,
-        string email,
         string password,
         Action<UserData, string> onSuccess,
         Action<string> onError)
@@ -73,9 +77,11 @@ public class AuthService : MonoBehaviour
         var body = new RegisterRequest
         {
             username = username,
-            email = email,
             password = password
         };
+
+        if (ApiConfig.Instance != null && ApiConfig.Instance.IsReady && ApiConfig.Instance.Config != null && ApiConfig.Instance.Config.debugMode)
+            Debug.Log($"[AuthService] Sending register payload: username='{username}', passwordLength={password?.Length ?? 0}");
 
         yield return StartCoroutine(ApiClient.Instance.Post(
             "/auth/register",
@@ -113,6 +119,112 @@ public class AuthService : MonoBehaviour
                     onSuccess?.Invoke(resp.data.user);
                 else
                     onError?.Invoke(resp?.message ?? "Session invalid or expired.");
+            },
+            onError: onError,
+            requiresAuth: true
+        ));
+    }
+
+    /// <summary>
+    /// GET /auth/profile
+    /// Fetches current authenticated user's profile data.
+    /// </summary>
+    public IEnumerator GetProfile(
+        Action<UserData> onSuccess,
+        Action<string> onError)
+    {
+        yield return StartCoroutine(ApiClient.Instance.Get(
+            "/auth/profile",
+            onSuccess: json =>
+            {
+                var resp = JsonUtility.FromJson<ProfileResponse>(json);
+                if (resp != null && resp.success && resp.data?.user != null)
+                    onSuccess?.Invoke(resp.data.user);
+                else
+                    onError?.Invoke(resp?.message ?? "Failed to fetch profile.");
+            },
+            onError: onError,
+            requiresAuth: true
+        ));
+    }
+
+    /// <summary>
+    /// PUT /auth/profile with username field.
+    /// </summary>
+    public IEnumerator UpdateUsername(
+        string username,
+        Action<UserData> onSuccess,
+        Action<string> onError)
+    {
+        var body = new ProfileUpdateRequest
+        {
+            username = username
+        };
+
+        yield return StartCoroutine(ApiClient.Instance.Put(
+            "/auth/profile",
+            body,
+            onSuccess: json =>
+            {
+                var resp = JsonUtility.FromJson<ProfileResponse>(json);
+                if (resp != null && resp.success && resp.data?.user != null)
+                    onSuccess?.Invoke(resp.data.user);
+                else
+                    onError?.Invoke(resp?.message ?? "Failed to update username.");
+            },
+            onError: onError,
+            requiresAuth: true
+        ));
+    }
+
+    /// <summary>
+    /// PUT /auth/profile with currentPassword and newPassword fields.
+    /// </summary>
+    public IEnumerator ChangePassword(
+        string currentPassword,
+        string newPassword,
+        Action onSuccess,
+        Action<string> onError)
+    {
+        var body = new ProfileUpdateRequest
+        {
+            currentPassword = currentPassword,
+            newPassword = newPassword
+        };
+
+        yield return StartCoroutine(ApiClient.Instance.Put(
+            "/auth/profile",
+            body,
+            onSuccess: json =>
+            {
+                var resp = JsonUtility.FromJson<ApiBaseResponse>(json);
+                if (resp != null && resp.success)
+                    onSuccess?.Invoke();
+                else
+                    onError?.Invoke(resp?.message ?? "Failed to change password.");
+            },
+            onError: onError,
+            requiresAuth: true
+        ));
+    }
+
+    /// <summary>
+    /// DELETE /auth/profile
+    /// Deletes the current authenticated account.
+    /// </summary>
+    public IEnumerator DeleteAccount(
+        Action onSuccess,
+        Action<string> onError)
+    {
+        yield return StartCoroutine(ApiClient.Instance.Delete(
+            "/auth/profile",
+            onSuccess: json =>
+            {
+                var resp = JsonUtility.FromJson<ApiBaseResponse>(json);
+                if (resp != null && resp.success)
+                    onSuccess?.Invoke();
+                else
+                    onError?.Invoke(resp?.message ?? "Failed to delete account.");
             },
             onError: onError,
             requiresAuth: true

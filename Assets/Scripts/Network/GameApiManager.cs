@@ -74,16 +74,25 @@ public class GameApiManager : MonoBehaviour
     // ─── Public API ───────────────────────────────────────────
 
     /// <summary>
-    /// Log in with email + password.
+    /// Log in with username or email + password.
     /// Fires OnLoginSuccess or OnLoginError.
     /// </summary>
     public void Login(
-        string email,
+        string identifier,
         string password,
         Action<UserData> onSuccess = null,
         Action<string> onError = null)
     {
-        StartCoroutine(AuthService.Instance.Login(email, password,
+        if (AuthService.Instance == null)
+        {
+            const string msg = "AuthService is missing on GameAPI object.";
+            Debug.LogError("[GameApiManager] " + msg);
+            onError?.Invoke(msg);
+            OnLoginError?.Invoke(msg);
+            return;
+        }
+
+        StartCoroutine(AuthService.Instance.Login(identifier, password,
             onSuccess: (userData, token) =>
             {
                 StoreSession(token, userData);
@@ -100,16 +109,25 @@ public class GameApiManager : MonoBehaviour
 
     /// <summary>
     /// Register a new account and log in automatically.
+    /// Only username + password required — email is optional/null.
     /// Fires OnLoginSuccess or OnLoginError.
     /// </summary>
     public void Register(
         string username,
-        string email,
         string password,
         Action<UserData> onSuccess = null,
         Action<string> onError = null)
     {
-        StartCoroutine(AuthService.Instance.Register(username, email, password,
+        if (AuthService.Instance == null)
+        {
+            const string msg = "AuthService is missing on GameAPI object.";
+            Debug.LogError("[GameApiManager] " + msg);
+            onError?.Invoke(msg);
+            OnLoginError?.Invoke(msg);
+            return;
+        }
+
+        StartCoroutine(AuthService.Instance.Register(username, password,
             onSuccess: (userData, token) =>
             {
                 StoreSession(token, userData);
@@ -121,6 +139,108 @@ public class GameApiManager : MonoBehaviour
                 onError?.Invoke(err);
                 OnLoginError?.Invoke(err);
             }
+        ));
+    }
+
+    /// <summary>
+    /// Fetch the latest profile for the currently authenticated user.
+    /// </summary>
+    public void GetProfile(
+        Action<UserData> onSuccess = null,
+        Action<string> onError = null)
+    {
+        if (AuthService.Instance == null)
+        {
+            const string msg = "AuthService is missing on GameAPI object.";
+            Debug.LogError("[GameApiManager] " + msg);
+            onError?.Invoke(msg);
+            return;
+        }
+
+        StartCoroutine(AuthService.Instance.GetProfile(
+            onSuccess: userData =>
+            {
+                CurrentUser = userData;
+                onSuccess?.Invoke(userData);
+            },
+            onError: onError
+        ));
+    }
+
+    /// <summary>
+    /// Update username and refresh cached CurrentUser.
+    /// </summary>
+    public void UpdateUsername(
+        string username,
+        Action<UserData> onSuccess = null,
+        Action<string> onError = null)
+    {
+        if (AuthService.Instance == null)
+        {
+            const string msg = "AuthService is missing on GameAPI object.";
+            Debug.LogError("[GameApiManager] " + msg);
+            onError?.Invoke(msg);
+            return;
+        }
+
+        StartCoroutine(AuthService.Instance.UpdateUsername(
+            username,
+            onSuccess: userData =>
+            {
+                CurrentUser = userData;
+                onSuccess?.Invoke(userData);
+            },
+            onError: onError
+        ));
+    }
+
+    /// <summary>
+    /// Change password for current account.
+    /// </summary>
+    public void ChangePassword(
+        string currentPassword,
+        string newPassword,
+        Action onSuccess = null,
+        Action<string> onError = null)
+    {
+        if (AuthService.Instance == null)
+        {
+            const string msg = "AuthService is missing on GameAPI object.";
+            Debug.LogError("[GameApiManager] " + msg);
+            onError?.Invoke(msg);
+            return;
+        }
+
+        StartCoroutine(AuthService.Instance.ChangePassword(
+            currentPassword,
+            newPassword,
+            onSuccess: onSuccess,
+            onError: onError
+        ));
+    }
+
+    /// <summary>
+    /// Delete current account from backend, then clear local session.
+    /// </summary>
+    public void DeleteAccount(
+        Action onSuccess = null,
+        Action<string> onError = null)
+    {
+        if (AuthService.Instance == null)
+        {
+            const string msg = "AuthService is missing on GameAPI object.";
+            Debug.LogError("[GameApiManager] " + msg);
+            onError?.Invoke(msg);
+            return;
+        }
+
+        StartCoroutine(AuthService.Instance.DeleteAccount(
+            onSuccess: () =>
+            {
+                Logout();
+                onSuccess?.Invoke();
+            },
+            onError: onError
         ));
     }
 
@@ -156,6 +276,12 @@ public class GameApiManager : MonoBehaviour
         // Wait until ApiConfig has loaded game.config.json
         while (ApiConfig.Instance == null || !ApiConfig.Instance.IsReady)
             yield return null;
+
+        if (AuthService.Instance == null)
+        {
+            Debug.LogError("[GameApiManager] AuthService is missing on GameAPI object.");
+            yield break;
+        }
 
         string saved = PlayerPrefs.GetString(TOKEN_PREF_KEY, string.Empty);
         if (string.IsNullOrEmpty(saved))
