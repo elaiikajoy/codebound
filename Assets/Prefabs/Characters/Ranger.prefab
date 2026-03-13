@@ -12,10 +12,13 @@ GameObject:
   - component: {fileID: 3246750631410837115}
   - component: {fileID: 4206535285941922856}
   - component: {fileID: 4014238683259247014}
-  - component: {fileID: 5599635201908068578}
-  m_Layer: 0
+  - component: {fileID: 4929390761684451004}
+  - component: {fileID: 3727901314035990663}
+  - component: {fileID: 2435836993150348548}
+  - component: {fileID: 2106974850685714669}
+  m_Layer: 3
   m_Name: Ranger
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29,8 +32,8 @@ Transform:
   m_GameObject: {fileID: 4025925460572891436}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -9.3438, y: -3.5356, z: 0}
-  m_LocalScale: {x: 0.049648605, y: 0.0459861, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.07, y: 0.064836204, z: 1.4099087}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -100,8 +103,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.4124061, y: -0.68068856}
-  m_Size: {x: 12.530729, y: 17.678938}
+  m_Offset: {x: -0.34561837, y: -0.76675886}
+  m_Size: {x: 12.385436, y: 17.46309}
   m_Direction: 0
 --- !u!50 &4014238683259247014
 Rigidbody2D:
@@ -118,13 +121,13 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_GravityScale: 1
+  m_Material: {fileID: 6200000, guid: 03a9c0cdb243cee42950dc558b894c52, type: 2}
+  m_Interpolate: 1
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &5599635201908068578
+--- !u!114 &4929390761684451004
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,9 +136,61 @@ MonoBehaviour:
   m_GameObject: {fileID: 4025925460572891436}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a05f2981a124504d8a88843519e9ca9, type: 3}
+  m_Script: {fileID: 11500000, guid: 45f3f24a7f90f2644ae2041d4ef4fd93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
-  maxJumpHeight: 3
-  maxJumpTime: 0.75
+  characterDB: {fileID: 11400000, guid: d9bd255feee2d1e4b9d0ea48bd67b5d8, type: 2}
+  artworkSprite: {fileID: 3246750631410837115}
+--- !u!114 &3727901314035990663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025925460572891436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4869ee35d4960043be92e11d6656ce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 7
+  maxJumpHeight: 3.5
+  maxJumpTime: 1
+  velocity: {x: 0, y: 0}
+  animator: {fileID: 0}
+--- !u!114 &2435836993150348548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025925460572891436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8cf70ad73f8ff7b4ea2e41fdf59eff6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idleSprite: {fileID: 21300000, guid: 83e5c35a1275f924b8d4eb04647b7a07, type: 3}
+  runSprite: {fileID: 0}
+  jumpSprite: {fileID: 0}
+  fallSprite: {fileID: 0}
+--- !u!95 &2106974850685714669
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025925460572891436}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: a20345cff2765684cbf5a66743899709, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

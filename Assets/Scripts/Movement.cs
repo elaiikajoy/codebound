@@ -1,6 +1,7 @@
+
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class Movement : MonoBehaviour
 {
     private new Camera camera;
     private new Rigidbody2D rigidbody;
@@ -13,12 +14,15 @@ public class PlayerMovement : MonoBehaviour
     public bool Grounded { get; private set; }
     public bool Jumping { get; private set; }
     private float inputAxis;
-    private Vector2 velocity;
+    public Vector2 velocity;
+
+    public Animator animator;
 
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody2D>();
         camera = Camera.main;
+        animator = GetComponent<Animator>();
     }
 
     private void Update()
@@ -33,6 +37,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         ApplyGravity();
+
+        animator.SetFloat("speed", Mathf.Abs(velocity.x));
+
     }
 
     private void GroundedMovement()
@@ -50,16 +57,30 @@ public class PlayerMovement : MonoBehaviour
     private void ApplyGravity()
     {
         bool falling = velocity.y < 0f || !Input.GetButton("Jump");
-        float multiplier = falling ? 2f : 1f;
+        float multiplier = falling ? 3f : 1f;
 
         velocity.y += Gravity * multiplier * Time.deltaTime;
-        velocity.y = Mathf.Max(velocity.y, Gravity / 2f);
+        velocity.y = Mathf.Max(velocity.y, Gravity);
     }
 
     private void HorizontalMovement()
     {
         inputAxis = Input.GetAxis("Horizontal");
         velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, moveSpeed * Time.deltaTime);
+
+        if (rigidbody.Raycast(Vector2.right * velocity.x))
+        {
+            velocity.x = 0f;
+        }
+
+        if (velocity.x > 0f)
+        {
+            transform.eulerAngles = Vector3.zero;
+        }
+        else if (velocity.x < 0f)
+        {
+            transform.eulerAngles = new Vector3(0f, 180f, 0f);
+        }
     }
 
     private void FixedUpdate()
@@ -72,6 +93,19 @@ public class PlayerMovement : MonoBehaviour
         position.x = Mathf.Clamp(position.x, leftEdge.x + 0.5f, rightEdge.x - 0.5f);
 
         rigidbody.MovePosition(position);
+
+        animator.SetBool("isGrounded", Grounded);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer != LayerMask.NameToLayer("Ground"))
+        {
+            if (transform.DoTest(collision.transform, Vector2.up))
+            {
+                velocity.y = 0f;
+            }
+        }
     }
 
 }
