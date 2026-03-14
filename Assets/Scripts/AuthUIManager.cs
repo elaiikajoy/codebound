@@ -29,42 +29,71 @@ public class AuthUIManager : MonoBehaviour
 {
     // ─── Inspector fields ─────────────────────────────────────
 
-    [Header("Panel switching")]
-    [Tooltip("The login form panel root")]
+    [Header("Auth Panel")]
+    [Tooltip("The login/register form panel root")]
     public GameObject loginPanel;
-    [Tooltip("The register form panel root")]
-    public GameObject registerPanel;
 
-    [Header("Login inputs")]
-    [Tooltip("Username or email — both accepted by the backend")]
-    public TMP_InputField loginIdentifierInput;
-    public TMP_InputField loginPasswordInput;
+    [Header("Inputs")]
+    [Tooltip("Username accepted by the backend")]
+    public TMP_InputField usernameInput;
+    public TMP_InputField passwordInput;
     public Button loginButton;
-
-    [Header("Register inputs")]
-    public TMP_InputField registerUsernameInput;
-    public TMP_InputField registerPasswordInput;
     public Button registerButton;
 
     [Header("Scene navigation")]
     [Tooltip("Scene name to load after successful login or register")]
     public string nextSceneName = "Main";
 
+    [Header("Optional in-scene transition")]
+    public GameObject mainMenuPanel;
+
+    [Header("Behavior")]
+    public bool autoFindSceneReferences = true;
+
     // ─── Private state ────────────────────────────────────────
     private bool _isBusy = false;
+    private bool _isShowingAuthenticatedState;
 
     // ─── Lifecycle ────────────────────────────────────────────
+    private void OnEnable()
+    {
+        GameApiManager.OnLoginSuccess += HandleAuthenticated;
+        GameApiManager.OnLogout += HandleLoggedOut;
+    }
+
+    private void OnDisable()
+    {
+        GameApiManager.OnLoginSuccess -= HandleAuthenticated;
+        GameApiManager.OnLogout -= HandleLoggedOut;
+    }
+
     private void Start()
     {
         EnsureGameApiReady();
 
-        // If a valid session was already restored on startup, skip auth.
-        StartCoroutine(CheckExistingSession());
+        if (autoFindSceneReferences)
+            TryAutoFindSceneReferences();
 
         WireButtonHandlers();
 
-        // Default: show login panel
+        // Always show the auth screen initially so the player can log in 
+        // with a different account if they want.
         ShowLoginPanel();
+
+        // Optional: Force clear the session token to logically log them out
+        if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
+            GameApiManager.Instance.Logout();
+    }
+
+    private void Update()
+    {
+        if (GameApiManager.Instance == null)
+            return;
+
+        // If we are showing the authenticated UI but the user is no longer logged in
+        // (e.g. they logged out), we should revert to the login screen.
+        if (_isShowingAuthenticatedState && !GameApiManager.Instance.IsLoggedIn)
+            HandleLoggedOut();
     }
 
     private void WireButtonHandlers()
@@ -72,13 +101,6 @@ public class AuthUIManager : MonoBehaviour
         if (loginButton == null && registerButton == null)
         {
             Debug.LogWarning("[Auth UI] No login/register button assigned.");
-            return;
-        }
-
-        if (loginButton != null && registerButton != null && loginButton == registerButton)
-        {
-            loginButton.onClick.RemoveListener(OnPrimaryButtonClicked);
-            loginButton.onClick.AddListener(OnPrimaryButtonClicked);
             return;
         }
 
@@ -95,9 +117,15 @@ public class AuthUIManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Generic primary-button handler: executes Register if the register
+    /// button is visible, otherwise falls back to Login.
+    /// Note: this class does not expose a separate registerPanel — tab
+    /// visibility is inferred from the registerButton state instead.
+    /// </summary>
     private void OnPrimaryButtonClicked()
     {
-        bool registerVisible = registerPanel != null && registerPanel.activeInHierarchy;
+        bool registerVisible = registerButton != null && registerButton.gameObject.activeInHierarchy;
         if (registerVisible)
             ClickRegister();
         else
@@ -106,19 +134,16 @@ public class AuthUIManager : MonoBehaviour
 
     // ─── Panel switching ──────────────────────────────────────
 
-    /// <summary>Show the login form and hide the register form.</summary>
+    /// <summary>Show the login/register form panel.</summary>
     public void ShowLoginPanel()
     {
-        loginPanel?.SetActive(true);
-        registerPanel?.SetActive(false);
-        ClearFeedback();
-    }
+        if (loginPanel != null) loginPanel.SetActive(true);
+        
+        // Ensure root background image is enabled to block raycasts/show background
+        Image bgImage = GetComponent<Image>();
+        if (bgImage != null) bgImage.enabled = true;
 
-    /// <summary>Show the register form and hide the login form.</summary>
-    public void ShowRegisterPanel()
-    {
-        loginPanel?.SetActive(false);
-        registerPanel?.SetActive(true);
+        _isShowingAuthenticatedState = false;
         ClearFeedback();
     }
 
@@ -126,7 +151,7 @@ public class AuthUIManager : MonoBehaviour
 
     /// <summary>
     /// Called by the Login button's OnClick event.
-    /// Accepts username OR email in the identifier field.
+    /// Accepts username in the identifier field.
     /// </summary>
     public void ClickLogin()
     {
@@ -138,8 +163,8 @@ public class AuthUIManager : MonoBehaviour
             return;
         }
 
-        string identifier = loginIdentifierInput?.text?.Trim();
-        string password = loginPasswordInput?.text;
+        string identifier = usernameInput?.text?.Trim();
+        string password = passwordInput?.text;
 
         if (string.IsNullOrEmpty(identifier) || string.IsNullOrEmpty(password))
         {
@@ -147,7 +172,7 @@ public class AuthUIManager : MonoBehaviour
             return;
         }
 
-        StartCoroutine(DoLoginOrRegister(identifier, password));
+        StartCoroutine(DoLogin(identifier, password));
     }
 
     /// <summary>
@@ -259,8 +284,8 @@ public class AuthUIManager : MonoBehaviour
             return;
         }
 
-        string username = registerUsernameInput?.text?.Trim();
-        string password = registerPasswordInput?.text;
+        string username = usernameInput?.text?.Trim();
+        string password = passwordInput?.text;
         if (string.IsNullOrEmpty(username))
         {
             ShowFeedback("Please enter a username.");
@@ -321,30 +346,38 @@ public class AuthUIManager : MonoBehaviour
         SetBusy(false);
     }
 
-    // ─── Session check ────────────────────────────────────────
-
-    /// <summary>
-    /// If GameApiManager already restored a session from PlayerPrefs,
-    /// skip the auth screen entirely.
-    /// </summary>
-    private IEnumerator CheckExistingSession()
-    {
-        // Give GameApiManager.Start() time to call TryRestoreSession
-        yield return new WaitForSeconds(0.3f);
-
-        if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
-        {
-            Debug.Log("[Auth] Existing session found — skipping auth screen.");
-            LoadNextScene();
-        }
-    }
-
     // ─── Helpers ──────────────────────────────────────────────
 
     private void LoadNextScene()
     {
-        if (!string.IsNullOrEmpty(nextSceneName))
-            SceneManager.LoadSceneAsync(nextSceneName);
+        string activeSceneName = SceneManager.GetActiveScene().name;
+
+        if (string.IsNullOrEmpty(nextSceneName) || nextSceneName == activeSceneName)
+        {
+            ShowAuthenticatedMainState();
+            return;
+        }
+
+        SceneManager.LoadSceneAsync(nextSceneName);
+    }
+
+    private void ShowAuthenticatedMainState()
+    {
+        if (autoFindSceneReferences)
+            TryAutoFindSceneReferences();
+
+        if (loginPanel != null)
+            loginPanel.SetActive(false);
+
+        // Disable root background so it doesn't block Main Menu buttons
+        Image bgImage = GetComponent<Image>();
+        if (bgImage != null) bgImage.enabled = false;
+
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
+
+        _isShowingAuthenticatedState = true;
+        SetBusy(false);
     }
 
     private void SetBusy(bool busy)
@@ -390,5 +423,44 @@ public class AuthUIManager : MonoBehaviour
 
         Debug.Log("[Auth UI] Auto-created missing GameAPI stack.");
         return GameApiManager.Instance != null;
+    }
+
+    private void TryAutoFindSceneReferences()
+    {
+        if (loginPanel == null)
+        {
+            if (gameObject.name == "LoginPanel")
+                loginPanel = gameObject;
+            else
+                loginPanel = FindSceneObject("LoginPanel");
+        }
+
+        if (mainMenuPanel == null)
+            mainMenuPanel = FindSceneObject("Main Menu");
+    }
+
+    private void HandleAuthenticated(UserData userData)
+    {
+        ShowAuthenticatedMainState();
+    }
+
+    private void HandleLoggedOut()
+    {
+        if (autoFindSceneReferences)
+            TryAutoFindSceneReferences();
+
+        ShowLoginPanel();
+        SetBusy(false);
+    }
+
+    private GameObject FindSceneObject(string objectName)
+    {
+        foreach (GameObject obj in Resources.FindObjectsOfTypeAll<GameObject>())
+        {
+            if (obj.name == objectName && obj.scene.IsValid())
+                return obj;
+        }
+
+        return null;
     }
 }

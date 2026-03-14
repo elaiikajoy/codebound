@@ -1,3 +1,12 @@
+// ============================================================
+// 1. Script Name: LevelDataLoader.cs
+// 2. Purpose: Defines the JSON data structure for IDE levels and handles parsing the static JSON files into usable C# objects.
+// 3. Unity Setup Instructions:
+//    - Attach to: None (This is a static utility class / serializable data classes).
+//    - Required Components: None.
+//    - Note: Level JSON files must be stored exactly at 'Resources/LevelData/level_001.json', etc.
+// ============================================================
+
 using UnityEngine;
 
 [System.Serializable]
