@@ -1,27 +1,29 @@
 {
     "levelNumber": 1,
-    "levelName": "Level 1: Basics Protocol",
+    "levelName": "Level 1: Hello World",
     "category": "Basics",
     "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 1.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "puzzleDescription": "Welcome to your first Java coding task! In Java, we print messages to the console using 'System.out.println()'.",
+    "objective": "Use System.out.println to print exactly \"Hello World\" to the console.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below this line:\n        \n        \n    }\n}",
+    "expectedOutput": "Hello World",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Basics."
+        "Check your spelling and capitalization carefully.",
+        "Remember that statements in Java must end with a semicolon (;).",
+        "Make sure your text is inside quotes: \"Hello World\""
     ],
     "testCases": [],
+    "requiredKeywords": [
+        "System.out.println", 
+        "\"Hello World\""
+    ],
+    "forbiddenKeywords": [],
     "baseTokenReward": 110,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
-    "requiredMechanics": [
-        "platform",
-        "switch",
-        "terminal"
-    ],
+    "requiredMechanics": ["terminal"],
     "tokensToCollect": 3,
     "isLocked": false,
     "requiredLevel": 0

@@ -1,3 +1,11 @@
+// ============================================================
+// 1. Script Name: Movement.cs
+// 2. Purpose: Handles 2D character movement (walking, jumping) and custom gravity/physics via raycasts.
+// 3. Unity Setup Instructions:
+//    - Attach to: The Player GameObject.
+//    - Required Components: Rigidbody2D, Animator, Main Camera.
+//    - Tags/Layers: Ground objects must be on the "Ground" layer to enable jumping.
+// ============================================================
 
 using UnityEngine;
 

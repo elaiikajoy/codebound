@@ -12,13 +12,14 @@ public class UserProfileUIManager : MonoBehaviour
     [Header("Panel Roots")]
     public GameObject profileRootPanel;
     public GameObject mainProfilePanel;
-    public GameObject renamePanel;
+    public GameObject renamePanel;/*  */
     public GameObject changePassPanel;
     public GameObject mainMenuPanel;
     public GameObject loginPanel;
 
     [Header("Inputs")]
     public TMP_InputField mainUsernameInput;
+    public TMP_Text mainUsernameText;
     public TMP_InputField renameInput;
     public TMP_InputField changePasswordInput;
 
@@ -53,6 +54,9 @@ public class UserProfileUIManager : MonoBehaviour
         BindButtons();
         OpenMainPanel();
 
+        if (GameApiManager.Instance != null && GameApiManager.Instance.CurrentUser != null)
+            SetDisplayedUsername(GameApiManager.Instance.CurrentUser.username);
+
         if (autoLoadOnStart)
             ClickRefreshProfile();
     }
@@ -83,8 +87,15 @@ public class UserProfileUIManager : MonoBehaviour
     public void ReturnToLoginPanel()
     {
         if (profileRootPanel != null) profileRootPanel.SetActive(false);
-        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
         if (loginPanel != null) loginPanel.SetActive(true);
+
+        AuthUIManager authUi = loginPanel != null ? loginPanel.GetComponent<AuthUIManager>() : null;
+        if (authUi == null)
+            authUi = FindObjectOfType<AuthUIManager>(true);
+
+        if (authUi != null)
+            authUi.ShowLoginPanel();
     }
 
     public void OpenRenamePanel()
@@ -95,7 +106,7 @@ public class UserProfileUIManager : MonoBehaviour
         if (changePassPanel != null) changePassPanel.SetActive(false);
 
         if (renameInput != null)
-            renameInput.text = mainUsernameInput != null ? mainUsernameInput.text : string.Empty;
+            renameInput.text = GetDisplayedUsername();
     }
 
     public void OpenChangePassPanel()
@@ -122,9 +133,7 @@ public class UserProfileUIManager : MonoBehaviour
         GameApiManager.Instance.GetProfile(
             onSuccess: user =>
             {
-                string username = user.username ?? string.Empty;
-                if (mainUsernameInput != null) mainUsernameInput.text = username;
-                if (renameInput != null) renameInput.text = username;
+                SetDisplayedUsername(user != null ? user.username : string.Empty);
 
                 ShowFeedback("Profile loaded.");
                 SetBusy(false);
@@ -161,9 +170,7 @@ public class UserProfileUIManager : MonoBehaviour
             nextUsername,
             onSuccess: user =>
             {
-                string updated = user.username ?? string.Empty;
-                if (mainUsernameInput != null) mainUsernameInput.text = updated;
-                if (renameInput != null) renameInput.text = updated;
+                SetDisplayedUsername(user != null ? user.username : nextUsername);
 
                 ShowFeedback("Username updated.");
                 SetBusy(false);
@@ -307,6 +314,20 @@ public class UserProfileUIManager : MonoBehaviour
         if (mainUsernameInput == null && mainProfilePanel != null)
             mainUsernameInput = mainProfilePanel.GetComponentInChildren<TMP_InputField>(true);
 
+        if (mainUsernameText == null && mainProfilePanel != null)
+        {
+            foreach (TMP_Text candidate in mainProfilePanel.GetComponentsInChildren<TMP_Text>(true))
+            {
+                if (candidate == null) continue;
+                string loweredName = candidate.name.ToLowerInvariant();
+                if (loweredName.Contains("username") || loweredName.Contains("usernametext") || loweredName.Contains("namevalue"))
+                {
+                    mainUsernameText = candidate;
+                    break;
+                }
+            }
+        }
+
         if (renameInput == null && renamePanel != null)
             renameInput = renamePanel.GetComponentInChildren<TMP_InputField>(true);
 
@@ -377,6 +398,29 @@ public class UserProfileUIManager : MonoBehaviour
         if (renameBackButton != null) renameBackButton.interactable = !busy;
         if (changePassOkButton != null) changePassOkButton.interactable = !busy;
         if (changePassBackButton != null) changePassBackButton.interactable = !busy;
+    }
+
+    private void SetDisplayedUsername(string username)
+    {
+        string safeUsername = username ?? string.Empty;
+
+        if (mainUsernameInput != null) mainUsernameInput.text = safeUsername;
+        if (mainUsernameText != null) mainUsernameText.text = safeUsername;
+        if (renameInput != null) renameInput.text = safeUsername;
+    }
+
+    private string GetDisplayedUsername()
+    {
+        if (mainUsernameInput != null && !string.IsNullOrEmpty(mainUsernameInput.text))
+            return mainUsernameInput.text;
+
+        if (mainUsernameText != null && !string.IsNullOrEmpty(mainUsernameText.text))
+            return mainUsernameText.text;
+
+        if (GameApiManager.Instance != null && GameApiManager.Instance.CurrentUser != null)
+            return GameApiManager.Instance.CurrentUser.username ?? string.Empty;
+
+        return string.Empty;
     }
 
     private void ShowFeedback(string message)
