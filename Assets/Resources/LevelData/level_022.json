@@ -1,25 +1,30 @@
 {
     "levelNumber": 22,
-    "levelName": "Level 22: Conditionals Protocol",
-    "category": "Conditionals",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 22.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 22: Addition Pt 1",
+    "category": "Basics",
+    "difficulty": 2,
+    "puzzleDescription": "Adding two numbers.",
+    "objective": "Declare integers a = 22 and b = 44. Print their sum.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "66",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Conditionals."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 320,
+    "requiredKeywords": [
+        "a = 22",
+        "b = 44",
+        "System.out.println"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 140,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

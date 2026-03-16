@@ -1,25 +1,30 @@
 {
     "levelNumber": 57,
-    "levelName": "Level 57: Collections Protocol",
-    "category": "Collections",
-    "difficulty": 1,
-    "puzzleDescription": "Objective: Establish communication with subsystem 57.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 57: If Statements Pt 6",
+    "category": "Basics",
+    "difficulty": 5,
+    "puzzleDescription": "Using an if statement.",
+    "objective": "If score is greater than 280, print \"Win\". The score is 285.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int score = 285;\n        // Write an if statement below:\n        \n    }\n}",
+    "expectedOutput": "Win",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Collections."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 670,
+    "requiredKeywords": [
+        "if",
+        "score > 280",
+        "\"Win\""
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 210,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

@@ -1,25 +1,30 @@
 {
     "levelNumber": 68,
-    "levelName": "Level 68: Classes Protocol",
-    "category": "Classes",
-    "difficulty": 1,
-    "puzzleDescription": "Objective: Establish communication with subsystem 68.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 68: For Loops Pt 7",
+    "category": "Basics",
+    "difficulty": 6,
+    "puzzleDescription": "Looping a specific number of times.",
+    "objective": "Write a for loop that prints \"Plum\" exactly 8 times on separate lines.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
+    "expectedOutput": "Plum\nPlum\nPlum\nPlum\nPlum\nPlum\nPlum\nPlum",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Classes."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 780,
+    "requiredKeywords": [
+        "for",
+        "i < 8",
+        "\"Plum\""
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 230,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

@@ -27,11 +27,10 @@ public class Main : MonoBehaviour
         SceneManager.LoadSceneAsync("LevelPanel");
     }
 
-    public void PlayLevel()
+    public void PlayLevel1()
     {
-        // Save data before changing scenes
-        SaveGameData();
-        SceneManager.LoadSceneAsync("Level1");
+        // Addressed by LevelSelectionManager dynamically hooking onto buttons instead.
+        // Left here so missing Unity button references don't crash the editor inspector.
     }
 
     public void OpenShop()

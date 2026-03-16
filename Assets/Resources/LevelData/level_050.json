@@ -1,27 +1,30 @@
 {
     "levelNumber": 50,
-    "levelName": "Level 50: Methods Protocol",
-    "category": "Methods",
-    "difficulty": 2,
-    "puzzleDescription": "Objective: Establish communication with subsystem 50.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 50: Multiplication Pt 9",
+    "category": "Basics",
+    "difficulty": 5,
+    "puzzleDescription": "Multiplying numbers.",
+    "objective": "Declare integers w = 10 and z = 7. Print their product (w * z).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "70",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Methods."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 600,
+    "requiredKeywords": [
+        "w = 10",
+        "z = 7",
+        "System.out.println"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 200,
     "perfectBonus": 50,
     "speedBonus": 25,
-    "unlockedAchievements": [
-        "ACHIEVEMENT_LEVEL_50_MASTER"
-    ],
+    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

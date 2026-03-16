@@ -1,25 +1,30 @@
 {
     "levelNumber": 29,
-    "levelName": "Level 29: Conditionals Protocol",
-    "category": "Conditionals",
+    "levelName": "Level 29: Addition Pt 8",
+    "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Objective: Establish communication with subsystem 29.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "puzzleDescription": "Adding two numbers.",
+    "objective": "Declare integers a = 29 and b = 58. Print their sum.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "87",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Conditionals."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 390,
+    "requiredKeywords": [
+        "a = 29",
+        "b = 58",
+        "System.out.println"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 150,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

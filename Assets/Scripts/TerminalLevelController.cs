@@ -14,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using System.Text.RegularExpressions;
+using UnityEngine.EventSystems;
 
 public class TerminalLevelController : MonoBehaviour
 {
@@ -56,6 +57,24 @@ public class TerminalLevelController : MonoBehaviour
         else
         {
             Debug.LogError("[TerminalLevelController] 'terminalModal' is UNASSIGNED in the Inspector! Assign the Terminal Panel UI object.");
+        }
+
+        // If the level number is not set in the inspector, attempt to infer it
+        // from the scene name (e.g., "Level3" -> 3). This helps avoid the
+        // common mistake of forgetting to set the inspector value.
+        if (sceneLevelNumber <= 0)
+        {
+            string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            var match = Regex.Match(sceneName, "(\\d+)");
+            if (match.Success && int.TryParse(match.Value, out int parsed))
+            {
+                sceneLevelNumber = parsed;
+                Debug.Log($"[TerminalLevelController] Inferred sceneLevelNumber={sceneLevelNumber} from scene name '{sceneName}'");
+            }
+            else
+            {
+                Debug.LogWarning($"[TerminalLevelController] sceneLevelNumber is not set and could not be inferred from scene name '{sceneName}'.");
+            }
         }
     }
 
@@ -127,8 +146,16 @@ public class TerminalLevelController : MonoBehaviour
         Debug.Log($"[TerminalLevelController] OpenForLevel called for level: {levelNumber}");
 
         activeLevelNumber = Mathf.Clamp(levelNumber, 1, 100);
-        activeLevelData = LevelDataLoader.LoadLevel(activeLevelNumber);
 
+        // Keep the inspector-level number in sync so any code paths that
+        // rely on sceneLevelNumber (like progress sync) have a valid value.
+        if (sceneLevelNumber != activeLevelNumber)
+        {
+            sceneLevelNumber = activeLevelNumber;
+            Debug.Log($"[TerminalLevelController] Corrected sceneLevelNumber to {sceneLevelNumber} (OpenForLevel called with {levelNumber}).");
+        }
+
+        activeLevelData = LevelDataLoader.LoadLevel(activeLevelNumber);
         if (activeLevelData == null)
         {
             Debug.LogError("[TerminalLevelController] Failed to load JSON level data!");
@@ -178,6 +205,25 @@ public class TerminalLevelController : MonoBehaviour
         else
         {
             Debug.LogError("[TerminalLevelController] Cannot open UI: 'terminalModal' is UNASSIGNED in the Inspector!");
+        }
+
+        // Ensure an EventSystem exists so UI input can receive focus/clicks.
+        if (EventSystem.current == null)
+        {
+            Debug.LogWarning("[TerminalLevelController] No EventSystem found — creating one to enable UI input.");
+            var esObj = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            EventSystem.current = esObj.GetComponent<EventSystem>();
+        }
+
+        // Make sure the input field is interactable and focused so the player
+        // can immediately type when the terminal opens.
+        if (codeInputField != null)
+        {
+            codeInputField.interactable = true;
+            // Select and activate the TMP input field
+            EventSystem.current.SetSelectedGameObject(codeInputField.gameObject);
+            codeInputField.Select();
+            codeInputField.ActivateInputField();
         }
     }
 
@@ -247,7 +293,41 @@ public class TerminalLevelController : MonoBehaviour
                 : "Code validation passed. Completing level...";
         }
 
+        if (!hasCodeErrors)
+        {
+            // Ensure the next level is unlocked locally immediately, even if
+            // backend sync fails or is interrupted by a scene change.
+            UnlockNextLevelLocally();
+        }
+
         HandleRunResult(hasCodeErrors);
+    }
+
+    private void UnlockNextLevelLocally()
+    {
+        int completedLevel = activeLevelNumber > 0 ? activeLevelNumber : sceneLevelNumber;
+        if (completedLevel <= 0)
+            return;
+
+        // If keys don't exist yet, seed them from the completed level so
+        // progression continues naturally instead of using a hard-coded 1.
+        int current = PlayerPrefs.HasKey("CurrentLevel")
+            ? PlayerPrefs.GetInt("CurrentLevel")
+            : completedLevel;
+
+        int highest = PlayerPrefs.HasKey("HighestLevel")
+            ? PlayerPrefs.GetInt("HighestLevel")
+            : completedLevel;
+
+        int nextLevel = completedLevel + 1;
+        int newCurrent = Mathf.Max(current, nextLevel);
+        int newHighest = Mathf.Max(highest, nextLevel);
+
+        PlayerPrefs.SetInt("CurrentLevel", newCurrent);
+        PlayerPrefs.SetInt("HighestLevel", newHighest);
+        PlayerPrefs.Save();
+
+        Debug.Log($"[TerminalLevelController] Locally unlocked next level: CurrentLevel={newCurrent}, HighestLevel={newHighest} (completed {completedLevel}).");
     }
 
     private bool ValidateSubmittedCode(string submittedCode, out string message)
@@ -412,6 +492,56 @@ public class TerminalLevelController : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
+        // ── Backend progress sync ─────────────────────────────────────────
+        // POST /progress/update for the currently logged-in user.
+        // Uses GameApiManager.CurrentUser to identify the player —
+        // whoever is logged in is the player currently playing this level.
+        // The sync is non-blocking: if not logged in or the request fails,
+        // the game flow still continues and the door still opens.
+        int tokensEarned = activeLevelData != null ? activeLevelData.baseTokenReward : fallbackTokenReward;
+        bool syncDone = false;
+        bool syncSuccess = false;
+
+        if (outputText != null)
+            outputText.text = baseSuccessText + "Saving progress...";
+
+        int levelToSync = activeLevelNumber > 0 ? activeLevelNumber : sceneLevelNumber;
+
+        if (levelToSync <= 0)
+        {
+            Debug.LogError($"[TerminalLevelController] Invalid levelToSync ({levelToSync}) — cannot sync progress.");
+            syncDone = true;
+            syncSuccess = false;
+        }
+        else
+        {
+            Debug.Log($"[TerminalLevelController] Syncing progress to backend: level={levelToSync}, tokens={tokensEarned}");
+            ProgressService.SyncAfterLevel(
+                levelNumber: levelToSync,
+                tokensEarned: tokensEarned,
+                onSuccess: _ => { syncDone = true; syncSuccess = true; },
+                onError: _ => { syncDone = true; syncSuccess = false; }
+            );
+        }
+
+        // Wait up to 5 seconds for the HTTP response.
+        float elapsed = 0f;
+        while (!syncDone && elapsed < 5f)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        if (outputText != null)
+        {
+            outputText.text = syncSuccess
+                ? baseSuccessText + "Progress saved!"
+                : baseSuccessText + "Progress saved locally.";
+        }
+
+        yield return new WaitForSeconds(0.8f);
+        // ─────────────────────────────────────────────────────────────────
+
         onLevelSolved?.Invoke();
         CloseTerminalModal();
     }
@@ -453,7 +583,7 @@ public class TerminalLevelController : MonoBehaviour
         }
 
         string normalizedPredicted = Normalize(predicted);
-        string normalizedExpected  = Normalize(expected);
+        string normalizedExpected = Normalize(expected);
 
         // Debug: log exact values so mismatches can be traced in the Console.
         Debug.Log($"[TerminalLevelController] Output check — Expected: '{normalizedExpected}' | Found: '{normalizedPredicted}'");
@@ -473,19 +603,94 @@ public class TerminalLevelController : MonoBehaviour
 
     private string ExtractPredictedOutput(string code)
     {
-        Match m = Regex.Match(code, "System\\.out\\.println\\s*\\(\\s*\"(?<txt>[^\"]+)\"\\s*\\)");
-        if (m.Success)
+        // Find a print call: System.out.println(...), System.out.print(...), or print(...)
+        Match call = Regex.Match(code, @"System\.out\.(?:println|print)\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+        if (!call.Success)
+            call = Regex.Match(code, @"\bprint\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+
+        if (!call.Success)
+            return string.Empty;
+
+        string expr = call.Groups["expr"].Value.Trim();
+
+        // 1) Exact string literal: "text"
+        Match strLit = Regex.Match(expr, "^\"(?<txt>[\\s\\S]*)\"$");
+        if (strLit.Success)
+            return strLit.Groups["txt"].Value;
+
+        // 2) Numeric literal (integer or float, allow negative)
+        Match numLit = Regex.Match(expr, "^(?<num>-?\\d+(?:\\.\\d+)?)$");
+        if (numLit.Success)
+            return numLit.Groups["num"].Value;
+
+        // 3) Expression with concatenation using + — collect tokens
+        // Tokenize: string literals, numbers, identifiers
+        var tokenRegex = new Regex("\"(?<str>[^\"]*)\"|(?<num>-?\\d+(?:\\.\\d+)?)|(?<id>[A-Za-z_][A-Za-z0-9_]*)");
+        var matches = tokenRegex.Matches(expr);
+        if (matches.Count > 0)
         {
-            return m.Groups["txt"].Value;
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            bool any = false;
+            foreach (Match mm in matches)
+            {
+                if (mm.Groups["str"].Success)
+                {
+                    sb.Append(mm.Groups["str"].Value);
+                    any = true;
+                    continue;
+                }
+                if (mm.Groups["num"].Success)
+                {
+                    sb.Append(mm.Groups["num"].Value);
+                    any = true;
+                    continue;
+                }
+                if (mm.Groups["id"].Success)
+                {
+                    string id = mm.Groups["id"].Value;
+                    // Look for a literal assignment to this identifier earlier in the code
+                    var assign = Regex.Match(code, $"\\b(?:int|long|float|double|var)?\\s*{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;",
+                        RegexOptions.Singleline);
+                    if (assign.Success)
+                    {
+                        sb.Append(assign.Groups["val"].Value);
+                        any = true;
+                        continue;
+                    }
+                    // Also try simple assignment without type
+                    assign = Regex.Match(code, $"\\b{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;", RegexOptions.Singleline);
+                    if (assign.Success)
+                    {
+                        sb.Append(assign.Groups["val"].Value);
+                        any = true;
+                        continue;
+                    }
+                    // If identifier can't be resolved, we can't predict output
+                    return string.Empty;
+                }
+            }
+
+            if (any)
+                return sb.ToString();
         }
 
-        Match alt = Regex.Match(code, "print\\s*\\(\\s*\"(?<txt>[^\"]+)\"\\s*\\)");
-        if (alt.Success)
+        // 4) Single identifier: try to resolve assignment
+        var idOnly = Regex.Match(expr, "^(?<id>[A-Za-z_][A-Za-z0-9_]*)$");
+        if (idOnly.Success)
         {
-            return alt.Groups["txt"].Value;
+            string id = idOnly.Groups["id"].Value;
+            var assign = Regex.Match(code, $"\\b(?:int|long|float|double|var)?\\s*{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;", RegexOptions.Singleline);
+            if (assign.Success)
+                return assign.Groups["val"].Value;
+            assign = Regex.Match(code, $"\\b{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;", RegexOptions.Singleline);
+            if (assign.Success)
+                return assign.Groups["val"].Value;
         }
 
+        // Unknown/unhandled expression
         return string.Empty;
+
+
     }
 
     // -------------------------------------------------------

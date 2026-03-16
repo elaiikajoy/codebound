@@ -1,25 +1,30 @@
 {
     "levelNumber": 42,
-    "levelName": "Level 42: Methods Protocol",
-    "category": "Methods",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 42.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 42: Multiplication Pt 1",
+    "category": "Basics",
+    "difficulty": 4,
+    "puzzleDescription": "Multiplying numbers.",
+    "objective": "Declare integers w = 2 and z = 7. Print their product (w * z).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "14",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Methods."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 520,
+    "requiredKeywords": [
+        "w = 2",
+        "z = 7",
+        "System.out.println"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 180,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

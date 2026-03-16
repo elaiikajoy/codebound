@@ -1,25 +1,30 @@
 {
     "levelNumber": 5,
-    "levelName": "Level 5: Basics Protocol",
+    "levelName": "Level 5: Variables Pt 4",
     "category": "Basics",
-    "difficulty": 1,
-    "puzzleDescription": "Objective: Establish communication with subsystem 5.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "difficulty": 0,
+    "puzzleDescription": "Learn to declare variable integers.",
+    "objective": "Declare an integer variable named 'score' with value 25, then print it.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "25",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Basics."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 150,
+    "requiredKeywords": [
+        "int score",
+        "25",
+        "System.out.println(score);"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 110,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

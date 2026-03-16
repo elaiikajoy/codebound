@@ -1,25 +1,30 @@
 {
     "levelNumber": 12,
-    "levelName": "Level 12: Variables Protocol",
-    "category": "Variables",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 12.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 12: Strings Pt 1",
+    "category": "Basics",
+    "difficulty": 1,
+    "puzzleDescription": "Working with text variables.",
+    "objective": "Declare a String named 'fruit' with value \"Apple\", then print it.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "Apple",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Variables."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 220,
+    "requiredKeywords": [
+        "String fruit",
+        "\"Apple\"",
+        "System.out.println"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 120,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

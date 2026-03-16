@@ -1,25 +1,30 @@
 {
     "levelNumber": 71,
-    "levelName": "Level 71: OOP II Protocol",
-    "category": "OOP II",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 71.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 71: For Loops Pt 10",
+    "category": "Basics",
+    "difficulty": 7,
+    "puzzleDescription": "Looping a specific number of times.",
+    "objective": "Write a for loop that prints \"Melon\" exactly 11 times on separate lines.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
+    "expectedOutput": "Melon\nMelon\nMelon\nMelon\nMelon\nMelon\nMelon\nMelon\nMelon\nMelon\nMelon",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for OOP II."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 810,
+    "requiredKeywords": [
+        "for",
+        "i < 11",
+        "\"Melon\""
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 240,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

@@ -1,25 +1,30 @@
 {
     "levelNumber": 65,
-    "levelName": "Level 65: Classes Protocol",
-    "category": "Classes",
-    "difficulty": 1,
-    "puzzleDescription": "Objective: Establish communication with subsystem 65.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 65: For Loops Pt 4",
+    "category": "Basics",
+    "difficulty": 6,
+    "puzzleDescription": "Looping a specific number of times.",
+    "objective": "Write a for loop that prints \"Grape\" exactly 5 times on separate lines.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
+    "expectedOutput": "Grape\nGrape\nGrape\nGrape\nGrape",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Classes."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 750,
+    "requiredKeywords": [
+        "for",
+        "i < 5",
+        "\"Grape\""
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 230,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

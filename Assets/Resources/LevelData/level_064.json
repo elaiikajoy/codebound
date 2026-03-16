@@ -1,25 +1,30 @@
 {
     "levelNumber": 64,
-    "levelName": "Level 64: Classes Protocol",
-    "category": "Classes",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 64.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 64: For Loops Pt 3",
+    "category": "Basics",
+    "difficulty": 6,
+    "puzzleDescription": "Looping a specific number of times.",
+    "objective": "Write a for loop that prints \"Banana\" exactly 4 times on separate lines.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
+    "expectedOutput": "Banana\nBanana\nBanana\nBanana",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Classes."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 740,
+    "requiredKeywords": [
+        "for",
+        "i < 4",
+        "\"Banana\""
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 220,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

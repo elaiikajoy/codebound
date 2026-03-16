@@ -1,25 +1,28 @@
 {
     "levelNumber": 95,
-    "levelName": "Level 95: Advanced Algorithms Protocol",
-    "category": "Advanced Algorithms",
-    "difficulty": 1,
-    "puzzleDescription": "Objective: Establish communication with subsystem 95.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 95: Methods Pt 4",
+    "category": "Basics",
+    "difficulty": 9,
+    "puzzleDescription": "Calling a method with parameters.",
+    "objective": "Call printNumber(285) inside main().",
+    "starterCode": "public class Solution {\n    public static void printNumber(int x) {\n        System.out.println(x);\n    }\n    public static void main(String[] args) {\n        // Call printNumber below:\n        \n    }\n}",
+    "expectedOutput": "285",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Advanced Algorithms."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 1050,
+    "requiredKeywords": [
+        "printNumber(285);"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 290,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

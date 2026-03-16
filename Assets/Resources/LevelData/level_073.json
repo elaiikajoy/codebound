@@ -1,25 +1,30 @@
 {
     "levelNumber": 73,
-    "levelName": "Level 73: OOP II Protocol",
-    "category": "OOP II",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 73.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 73: While Loops Pt 2",
+    "category": "Basics",
+    "difficulty": 7,
+    "puzzleDescription": "Looping downwards.",
+    "objective": "Use a while loop to print numbers from 3 down to 1.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int count = 3;\n        // Your while loop here:\n        \n    }\n}",
+    "expectedOutput": "3\n2\n1",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for OOP II."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 830,
+    "requiredKeywords": [
+        "while",
+        "count >",
+        "count--"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 240,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

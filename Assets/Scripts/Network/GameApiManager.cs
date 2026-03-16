@@ -96,8 +96,31 @@ public class GameApiManager : MonoBehaviour
             onSuccess: (userData, token) =>
             {
                 StoreSession(token, userData);
-                onSuccess?.Invoke(userData);
-                OnLoginSuccess?.Invoke(userData);
+
+                // Fetch progress before firing the success event to ensure PlayerPrefs are ready
+                if (ProgressService.Instance != null)
+                {
+                    StartCoroutine(ProgressService.Instance.GetProgress(
+                        onSuccess: progress =>
+                        {
+                            SyncProgressLocally(progress);
+                            onSuccess?.Invoke(userData);
+                            OnLoginSuccess?.Invoke(userData);
+                        },
+                        onError: err =>
+                        {
+                            // Login succeeded but progress fetch failed (e.g. timeout). Still proceed.
+                            Debug.LogWarning($"[GameApiManager] Progress fetch failed after login: {err}");
+                            onSuccess?.Invoke(userData);
+                            OnLoginSuccess?.Invoke(userData);
+                        }
+                    ));
+                }
+                else
+                {
+                    onSuccess?.Invoke(userData);
+                    OnLoginSuccess?.Invoke(userData);
+                }
             },
             onError: err =>
             {
@@ -131,8 +154,29 @@ public class GameApiManager : MonoBehaviour
             onSuccess: (userData, token) =>
             {
                 StoreSession(token, userData);
-                onSuccess?.Invoke(userData);
-                OnLoginSuccess?.Invoke(userData);
+
+                if (ProgressService.Instance != null)
+                {
+                    StartCoroutine(ProgressService.Instance.GetProgress(
+                        onSuccess: progress =>
+                        {
+                            SyncProgressLocally(progress);
+                            onSuccess?.Invoke(userData);
+                            OnLoginSuccess?.Invoke(userData);
+                        },
+                        onError: err =>
+                        {
+                            Debug.LogWarning($"[GameApiManager] Progress fetch failed after register: {err}");
+                            onSuccess?.Invoke(userData);
+                            OnLoginSuccess?.Invoke(userData);
+                        }
+                    ));
+                }
+                else
+                {
+                    onSuccess?.Invoke(userData);
+                    OnLoginSuccess?.Invoke(userData);
+                }
             },
             onError: err =>
             {
@@ -253,10 +297,22 @@ public class GameApiManager : MonoBehaviour
         CurrentUser = null;
 
         PlayerPrefs.DeleteKey(TOKEN_PREF_KEY);
+
+        // ── Clear all local game-progress cache ───────────────────────────
+        // This runs on regular logout AND on account deletion (DeleteAccount
+        // calls Logout on success), so the UI always starts clean for the
+        // next player who logs in on this device.
+        PlayerPrefs.DeleteKey("CurrentLevel");
+        PlayerPrefs.DeleteKey("HighestLevel");
+        PlayerPrefs.DeleteKey("TotalTokens");
+        PlayerPrefs.DeleteKey("PlayerTokens");
+        PlayerPrefs.DeleteKey("EquippedCharacter");
+        // ─────────────────────────────────────────────────────────────────
+
         PlayerPrefs.Save();
 
         OnLogout?.Invoke();
-        Debug.Log("[GameApiManager] Logged out.");
+        Debug.Log("[GameApiManager] Logged out. All local player data cleared.");
     }
 
     /// <summary>
@@ -297,8 +353,27 @@ public class GameApiManager : MonoBehaviour
             onSuccess: userData =>
             {
                 CurrentUser = userData;
-                Debug.Log($"[GameApiManager] Session restored — {userData.username}");
-                OnSessionRestored?.Invoke(userData);
+                Debug.Log($"[GameApiManager] Session restored — {userData.username}. Fetching progress...");
+
+                if (ProgressService.Instance != null)
+                {
+                    StartCoroutine(ProgressService.Instance.GetProgress(
+                        onSuccess: progress =>
+                        {
+                            SyncProgressLocally(progress);
+                            OnSessionRestored?.Invoke(userData);
+                        },
+                        onError: err =>
+                        {
+                            Debug.LogWarning($"[GameApiManager] Progress fetch failed after session restore: {err}");
+                            OnSessionRestored?.Invoke(userData);
+                        }
+                    ));
+                }
+                else
+                {
+                    OnSessionRestored?.Invoke(userData);
+                }
             },
             onError: err =>
             {
@@ -316,5 +391,57 @@ public class GameApiManager : MonoBehaviour
         PlayerPrefs.SetString(TOKEN_PREF_KEY, token);
         PlayerPrefs.Save();
         Debug.Log($"[GameApiManager] Session stored for: {user.username}");
+    }
+
+    private void SyncProgressLocally(UserProgressData progress)
+    {
+        if (progress == null) return;
+
+        PlayerPrefs.SetInt("CurrentLevel", progress.currentLevel);
+        PlayerPrefs.SetInt("HighestLevel", progress.highestLevel);
+        PlayerPrefs.SetInt("TotalTokens", progress.totalTokens);
+
+        if (!string.IsNullOrEmpty(progress.equippedCharacter))
+            PlayerPrefs.SetString("EquippedCharacter", progress.equippedCharacter);
+
+        PlayerPrefs.Save();
+
+        TokenManager.SyncFromBackend(progress.totalTokens);
+
+        Debug.Log($"[GameApiManager] Synced progress locally - Level: {progress.currentLevel}, Tokens: {progress.totalTokens}");
+
+        // If the local client has progressed further while offline, push that
+        // local progress up to the backend so the database matches the game.
+        // Local stored HighestLevel uses the convention of "next playable"
+        // (highest = lastCompleted + 1), so convert back to completed level.
+        try
+        {
+            int localHighest = PlayerPrefs.HasKey("HighestLevel") ? PlayerPrefs.GetInt("HighestLevel") : progress.highestLevel;
+            int serverHighest = progress.highestLevel;
+
+            if (localHighest > serverHighest)
+            {
+                int localCompleted = Mathf.Max(1, localHighest - 1);
+                Debug.Log($"[GameApiManager] Local progress ({localHighest}) is ahead of server ({serverHighest}). Syncing completed level {localCompleted} to backend.");
+
+                if (ProgressService.Instance != null)
+                {
+                    // Fire-and-forget; backend will respond and ProgressService will update PlayerPrefs again.
+                    ProgressService.SyncAfterLevel(
+                        levelNumber: localCompleted,
+                        tokensEarned: 0,
+                        onSuccess: _ => Debug.Log("[GameApiManager] Local progress pushed to backend."),
+                        onError: err => Debug.LogWarning($"[GameApiManager] Failed to push local progress: {err}"));
+                }
+                else
+                {
+                    Debug.LogWarning("[GameApiManager] ProgressService instance missing — cannot push local progress.");
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[GameApiManager] Error while reconciling local progress: {ex.Message}");
+        }
     }
 }

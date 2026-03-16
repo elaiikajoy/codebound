@@ -25,6 +25,10 @@ using UnityEngine;
 
 public class ProgressService : MonoBehaviour
 {
+    // Public debug/status fields (readable by on-screen overlays)
+    public static string LastSyncStatus = "Never"; // Started | Success | Error | Never
+    public static string LastSyncDetails = "";    // JSON request/response or error message
+    public static string LastSyncTime = "";       // ISO timestamp of last attempt
     // ─── Singleton ────────────────────────────────────────────
     public static ProgressService Instance { get; private set; }
 
@@ -46,42 +50,135 @@ public class ProgressService : MonoBehaviour
         Action<UserProgressData> onSuccess = null,
         Action<string> onError = null)
     {
+        // Always apply a local unlock for the next level even when offline.
+        // This ensures the level selector will allow the player to continue
+        // without requiring a successful backend call.
+        ApplyLocalProgressForLevelCompletion(request.levelCompleted);
+
+        // Debug: show request and runtime state so we can trace missing backend calls.
+        try { Debug.Log($"[ProgressService] SyncLevelCompletion called. req={JsonUtility.ToJson(request)}"); } catch { Debug.Log("[ProgressService] SyncLevelCompletion called (json failed)"); }
+
+        // Update last-sync debug fields for overlay/diagnostics
+        try
+        {
+            LastSyncStatus = "Started";
+            LastSyncDetails = JsonUtility.ToJson(request);
+            LastSyncTime = System.DateTime.UtcNow.ToString("o");
+        }
+        catch { /* ignore debug failures */ }
+
+        if (GameApiManager.Instance == null)
+        {
+            Debug.LogWarning("[ProgressService] No GameApiManager instance available — cannot send authenticated progress.");
+            onError?.Invoke("No GameApiManager instance.");
+            yield break;
+        }
+
         if (!GameApiManager.Instance.IsLoggedIn)
         {
-            Debug.LogWarning("[ProgressService] Not logged in — progress not synced.");
+            Debug.LogWarning("[ProgressService] Not logged in — progress not synced to backend, but local progress updated.");
+            onSuccess?.Invoke(new UserProgressData
+            {
+                currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1),
+                highestLevel = PlayerPrefs.GetInt("HighestLevel", 1),
+                totalTokens = PlayerPrefs.GetInt("TotalTokens", 0)
+            });
+            yield break;
+        }
+
+        if (ApiClient.Instance == null)
+        {
+            Debug.LogError("[ProgressService] ApiClient instance is missing — cannot POST progress.");
+            onError?.Invoke("ApiClient instance missing.");
+            yield break;
+        }
+
+        // Ensure ApiConfig is ready so ApiClient can build a proper URL and headers.
+        if (ApiConfig.Instance == null || !ApiConfig.Instance.IsReady || ApiConfig.Instance.Config == null)
+        {
+            Debug.LogError("[ProgressService] ApiConfig not ready — progress request aborted.");
+            onError?.Invoke("ApiConfig not ready.");
             yield break;
         }
 
         yield return StartCoroutine(ApiClient.Instance.Post(
-            "/progress/update",
-            request,
-            onSuccess: json =>
+        "/progress/update",
+        request,
+        onSuccess: json =>
+        {
+            var resp = JsonUtility.FromJson<ProgressResponse>(json);
+            if (resp != null && resp.success && resp.data != null)
             {
-                var resp = JsonUtility.FromJson<ProgressResponse>(json);
-                if (resp != null && resp.success && resp.data != null)
-                {
-                    // Mirror backend values into local PlayerPrefs so
-                    // offline reads (e.g. leaderboard UI) stay accurate.
-                    TokenManager.SyncFromBackend(resp.data.totalTokens);
-                    PlayerPrefs.SetInt("CurrentLevel", resp.data.currentLevel);
-                    PlayerPrefs.SetInt("HighestLevel", resp.data.highestLevel);
-                    PlayerPrefs.Save();
+                // Mirror backend values into local PlayerPrefs so
+                // offline reads (e.g. leaderboard UI) stay accurate.
+                TokenManager.SyncFromBackend(resp.data.totalTokens);
+                PlayerPrefs.SetInt("CurrentLevel", resp.data.currentLevel);
+                PlayerPrefs.SetInt("HighestLevel", resp.data.highestLevel);
+                PlayerPrefs.Save();
 
-                    onSuccess?.Invoke(resp.data);
-                }
-                else
+                // Update debug overlay on success
+                try
                 {
-                    onError?.Invoke(resp?.message ?? "Progress sync failed.");
+                    LastSyncStatus = "Success";
+                    LastSyncDetails = json;
+                    LastSyncTime = System.DateTime.UtcNow.ToString("o");
                 }
-            },
-            onError: err =>
+                catch { }
+
+                onSuccess?.Invoke(resp.data);
+            }
+            else
             {
-                // Progress sync failures are non-fatal; game continues offline.
-                Debug.LogWarning($"[ProgressService] Sync failed (offline?): {err}");
-                onError?.Invoke(err);
-            },
-            requiresAuth: true
-        ));
+                // Update debug overlay on failure
+                try
+                {
+                    LastSyncStatus = "Error";
+                    LastSyncDetails = resp?.message ?? "Progress sync failed.";
+                    LastSyncTime = System.DateTime.UtcNow.ToString("o");
+                }
+                catch { }
+
+                onError?.Invoke(resp?.message ?? "Progress sync failed.");
+            }
+        },
+        onError: err =>
+        {
+            // Progress sync failures are non-fatal; game continues offline.
+            Debug.LogWarning($"[ProgressService] Sync failed (offline?): {err}");
+            try
+            {
+                LastSyncStatus = "Error";
+                LastSyncDetails = err;
+                LastSyncTime = System.DateTime.UtcNow.ToString("o");
+            }
+            catch { }
+
+            onError?.Invoke(err);
+        },
+        requiresAuth: true
+    ));
+    }
+
+    private void ApplyLocalProgressForLevelCompletion(int levelCompleted)
+    {
+        // Unlock the next level locally. This allows users to progress even
+        // when the backend is unreachable or when they're not logged in.
+        int current = PlayerPrefs.HasKey("CurrentLevel")
+            ? PlayerPrefs.GetInt("CurrentLevel")
+            : levelCompleted;
+
+        int highest = PlayerPrefs.HasKey("HighestLevel")
+            ? PlayerPrefs.GetInt("HighestLevel")
+            : levelCompleted;
+
+        int nextLevel = Mathf.Max(current, levelCompleted + 1);
+        int newHighest = Mathf.Max(highest, levelCompleted + 1);
+
+        PlayerPrefs.SetInt("CurrentLevel", nextLevel);
+        PlayerPrefs.SetInt("HighestLevel", newHighest);
+        PlayerPrefs.Save();
+
+        Debug.Log($"[ProgressService] Local progress updated: CurrentLevel={nextLevel}, HighestLevel={newHighest} (completed level {levelCompleted})");
     }
 
     // ─── Get full progress ────────────────────────────────────
@@ -152,9 +249,16 @@ public class ProgressService : MonoBehaviour
     {
         if (Instance == null)
         {
-            Debug.LogError("[ProgressService] No instance in scene.");
-            onError?.Invoke("ProgressService instance is missing.");
-            return;
+            // Attempt to create a fallback ProgressService so SyncAfterLevel
+            // calls from gameplay don't silently fail when the persistent
+            // GameAPI object wasn't added to the scene.
+            Debug.LogWarning("[ProgressService] No instance in scene — creating fallback ProgressService at runtime.");
+            var go = new GameObject("ProgressService");
+            DontDestroyOnLoad(go);
+            Instance = go.AddComponent<ProgressService>();
+            // Instance.Awake will run and set Instance; log to help debugging.
+            Debug.Log("[ProgressService] Fallback instance created.");
+            try { LastSyncStatus = "FallbackCreated"; LastSyncTime = System.DateTime.UtcNow.ToString("o"); } catch { }
         }
 
         var req = new ProgressUpdateRequest
@@ -167,6 +271,8 @@ public class ProgressService : MonoBehaviour
             hasCodeErrors = false
         };
 
+        Debug.Log($"[ProgressService] SyncAfterLevel invoked: level={levelNumber}, tokens={tokensEarned}, isPerfect={isPerfect}");
+        try { LastSyncStatus = "Invoked"; LastSyncDetails = JsonUtility.ToJson(req); LastSyncTime = System.DateTime.UtcNow.ToString("o"); } catch { }
         Instance.StartCoroutine(Instance.SyncLevelCompletion(req, onSuccess, onError));
     }
 }

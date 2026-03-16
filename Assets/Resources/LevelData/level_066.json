@@ -1,25 +1,30 @@
 {
     "levelNumber": 66,
-    "levelName": "Level 66: Classes Protocol",
-    "category": "Classes",
-    "difficulty": 1,
-    "puzzleDescription": "Objective: Establish communication with subsystem 66.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 66: For Loops Pt 5",
+    "category": "Basics",
+    "difficulty": 6,
+    "puzzleDescription": "Looping a specific number of times.",
+    "objective": "Write a for loop that prints \"Mango\" exactly 6 times on separate lines.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
+    "expectedOutput": "Mango\nMango\nMango\nMango\nMango\nMango",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Classes."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 760,
+    "requiredKeywords": [
+        "for",
+        "i < 6",
+        "\"Mango\""
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 230,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

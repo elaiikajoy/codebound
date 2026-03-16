@@ -1,25 +1,29 @@
 {
     "levelNumber": 82,
-    "levelName": "Level 82: Error Handling Protocol",
-    "category": "Error Handling",
-    "difficulty": 0,
-    "puzzleDescription": "Objective: Establish communication with subsystem 82.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "levelName": "Level 82: Arrays Pt 1",
+    "category": "Basics",
+    "difficulty": 8,
+    "puzzleDescription": "Accessing array elements.",
+    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 164. Print arr[1].",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
+    "expectedOutput": "164",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Error Handling."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 920,
+    "requiredKeywords": [
+        "arr[1] = 164",
+        "System.out.println(arr[1])"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 260,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,

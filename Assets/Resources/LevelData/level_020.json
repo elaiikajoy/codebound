@@ -1,27 +1,30 @@
 {
     "levelNumber": 20,
-    "levelName": "Level 20: Variables Protocol",
-    "category": "Variables",
+    "levelName": "Level 20: Strings Pt 9",
+    "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Objective: Establish communication with subsystem 20.",
-    "objective": "Complete the code segment to repair the logic node.",
-    "starterCode": "// Write your code here\npublic class Solution {\n    public void execute() {\n        // TODO\n    }\n}",
+    "puzzleDescription": "Working with text variables.",
+    "objective": "Declare a String named 'fruit' with value \"Cherry\", then print it.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "Cherry",
     "hints": [
-        "Check the syntax carefully.",
-        "Remember to close your braces.",
-        "Review the documentation for Variables."
+        "Read the objective carefully.",
+        "Make sure your syntax is correct.",
+        "Check for missing semicolons."
     ],
     "testCases": [],
-    "baseTokenReward": 300,
+    "requiredKeywords": [
+        "String fruit",
+        "\"Cherry\"",
+        "System.out.println"
+    ],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 140,
     "perfectBonus": 50,
     "speedBonus": 25,
-    "unlockedAchievements": [
-        "ACHIEVEMENT_LEVEL_20_MASTER"
-    ],
+    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
-        "platform",
-        "switch",
         "terminal"
     ],
     "tokensToCollect": 3,
