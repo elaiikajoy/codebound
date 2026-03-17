@@ -125,6 +125,13 @@ public class ProgressResponse
     public UserProgressData data;
 }
 
+// ─── Sync Tokens (overworld coin flush) ───────────────────────────────────────
+[System.Serializable]
+public class SyncTokensRequest
+{
+    public int tokensToAdd;
+}
+
 [System.Serializable]
 public class ProgressStats
 {

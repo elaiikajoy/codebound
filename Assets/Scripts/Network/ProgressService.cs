@@ -101,6 +101,17 @@ public class ProgressService : MonoBehaviour
             yield break;
         }
 
+        // Attach any coins the player collected in the overworld/level
+        // before this sync was triggered. The backend will credit the full
+        // sum, and SyncFromBackend (called in the onSuccess below) will
+        // reset PendingTokensToSync to 0 — no double-counting.
+        int pendingCoins = TokenManager.GetPending();
+        if (pendingCoins > 0)
+        {
+            Debug.Log($"[ProgressService] Attaching {pendingCoins} pending coin(s) to level sync. New tokensEarned: {request.tokensEarned} + {pendingCoins} = {request.tokensEarned + pendingCoins}");
+            request.tokensEarned += pendingCoins;
+        }
+
         yield return StartCoroutine(ApiClient.Instance.Post(
         "/progress/update",
         request,
@@ -109,8 +120,9 @@ public class ProgressService : MonoBehaviour
             var resp = JsonUtility.FromJson<ProgressResponse>(json);
             if (resp != null && resp.success && resp.data != null)
             {
-                // Mirror backend values into local PlayerPrefs so
-                // offline reads (e.g. leaderboard UI) stay accurate.
+                // Mirror backend authoritative values into local PlayerPrefs.
+                // SyncFromBackend also clears PendingTokensToSync because
+                // the level-completion POST now includes the pending coins.
                 TokenManager.SyncFromBackend(resp.data.totalTokens);
                 PlayerPrefs.SetInt("CurrentLevel", resp.data.currentLevel);
                 PlayerPrefs.SetInt("HighestLevel", resp.data.highestLevel);
@@ -274,5 +286,84 @@ public class ProgressService : MonoBehaviour
         Debug.Log($"[ProgressService] SyncAfterLevel invoked: level={levelNumber}, tokens={tokensEarned}, isPerfect={isPerfect}");
         try { LastSyncStatus = "Invoked"; LastSyncDetails = JsonUtility.ToJson(req); LastSyncTime = System.DateTime.UtcNow.ToString("o"); } catch { }
         Instance.StartCoroutine(Instance.SyncLevelCompletion(req, onSuccess, onError));
+    }
+
+    // ─── Sync pending overworld tokens ────────────────────────
+    /// <summary>
+    /// POST /progress/sync-tokens
+    /// Call this to flush coins the player collected in the overworld
+    /// (not from level completion) to the backend.
+    /// Safe to call at any time — no-ops when nothing is pending or not logged in.
+    /// </summary>
+    public IEnumerator SyncPendingTokens(
+        Action<UserProgressData> onSuccess = null,
+        Action<string> onError = null)
+    {
+        int pending = TokenManager.GetPending();
+        if (pending <= 0)
+        {
+            Debug.Log("[ProgressService] SyncPendingTokens: nothing to sync.");
+            yield break;
+        }
+
+        if (GameApiManager.Instance == null || !GameApiManager.Instance.IsLoggedIn)
+        {
+            Debug.LogWarning("[ProgressService] SyncPendingTokens: not logged in — pending tokens will sync on next login.");
+            yield break;
+        }
+
+        if (ApiClient.Instance == null || ApiConfig.Instance == null || !ApiConfig.Instance.IsReady)
+        {
+            Debug.LogWarning("[ProgressService] SyncPendingTokens: ApiClient or ApiConfig not ready.");
+            yield break;
+        }
+
+        var body = new SyncTokensRequest { tokensToAdd = pending };
+        Debug.Log($"[ProgressService] SyncPendingTokens: posting {pending} pending token(s).");
+
+        yield return StartCoroutine(ApiClient.Instance.Post(
+            "/progress/sync-tokens",
+            body,
+            onSuccess: json =>
+            {
+                var resp = JsonUtility.FromJson<ProgressResponse>(json);
+                if (resp != null && resp.success && resp.data != null)
+                {
+                    TokenManager.SyncFromBackend(resp.data.totalTokens);
+                    PlayerPrefs.SetInt("CurrentLevel", resp.data.currentLevel);
+                    PlayerPrefs.SetInt("HighestLevel", resp.data.highestLevel);
+                    PlayerPrefs.Save();
+                    Debug.Log($"[ProgressService] SyncPendingTokens succeeded. New total: {resp.data.totalTokens}");
+                    onSuccess?.Invoke(resp.data);
+                }
+                else
+                {
+                    string msg = resp?.message ?? "SyncPendingTokens failed.";
+                    Debug.LogWarning($"[ProgressService] SyncPendingTokens error: {msg}");
+                    onError?.Invoke(msg);
+                }
+            },
+            onError: err =>
+            {
+                Debug.LogWarning($"[ProgressService] SyncPendingTokens failed (offline?): {err}");
+                onError?.Invoke(err);
+            },
+            requiresAuth: true
+        ));
+    }
+
+    /// <summary>
+    /// Fire-and-forget version of SyncPendingTokens for use from non-coroutine code.
+    /// </summary>
+    public static void FlushPendingTokens(
+        Action<UserProgressData> onSuccess = null,
+        Action<string> onError = null)
+    {
+        if (Instance == null)
+        {
+            Debug.LogWarning("[ProgressService] FlushPendingTokens: no instance available.");
+            return;
+        }
+        Instance.StartCoroutine(Instance.SyncPendingTokens(onSuccess, onError));
     }
 }

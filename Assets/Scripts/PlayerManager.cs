@@ -1,36 +1,50 @@
-using System.Collections;
-using System.Collections.Generic;
+// ============================================================
+// PlayerManager.cs
+// Purpose: Tracks core in-scene player state (game-over, coin UI).
+//          Coin display is driven by TokenManager.GetTokens() so
+//          it always reflects the authoritative backend-synced total.
+// ============================================================
+
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlayerManager : MonoBehaviour
 {
+    [Header("Game Over")]
     public static bool isGameOver;
     public GameObject gameOverPanel;
-        public static int numberOfCoin;
-        public TextMeshProUGUI coinText;
 
-    void Update()
-     {
+    [Header("Coin UI")]
+    [Tooltip("Text element that shows the player's current token / coin count.")]
+    public TextMeshProUGUI coinText;
 
-        if (isGameOver)
-        {
-            gameOverPanel.SetActive(true);
-        }
-         coinText.text = numberOfCoin.ToString();
-     }
+    // ─── Lifecycle ────────────────────────────────────────────
 
-     private void Awake()
-     {
+    private void Awake()
+    {
         isGameOver = false;
-         numberOfCoin = PlayerPrefs.GetInt("numberOfCoin", 0);
-     }
-     public void ReplayLevel()
+        // No need to read PlayerPrefs manually — TokenManager keeps "PlayerTokens" in sync.
+    }
+
+    private void Update()
+    {
+        // Game-over panel
+        if (isGameOver && gameOverPanel != null)
+            gameOverPanel.SetActive(true);
+
+        // Update coin text every frame from the unified token store.
+        if (coinText != null)
+            coinText.text = TokenManager.GetTokens().ToString();
+    }
+
+    // ─── Public actions ───────────────────────────────────────
+
+    public void ReplayLevel()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
+
     public void PauseGame()
     {
         Time.timeScale = 0;

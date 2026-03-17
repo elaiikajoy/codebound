@@ -1,70 +1,92 @@
-using System.Collections;
-using System.Collections.Generic;
+// ============================================================
+// Main.cs
+// Purpose: Main scene controller — handles navigation between scenes
+//          and persisting game data. On SaveGameData, any overworld
+//          coins collected since the last save are flushed to the
+//          backend via ProgressService.FlushPendingTokens().
+// ============================================================
+
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using UnityEngine.Audio;
 
 public class Main : MonoBehaviour
 {
-    public void BackToMainMenuFromLevelPanel()
-    {
-        Debug.Log("BackToMainMenuFromLevelPanel called");
-        SaveGameData();
-        SceneManager.LoadSceneAsync("Main");
-    }
-
     void Start()
     {
-        // Load saved data when Main scene starts
         LoadGameData();
     }
 
+    // ─── Navigation ───────────────────────────────────────────
+
     public void PlayGame()
     {
-        // Save data before changing scenes
         SaveGameData();
         SceneManager.LoadSceneAsync("LevelPanel");
     }
 
-    public void PlayLevel1()
-    {
-        // Addressed by LevelSelectionManager dynamically hooking onto buttons instead.
-        // Left here so missing Unity button references don't crash the editor inspector.
-    }
-
     public void OpenShop()
     {
-        // Save data before changing scenes
         SaveGameData();
         SceneManager.LoadSceneAsync("Shop");
     }
 
+    public void BackToMainMenu()
+    {
+        SaveGameData();
+        SceneManager.LoadSceneAsync("Main");
+    }
+
+    public void BackToMainMenuFromLevelPanel()
+    {
+        Debug.Log("[Main] BackToMainMenuFromLevelPanel called.");
+        SaveGameData();
+        SceneManager.LoadSceneAsync("Main");
+    }
+
+    // ─── Game Data ────────────────────────────────────────────
+
+    /// <summary>
+    /// Persists current PlayerPrefs and flushes any pending overworld
+    /// tokens to the backend via POST /progress/sync-tokens.
+    /// </summary>
     public void SaveGameData()
     {
-        // Save your data here using PlayerPrefs
-        // Example: PlayerPrefs.SetInt("Score", score);
-        // Example: PlayerPrefs.SetInt("Level", currentLevel);
         PlayerPrefs.Save();
+
+        // Flush any coins collected in the overworld to the backend.
+        // This is fire-and-forget — the game doesn't wait for the response.
+        if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
+        {
+            int pending = TokenManager.GetPending();
+            if (pending > 0)
+            {
+                Debug.Log($"[Main] SaveGameData: flushing {pending} pending token(s) to backend.");
+                ProgressService.FlushPendingTokens(
+                    onSuccess: data => Debug.Log($"[Main] Token flush succeeded. New total: {data.totalTokens}"),
+                    onError:   err  => Debug.LogWarning($"[Main] Token flush failed (offline?): {err}")
+                );
+            }
+        }
+        else
+        {
+            Debug.Log("[Main] SaveGameData: not logged in — pending tokens will sync on next login.");
+        }
     }
 
     public void LoadGameData()
     {
-        // Load your data here using PlayerPrefs
-        // Example: score = PlayerPrefs.GetInt("Score", 0);
-        // Example: currentLevel = PlayerPrefs.GetInt("Level", 1);
+        // PlayerPrefs are live — TokenManager reads them on demand.
+        // Nothing extra needed here; SyncFromBackend is called by GameApiManager
+        // on login/session restore.
+        Debug.Log($"[Main] LoadGameData — current tokens: {TokenManager.GetTokens()}, pending: {TokenManager.GetPending()}");
     }
 
     public void ResetGameData()
     {
-        // Call this to reset everything to 0
         PlayerPrefs.DeleteAll();
+        Debug.Log("[Main] All game data reset.");
     }
 
-    public void BackToMainMenu()
-    {
-        // Save data before changing scenes
-        SaveGameData();
-        SceneManager.LoadSceneAsync("Main");
-    }
+    // Left for backward compatibility with old Inspector button references
+    public void PlayLevel1() { }
 }

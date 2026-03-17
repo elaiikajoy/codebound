@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 3246750631410837115}
   - component: {fileID: 4206535285941922856}
   - component: {fileID: 4014238683259247014}
-  - component: {fileID: 4929390761684451004}
   - component: {fileID: 3727901314035990663}
   - component: {fileID: 2106974850685714669}
   - component: {fileID: 1834120694}
+  - component: {fileID: 5046453932860453247}
   m_Layer: 3
   m_Name: Ranger
   m_TagString: Player
@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 4025925460572891436}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -9.3438, y: -3.5356, z: 0}
-  m_LocalScale: {x: 0.04964861, y: 0.045986105, z: 1}
+  m_LocalScale: {x: 0.06, y: 0.062940285, z: 0.49536636}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -127,20 +127,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 4
---- !u!114 &4929390761684451004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4025925460572891436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45f3f24a7f90f2644ae2041d4ef4fd93, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  characterDB: {fileID: 11400000, guid: d9bd255feee2d1e4b9d0ea48bd67b5d8, type: 2}
-  artworkSprite: {fileID: 3246750631410837115}
 --- !u!114 &3727901314035990663
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,3 +176,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3613592a7dabad84eb2f63232ddbfec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5046453932860453247
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025925460572891436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5ec93eb4fecd3048bad8544ca41f482, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterDB: {fileID: 11400000, guid: d9bd255feee2d1e4b9d0ea48bd67b5d8, type: 2}
+  artworkSprite: {fileID: 3246750631410837115}
+  nameText: {fileID: 0}

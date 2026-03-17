@@ -1,46 +1,120 @@
-using System.Collections;
-using System.Collections.Generic;
+// ============================================================
+// TokenManager.cs
+// Purpose: Single source-of-truth for the player's token / coin count.
+//
+//   PlayerPrefs keys used:
+//     "PlayerTokens"        – current total (read by UI)
+//     "PendingTokensToSync" – accumulated offline coins not yet pushed to backend
+//
+// Usage:
+//   TokenManager.AddTokens(1);        // collect a coin in-world (+pending)
+//   TokenManager.SpendTokens(50);     // buy a character (deduct only, no pending)
+//   TokenManager.GetTokens();         // read current total for UI
+//   TokenManager.GetPending();        // pending amount not yet synced
+//   TokenManager.ClearPending();      // call after a successful /sync-tokens POST
+//   TokenManager.SyncFromBackend(n);  // called by ProgressService after any /progress response
+// ============================================================
+
 using UnityEngine;
 
 public class TokenManager : MonoBehaviour
 {
-    // Call this method to give tokens to the player (local only)
+    // ─── Public API ───────────────────────────────────────────
+
+    /// <summary>
+    /// Add <paramref name="amount"/> coins to the player's local total.
+    /// Also queues them as pending so they get flushed to the backend on next Save.
+    /// </summary>
     public static void AddTokens(int amount)
     {
-        int currentTokens = PlayerPrefs.GetInt("PlayerTokens", 0);
-        currentTokens += amount;
-        PlayerPrefs.SetInt("PlayerTokens", currentTokens);
+        if (amount <= 0) return;
+
+        int current = PlayerPrefs.GetInt("PlayerTokens", 0);
+        PlayerPrefs.SetInt("PlayerTokens", current + amount);
+
+        // Also keep a running count of coins not yet pushed to the backend.
+        int pending = PlayerPrefs.GetInt("PendingTokensToSync", 0);
+        PlayerPrefs.SetInt("PendingTokensToSync", pending + amount);
+
         PlayerPrefs.Save();
     }
 
-    // Call this to get current token count
+    /// <summary>
+    /// Deduct <paramref name="amount"/> tokens from the player's balance.
+    /// Used for shop purchases — does NOT add to PendingTokensToSync because
+    /// the backend total will be corrected on the next progress sync.
+    /// Returns false if the player cannot afford it (balance unchanged).
+    /// </summary>
+    public static bool SpendTokens(int amount)
+    {
+        if (amount <= 0) return true; // nothing to spend
+
+        int current = PlayerPrefs.GetInt("PlayerTokens", 0);
+        if (current < amount)
+        {
+            Debug.LogWarning($"[TokenManager] SpendTokens({amount}) failed — insufficient balance ({current}).");
+            return false;
+        }
+
+        PlayerPrefs.SetInt("PlayerTokens", current - amount);
+        PlayerPrefs.Save();
+        Debug.Log($"[TokenManager] Spent {amount} token(s). Remaining: {current - amount}");
+        return true;
+    }
+
+    /// <summary>
+    /// Returns the current local token total (used by UI elements like coinText).
+    /// </summary>
     public static int GetTokens()
     {
         return PlayerPrefs.GetInt("PlayerTokens", 0);
     }
 
-    // Use this for testing - gives 100 tokens
+    /// <summary>
+    /// Returns how many tokens have been collected since the last successful backend sync.
+    /// </summary>
+    public static int GetPending()
+    {
+        return PlayerPrefs.GetInt("PendingTokensToSync", 0);
+    }
+
+    /// <summary>
+    /// Clears the pending counter after a successful POST to /progress/sync-tokens.
+    /// </summary>
+    public static void ClearPending()
+    {
+        PlayerPrefs.SetInt("PendingTokensToSync", 0);
+        PlayerPrefs.Save();
+    }
+
+    // ─── Backend sync ──────────────────────────────────────────
+    /// <summary>
+    /// Called by ProgressService after a successful /progress/update or /progress response.
+    /// Replaces the local total with the authoritative backend value and clears pending.
+    /// </summary>
+    public static void SyncFromBackend(int totalFromBackend)
+    {
+        PlayerPrefs.SetInt("PlayerTokens", totalFromBackend);
+        // Backend now has the ground truth — pending coins were included in this response.
+        PlayerPrefs.SetInt("PendingTokensToSync", 0);
+        PlayerPrefs.Save();
+        Debug.Log($"[TokenManager] Synced from backend — TotalTokens={totalFromBackend}");
+    }
+
+    // ─── Legacy helpers (kept for compatibility) ───────────────
+    /// <summary>Use AddTokens instead. Kept so old references still compile.</summary>
     public void GiveTestTokens()
     {
         AddTokens(100);
-        Debug.Log("Added 100 tokens! Total: " + GetTokens());
+        Debug.Log("[TokenManager] Added 100 test tokens. Total: " + GetTokens());
     }
 
-    // Reset tokens to zero
+    /// <summary>Resets both local total and pending counter to zero.</summary>
     public void ResetTokens()
     {
         PlayerPrefs.SetInt("PlayerTokens", 0);
+        PlayerPrefs.SetInt("PendingTokensToSync", 0);
         PlayerPrefs.Save();
-    }
-
-
-            // ─── Backend sync ──────────────────────────────────────────
-            // Called by ProgressService after a successful /progress/update response.
-            // Sets the absolute token count from the backend (avoids drift).
-            public static void SyncFromBackend(int totalFromBackend)
-    {
-        PlayerPrefs.SetInt("PlayerTokens", totalFromBackend);
-        PlayerPrefs.Save();
+        Debug.Log("[TokenManager] Tokens reset to 0.");
     }
 }
-
