@@ -226,7 +226,7 @@ public class Shop : MonoBehaviour
 
         // Token balance — always read live from TokenManager
         if (tokenText != null)
-            tokenText.text = "$" + TokenManager.GetTokens().ToString();
+            tokenText.text = TokenManager.GetTokens().ToString();
 
         bool owned = IsOwned(_selectedIndex);
         bool isFree = character.cost == 0;

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6133360667601154306}
   - component: {fileID: 4130321816540025572}
   - component: {fileID: 2387475528578020623}
+  - component: {fileID: -5490184437758101240}
   m_Layer: 0
   m_Name: Mace Preview
   m_TagString: Enemy
@@ -73,7 +74,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 4
   m_Sprite: {fileID: 21300000, guid: 6a98950cb71ceec47ad9e2bb460f3b76, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -101,3 +102,16 @@ CircleCollider2D:
   m_Offset: {x: 0, y: -1.4985554}
   serializedVersion: 2
   m_Radius: 0.5373242
+--- !u!114 &-5490184437758101240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 29494272192048197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3613592a7dabad84eb2f63232ddbfec5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTag: Player

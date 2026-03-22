@@ -54,6 +54,9 @@ public class GameApiManager : MonoBehaviour
     /// <summary>True when a valid token and user data are both available.</summary>
     public bool IsLoggedIn => !string.IsNullOrEmpty(AuthToken) && CurrentUser != null;
 
+    /// <summary>True when a saved auth token exists and session restore should be attempted.</summary>
+    public bool HasSavedSession => PlayerPrefs.HasKey(TOKEN_PREF_KEY);
+
     // Auth token is persisted between game sessions via PlayerPrefs.
     private const string TOKEN_PREF_KEY = "codebound_auth_token";
 

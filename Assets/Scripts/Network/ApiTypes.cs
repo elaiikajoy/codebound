@@ -151,6 +151,70 @@ public class ProgressStatsResponse
     public ProgressStats data;
 }
 
+// ─── Achievements ───────────────────────────────────────────────────────────
+[System.Serializable]
+public class AchievementStateItem
+{
+    public string id;
+    public string title;
+    public string description;
+    public int rewardTokens;
+    public int requiredHighestLevel;
+    public int requiredTotalTokens;
+    public bool isUnlocked;
+    public bool isClaimed;
+    public bool canClaim;
+}
+
+[System.Serializable]
+public class AchievementStateData
+{
+    public UserProgressData progress;
+    public AchievementStateItem[] achievements;
+    public int total;
+    public int unlockedCount;
+    public int claimableCount;
+}
+
+[System.Serializable]
+public class AchievementStateResponse
+{
+    public bool success;
+    public string message;
+    public AchievementStateData data;
+}
+
+[System.Serializable]
+public class AchievementClaimRequest
+{
+    public string achievementId;
+}
+
+[System.Serializable]
+public class AchievementClaimData
+{
+    public UserAchievementClaim achievement;
+    public UserProgressData progress;
+    public int rewardTokens;
+}
+
+[System.Serializable]
+public class UserAchievementClaim
+{
+    public string achievementId;
+    public float progress;
+    public string claimedAt;
+    public string unlockedAt;
+}
+
+[System.Serializable]
+public class AchievementClaimResponse
+{
+    public bool success;
+    public string message;
+    public AchievementClaimData data;
+}
+
 // ─── Leaderboard ──────────────────────────────────────────────────────────────
 [System.Serializable]
 public class LeaderboardEntry

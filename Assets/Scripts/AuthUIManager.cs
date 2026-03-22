@@ -53,17 +53,20 @@ public class AuthUIManager : MonoBehaviour
     // ─── Private state ────────────────────────────────────────
     private bool _isBusy = false;
     private bool _isShowingAuthenticatedState;
+    private bool _isWaitingForSessionRestore;
 
     // ─── Lifecycle ────────────────────────────────────────────
     private void OnEnable()
     {
         GameApiManager.OnLoginSuccess += HandleAuthenticated;
+        GameApiManager.OnSessionRestored += HandleAuthenticated;
         GameApiManager.OnLogout += HandleLoggedOut;
     }
 
     private void OnDisable()
     {
         GameApiManager.OnLoginSuccess -= HandleAuthenticated;
+        GameApiManager.OnSessionRestored -= HandleAuthenticated;
         GameApiManager.OnLogout -= HandleLoggedOut;
     }
 
@@ -76,13 +79,22 @@ public class AuthUIManager : MonoBehaviour
 
         WireButtonHandlers();
 
-        // Always show the auth screen initially so the player can log in 
-        // with a different account if they want.
-        ShowLoginPanel();
-
-        // Optional: Force clear the session token to logically log them out
-        if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
-            GameApiManager.Instance.Logout();
+        // If a saved session exists, wait for restore to finish so we do not
+        // flash the login panel for returning users.
+        if (GameApiManager.Instance != null && GameApiManager.Instance.HasSavedSession)
+        {
+            _isWaitingForSessionRestore = true;
+            HideLoginPanelOnly();
+            StartCoroutine(ResolveInitialAuthState());
+        }
+        else if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
+        {
+            ShowAuthenticatedMainState();
+        }
+        else
+        {
+            ShowLoginPanel();
+        }
     }
 
     private void Update()
@@ -138,13 +150,26 @@ public class AuthUIManager : MonoBehaviour
     public void ShowLoginPanel()
     {
         if (loginPanel != null) loginPanel.SetActive(true);
-        
+
         // Ensure root background image is enabled to block raycasts/show background
         Image bgImage = GetComponent<Image>();
         if (bgImage != null) bgImage.enabled = true;
 
         _isShowingAuthenticatedState = false;
+        _isWaitingForSessionRestore = false;
         ClearFeedback();
+    }
+
+    private void HideLoginPanelOnly()
+    {
+        if (loginPanel != null)
+            loginPanel.SetActive(false);
+
+        _isShowingAuthenticatedState = false;
+
+        Image bgImage = GetComponent<Image>();
+        if (bgImage != null)
+            bgImage.enabled = false;
     }
 
     // ─── Login ────────────────────────────────────────────────
@@ -369,12 +394,12 @@ public class AuthUIManager : MonoBehaviour
         if (loginPanel != null)
             loginPanel.SetActive(false);
 
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
+
         // Disable root background so it doesn't block Main Menu buttons
         Image bgImage = GetComponent<Image>();
         if (bgImage != null) bgImage.enabled = false;
-
-        if (mainMenuPanel != null)
-            mainMenuPanel.SetActive(true);
 
         _isShowingAuthenticatedState = true;
         SetBusy(false);
@@ -442,16 +467,43 @@ public class AuthUIManager : MonoBehaviour
 
     private void HandleAuthenticated(UserData userData)
     {
+        _isWaitingForSessionRestore = false;
         ShowAuthenticatedMainState();
     }
 
     private void HandleLoggedOut()
     {
+        _isWaitingForSessionRestore = false;
         if (autoFindSceneReferences)
             TryAutoFindSceneReferences();
 
         ShowLoginPanel();
         SetBusy(false);
+    }
+
+    private IEnumerator ResolveInitialAuthState()
+    {
+        float timeout = 5f;
+        while (timeout > 0f)
+        {
+            if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
+            {
+                ShowAuthenticatedMainState();
+                yield break;
+            }
+
+            if (GameApiManager.Instance == null || !GameApiManager.Instance.HasSavedSession)
+            {
+                ShowLoginPanel();
+                yield break;
+            }
+
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        if (!_isShowingAuthenticatedState)
+            ShowLoginPanel();
     }
 
     private GameObject FindSceneObject(string objectName)

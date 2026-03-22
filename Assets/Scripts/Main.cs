@@ -30,6 +30,12 @@ public class Main : MonoBehaviour
         SceneManager.LoadSceneAsync("Shop");
     }
 
+    public void OpenAchievements()
+    {
+        SaveGameData();
+        SceneManager.LoadSceneAsync("Achievement");
+    }
+
     public void BackToMainMenu()
     {
         SaveGameData();
@@ -63,7 +69,7 @@ public class Main : MonoBehaviour
                 Debug.Log($"[Main] SaveGameData: flushing {pending} pending token(s) to backend.");
                 ProgressService.FlushPendingTokens(
                     onSuccess: data => Debug.Log($"[Main] Token flush succeeded. New total: {data.totalTokens}"),
-                    onError:   err  => Debug.LogWarning($"[Main] Token flush failed (offline?): {err}")
+                    onError: err => Debug.LogWarning($"[Main] Token flush failed (offline?): {err}")
                 );
             }
         }

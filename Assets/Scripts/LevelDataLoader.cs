@@ -41,6 +41,9 @@ public class LevelData
     public int tokensToCollect;
     public bool isLocked;
     public int requiredLevel;
+    // When true, the player should not be allowed to fall off the bottom
+    // of the playable area for this level (matches behavior of early levels).
+    public bool preventFall;
 }
 
 public static class LevelDataLoader
