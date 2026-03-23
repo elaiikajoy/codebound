@@ -1,22 +1,21 @@
 {
     "levelNumber": 3,
-    "levelName": "Level 3: Variables Pt 2",
+    "levelName": "Level 3: Output Basics",
     "category": "Basics",
     "difficulty": 0,
-    "puzzleDescription": "Learn to declare variable integers.",
-    "objective": "Declare an integer variable named 'score' with value 15, then print it.",
+    "puzzleDescription": "Learn to print multiple lines of text.",
+    "objective": "Print three different sentences, each on a new line.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "15",
+    "expectedOutput": "",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use System.out.println() to print each sentence.",
+        "Each println() automatically moves to a new line.",
+        "Make sure each statement ends with a semicolon."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "int score",
-        "15",
-        "System.out.println(score);"
+        "System.out.println",
+        ";"
     ],
     "forbiddenKeywords": [],
     "baseTokenReward": 100,

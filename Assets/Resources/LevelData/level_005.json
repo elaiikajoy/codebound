@@ -1,22 +1,24 @@
 {
     "levelNumber": 5,
-    "levelName": "Level 5: Variables Pt 4",
+    "levelName": "Level 5: Output Numbers",
     "category": "Basics",
     "difficulty": 0,
-    "puzzleDescription": "Learn to declare variable integers.",
-    "objective": "Declare an integer variable named 'score' with value 25, then print it.",
+    "puzzleDescription": "Learn to print multiple numbers.",
+    "objective": "Print the numbers 1 to 5, each on a new line.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "25",
+    "expectedOutput": "1\n2\n3\n4\n5",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use System.out.println() for each number.",
+        "Each println() prints on a new line.",
+        "Follow the correct order from 1 to 5."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "int score",
-        "25",
-        "System.out.println(score);"
+        "System.out.println(1);",
+        "System.out.println(2);",
+        "System.out.println(3);",
+        "System.out.println(4);",
+        "System.out.println(5);"
     ],
     "forbiddenKeywords": [],
     "baseTokenReward": 110,

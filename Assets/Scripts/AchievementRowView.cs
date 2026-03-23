@@ -34,8 +34,10 @@ public class AchievementRowView : MonoBehaviour
     private Action<string> claimHandler;
     private AchievementStateItem currentAchievement;
     private string currentDisabledReason = string.Empty;
+    private string runtimeAchievementId = string.Empty;
 
-    public string AchievementId => achievementId;
+    public string AchievementId => !string.IsNullOrWhiteSpace(achievementId) ? achievementId : runtimeAchievementId;
+    public bool HasExplicitAchievementId => !string.IsNullOrWhiteSpace(achievementId);
     public string DisabledReason => currentDisabledReason;
     public AchievementStateItem CurrentAchievement => currentAchievement;
 
@@ -69,6 +71,22 @@ public class AchievementRowView : MonoBehaviour
     public void SetClaimHandler(Action<string> handler)
     {
         claimHandler = handler;
+    }
+
+    /// <summary>
+    /// Allows controller-driven setup for legacy scenes where each claim button
+    /// exists but rows were not fully wired in the inspector.
+    /// </summary>
+    public void ConfigureRuntime(string achievementIdOverride, Button claimButtonOverride = null)
+    {
+        runtimeAchievementId = achievementIdOverride ?? string.Empty;
+
+        if (claimButtonOverride != null)
+        {
+            claimButton = claimButtonOverride;
+            claimButton.onClick.RemoveListener(HandleClaimClicked);
+            claimButton.onClick.AddListener(HandleClaimClicked);
+        }
     }
 
     public void ApplyState(AchievementStateItem achievement, string disabledReason)
@@ -127,10 +145,11 @@ public class AchievementRowView : MonoBehaviour
         if (claimHandler == null || claimButton == null || !claimButton.interactable)
             return;
 
-        if (!string.IsNullOrWhiteSpace(achievementId))
+        string idToClaim = AchievementId;
+        if (!string.IsNullOrWhiteSpace(idToClaim))
         {
-            Debug.Log($"[AchievementRowView] Claim button clicked for '{achievementId}'.");
-            claimHandler.Invoke(achievementId);
+            Debug.Log($"[AchievementRowView] Claim button clicked for '{idToClaim}'.");
+            claimHandler.Invoke(idToClaim);
         }
     }
 

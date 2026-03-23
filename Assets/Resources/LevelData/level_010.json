@@ -1,22 +1,23 @@
 {
     "levelNumber": 10,
-    "levelName": "Level 10: Variables Pt 9",
+    "levelName": "Level 10: Variables & Output",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Learn to declare variable integers.",
-    "objective": "Declare an integer variable named 'score' with value 50, then print it.",
+    "puzzleDescription": "Learn to use variables in a sentence.",
+    "objective": "Create a variable for name and age, then print: My name is (name) and I am (age) years old.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "50",
+    "expectedOutput": "",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use String for name and int for age.",
+        "Use + to combine variables with text.",
+        "Example: \"Hello \" + name"
     ],
     "testCases": [],
     "requiredKeywords": [
-        "int score",
-        "50",
-        "System.out.println(score);"
+        "String name",
+        "int age",
+        "System.out.println",
+        "+"
     ],
     "forbiddenKeywords": [],
     "baseTokenReward": 120,
