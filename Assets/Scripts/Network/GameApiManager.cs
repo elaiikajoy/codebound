@@ -57,8 +57,14 @@ public class GameApiManager : MonoBehaviour
     /// <summary>True when a saved auth token exists and session restore should be attempted.</summary>
     public bool HasSavedSession => PlayerPrefs.HasKey(TOKEN_PREF_KEY);
 
+    /// <summary>True when local remembered credentials are available for auto-login fallback.</summary>
+    public bool HasRememberedCredentials =>
+        PlayerPrefs.HasKey(REMEMBER_IDENTIFIER_PREF_KEY) && PlayerPrefs.HasKey(REMEMBER_PASSWORD_PREF_KEY);
+
     // Auth token is persisted between game sessions via PlayerPrefs.
     private const string TOKEN_PREF_KEY = "codebound_auth_token";
+    private const string REMEMBER_IDENTIFIER_PREF_KEY = "codebound_remember_identifier";
+    private const string REMEMBER_PASSWORD_PREF_KEY = "codebound_remember_password";
 
     // ─── Lifecycle ────────────────────────────────────────────
     private void Awake()
@@ -98,7 +104,7 @@ public class GameApiManager : MonoBehaviour
         StartCoroutine(AuthService.Instance.Login(identifier, password,
             onSuccess: (userData, token) =>
             {
-                StoreSession(token, userData);
+                StoreSession(token, userData, identifier, password);
 
                 // Fetch progress before firing the success event to ensure PlayerPrefs are ready
                 if (ProgressService.Instance != null)
@@ -156,7 +162,7 @@ public class GameApiManager : MonoBehaviour
         StartCoroutine(AuthService.Instance.Register(username, password,
             onSuccess: (userData, token) =>
             {
-                StoreSession(token, userData);
+                StoreSession(token, userData, username, password);
 
                 if (ProgressService.Instance != null)
                 {
@@ -284,6 +290,7 @@ public class GameApiManager : MonoBehaviour
         StartCoroutine(AuthService.Instance.DeleteAccount(
             onSuccess: () =>
             {
+                ClearRememberedCredentials();
                 Logout();
                 onSuccess?.Invoke();
             },
@@ -310,6 +317,7 @@ public class GameApiManager : MonoBehaviour
         PlayerPrefs.DeleteKey("TotalTokens");
         PlayerPrefs.DeleteKey("PlayerTokens");
         PlayerPrefs.DeleteKey("EquippedCharacter");
+        ClearCharacterOwnershipCache();
         // ─────────────────────────────────────────────────────────────────
 
         PlayerPrefs.Save();
@@ -345,6 +353,13 @@ public class GameApiManager : MonoBehaviour
         string saved = PlayerPrefs.GetString(TOKEN_PREF_KEY, string.Empty);
         if (string.IsNullOrEmpty(saved))
         {
+            if (HasRememberedCredentials)
+            {
+                Debug.Log("[GameApiManager] No token found. Trying remembered credentials auto-login...");
+                yield return StartCoroutine(TryAutoLoginWithRememberedCredentials());
+                yield break;
+            }
+
             Debug.Log("[GameApiManager] No saved session found.");
             yield break;
         }
@@ -383,17 +398,112 @@ public class GameApiManager : MonoBehaviour
                 Debug.LogWarning($"[GameApiManager] Session restore failed: {err}");
                 AuthToken = null;
                 PlayerPrefs.DeleteKey(TOKEN_PREF_KEY);
+
+                if (HasRememberedCredentials)
+                {
+                    StartCoroutine(TryAutoLoginWithRememberedCredentials());
+                }
             }
         ));
     }
 
-    private void StoreSession(string token, UserData user)
+    private IEnumerator TryAutoLoginWithRememberedCredentials()
+    {
+        if (AuthService.Instance == null)
+            yield break;
+
+        string identifier = PlayerPrefs.GetString(REMEMBER_IDENTIFIER_PREF_KEY, string.Empty);
+        string password = PlayerPrefs.GetString(REMEMBER_PASSWORD_PREF_KEY, string.Empty);
+
+        if (string.IsNullOrEmpty(identifier) || string.IsNullOrEmpty(password))
+            yield break;
+
+        bool done = false;
+        bool success = false;
+        UserData autoUser = null;
+
+        yield return StartCoroutine(AuthService.Instance.Login(
+            identifier,
+            password,
+            onSuccess: (userData, token) =>
+            {
+                autoUser = userData;
+                StoreSession(token, userData, identifier, password);
+                success = true;
+                done = true;
+            },
+            onError: err =>
+            {
+                Debug.LogWarning($"[GameApiManager] Auto-login failed: {err}");
+                ClearRememberedCredentials();
+                done = true;
+            }
+        ));
+
+        while (!done)
+            yield return null;
+
+        if (!success || autoUser == null)
+            yield break;
+
+        if (ProgressService.Instance != null)
+        {
+            yield return StartCoroutine(ProgressService.Instance.GetProgress(
+                onSuccess: progress =>
+                {
+                    SyncProgressLocally(progress);
+                    OnSessionRestored?.Invoke(autoUser);
+                },
+                onError: err =>
+                {
+                    Debug.LogWarning($"[GameApiManager] Progress fetch failed after auto-login: {err}");
+                    OnSessionRestored?.Invoke(autoUser);
+                }
+            ));
+        }
+        else
+        {
+            OnSessionRestored?.Invoke(autoUser);
+        }
+    }
+
+    private void StoreSession(string token, UserData user, string rememberIdentifier = null, string rememberPassword = null)
     {
         AuthToken = token;
         CurrentUser = user;
+
+        // Prevent stale ownership from a previous account before fresh sync arrives.
+        ClearCharacterOwnershipCache();
+
+        if (!string.IsNullOrEmpty(rememberIdentifier) && !string.IsNullOrEmpty(rememberPassword))
+        {
+            PlayerPrefs.SetString(REMEMBER_IDENTIFIER_PREF_KEY, rememberIdentifier.Trim());
+            PlayerPrefs.SetString(REMEMBER_PASSWORD_PREF_KEY, rememberPassword);
+        }
+
         PlayerPrefs.SetString(TOKEN_PREF_KEY, token);
         PlayerPrefs.Save();
         Debug.Log($"[GameApiManager] Session stored for: {user.username}");
+    }
+
+    private void ClearRememberedCredentials()
+    {
+        PlayerPrefs.DeleteKey(REMEMBER_IDENTIFIER_PREF_KEY);
+        PlayerPrefs.DeleteKey(REMEMBER_PASSWORD_PREF_KEY);
+    }
+
+    private void ClearCharacterOwnershipCache()
+    {
+        PlayerPrefs.DeleteKey("SelectedCharacter");
+
+        // Legacy/local ownership keys that can leak between accounts on one device.
+        for (int i = 0; i < 20; i++)
+            PlayerPrefs.DeleteKey("Character_" + i);
+
+        PlayerPrefs.DeleteKey("OwnedChar_ranger");
+        PlayerPrefs.DeleteKey("OwnedChar_skeleton");
+        PlayerPrefs.DeleteKey("OwnedChar_minatour");
+        PlayerPrefs.DeleteKey("OwnedChar_goblin");
     }
 
     private void SyncProgressLocally(UserProgressData progress)

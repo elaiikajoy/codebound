@@ -274,6 +274,37 @@ public class CharacterItem
 }
 
 [System.Serializable]
+public class CharacterStateData
+{
+    public string equippedCharacter;
+    public string[] ownedCharacters;
+    public CharacterItem[] availableCharacters;
+    public int totalTokens;
+}
+
+[System.Serializable]
+public class CharacterStateResponse
+{
+    public bool success;
+    public string message;
+    public CharacterStateData data;
+}
+
+[System.Serializable]
+public class BuyCharacterRequest
+{
+    public string characterId;
+}
+
+[System.Serializable]
+public class BuyCharacterResponse
+{
+    public bool success;
+    public string message;
+    public CharacterStateData data;
+}
+
+[System.Serializable]
 public class EquipCharacterRequest
 {
     public string characterId;

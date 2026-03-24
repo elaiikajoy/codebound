@@ -81,7 +81,8 @@ public class AuthUIManager : MonoBehaviour
 
         // If a saved session exists, wait for restore to finish so we do not
         // flash the login panel for returning users.
-        if (GameApiManager.Instance != null && GameApiManager.Instance.HasSavedSession)
+        if (GameApiManager.Instance != null &&
+            (GameApiManager.Instance.HasSavedSession || GameApiManager.Instance.HasRememberedCredentials))
         {
             _isWaitingForSessionRestore = true;
             HideLoginPanelOnly();
@@ -492,7 +493,8 @@ public class AuthUIManager : MonoBehaviour
                 yield break;
             }
 
-            if (GameApiManager.Instance == null || !GameApiManager.Instance.HasSavedSession)
+            if (GameApiManager.Instance == null ||
+                (!GameApiManager.Instance.HasSavedSession && !GameApiManager.Instance.HasRememberedCredentials))
             {
                 ShowLoginPanel();
                 yield break;

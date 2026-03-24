@@ -46,7 +46,8 @@ public class Movement : MonoBehaviour
 
         ApplyGravity();
 
-        animator.SetFloat("speed", Mathf.Abs(velocity.x));
+        if (animator != null && animator.enabled)
+            animator.SetFloat("speed", Mathf.Abs(velocity.x));
 
     }
 
@@ -54,7 +55,7 @@ public class Movement : MonoBehaviour
     {
         velocity.y = Mathf.Max(velocity.y, 0f);
         Jumping = velocity.y > 0f;
-        
+
 
         if (Input.GetButtonDown("Jump"))
         {
@@ -104,7 +105,8 @@ public class Movement : MonoBehaviour
 
         rigidbody.MovePosition(position);
 
-        animator.SetBool("isGrounded", Grounded);
+        if (animator != null && animator.enabled)
+            animator.SetBool("isGrounded", Grounded);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

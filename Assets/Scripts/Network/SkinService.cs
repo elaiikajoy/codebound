@@ -1,9 +1,9 @@
 // ============================================================
 // SkinService.cs
-// Purpose: Legacy Unity component used to sync character state
-//          with the CodeBound backend.
-//            GET  /characters           — current player character (protected)
-//            POST /characters/equip     — set active character (protected)
+// Purpose: Character service for shop dropdown and buy/equip integration.
+//            GET  /characters           — equipped + owned + catalog + tokens
+//            POST /characters/buy       — buy a character
+//            POST /characters/equip     — set active character
 //
 // Unity Setup:
 //   - Attach to the "GameAPI" persistent GameObject.
@@ -29,17 +29,26 @@ public class SkinService : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    // ─── Available characters (local-only) ────────────────────
-    /// <summary>
-    /// Backend no longer serves character catalog data.
-    /// Returns an empty array to preserve call compatibility.
-    /// </summary>
-    public IEnumerator GetAvailableCharacters(
-        Action<CharacterItem[]> onSuccess,
+    // ─── Character dropdown state (protected) ─────────────────
+    public IEnumerator GetCharacterState(
+        Action<CharacterStateData> onSuccess,
         Action<string> onError = null)
     {
-        onSuccess?.Invoke(new CharacterItem[0]);
-        yield break;
+        if (!GameApiManager.Instance.IsLoggedIn) { onError?.Invoke("Not logged in."); yield break; }
+
+        yield return StartCoroutine(ApiClient.Instance.Get(
+            "/characters",
+            onSuccess: json =>
+            {
+                var result = JsonUtility.FromJson<CharacterStateResponse>(json);
+                if (result != null && result.success && result.data != null)
+                    onSuccess?.Invoke(result.data);
+                else
+                    onError?.Invoke(result?.message ?? "Failed to fetch character state.");
+            },
+            onError: onError ?? (e => Debug.LogWarning(e)),
+            requiresAuth: true
+        ));
     }
 
     // ─── Current character state (protected) ──────────────────
@@ -50,14 +59,41 @@ public class SkinService : MonoBehaviour
         Action<string> onSuccess,
         Action<string> onError = null)
     {
+        yield return StartCoroutine(GetCharacterState(
+            onSuccess: state => onSuccess?.Invoke(state?.equippedCharacter ?? "default"),
+            onError: onError
+        ));
+    }
+
+    public IEnumerator GetAvailableCharacters(
+        Action<CharacterItem[]> onSuccess,
+        Action<string> onError = null)
+    {
+        yield return StartCoroutine(GetCharacterState(
+            onSuccess: state => onSuccess?.Invoke(state?.availableCharacters ?? new CharacterItem[0]),
+            onError: onError
+        ));
+    }
+
+    public IEnumerator BuyCharacter(
+        string characterId,
+        Action<CharacterStateData> onSuccess = null,
+        Action<string> onError = null)
+    {
         if (!GameApiManager.Instance.IsLoggedIn) { onError?.Invoke("Not logged in."); yield break; }
 
-        yield return StartCoroutine(ApiClient.Instance.Get(
-            "/characters",
+        var body = new BuyCharacterRequest { characterId = characterId };
+
+        yield return StartCoroutine(ApiClient.Instance.Post(
+            "/characters/buy",
+            body,
             onSuccess: json =>
             {
-                var result = JsonUtility.FromJson<ProgressResponse>(json);
-                onSuccess?.Invoke(result?.data?.equippedCharacter ?? "default");
+                var result = JsonUtility.FromJson<BuyCharacterResponse>(json);
+                if (result != null && result.success && result.data != null)
+                    onSuccess?.Invoke(result.data);
+                else
+                    onError?.Invoke(result?.message ?? "Failed to buy character.");
             },
             onError: onError ?? (e => Debug.LogWarning(e)),
             requiresAuth: true

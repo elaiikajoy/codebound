@@ -29,6 +29,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections;
+using System.Collections.Generic;
 
 public class Shop : MonoBehaviour
 {
@@ -61,15 +63,43 @@ public class Shop : MonoBehaviour
     // ─── Private State ────────────────────────────────────────
     private int _selectedIndex = 0;
     private Rigidbody2D _cachedRb; // Cache the RB to avoid GetComponent delay
+    private Animator _cachedAnimator;
+    private readonly HashSet<string> _ownedCharacterIds = new HashSet<string>();
+    private bool _hasBackendCharacterState;
+    private bool _isShopUiContext;
+
+    private void OnEnable()
+    {
+        GameApiManager.OnLoginSuccess += HandleAuthStateChanged;
+        GameApiManager.OnSessionRestored += HandleAuthStateChanged;
+        GameApiManager.OnLogout += HandleLoggedOut;
+    }
+
+    private void OnDisable()
+    {
+        GameApiManager.OnLoginSuccess -= HandleAuthStateChanged;
+        GameApiManager.OnSessionRestored -= HandleAuthStateChanged;
+        GameApiManager.OnLogout -= HandleLoggedOut;
+    }
 
     // ─── Lifecycle ────────────────────────────────────────────
 
     private void Start()
     {
+        EnsureGameApiStack();
+
+        // When this script is attached to the in-level player prefab,
+        // only artworkSprite is assigned and shop UI references are null.
+        // In that mode we should trust locally equipped prefs and avoid
+        // backend state pulls that can briefly revert visuals to ranger.
+        _isShopUiContext = (buyButton != null) || (selectButton != null) || (playButton != null) ||
+                           (nameText != null) || (costText != null) || (tokenText != null);
+
         // Cache the Rigidbody once at the start to make RefreshDisplay faster
         if (artworkSprite != null)
         {
             _cachedRb = artworkSprite.GetComponent<Rigidbody2D>();
+            _cachedAnimator = artworkSprite.GetComponent<Animator>();
             if (_cachedRb != null)
             {
                 _cachedRb.bodyType = RigidbodyType2D.Kinematic;
@@ -82,6 +112,39 @@ public class Shop : MonoBehaviour
         // Pre-select the character the player has equipped
         _selectedIndex = FindIndexByEquippedId();
         RefreshDisplay();
+
+        if (!_isShopUiContext)
+            ApplyGameplayAnimatorMode();
+
+        if (!_isShopUiContext)
+            return;
+
+        if (GameApiManager.Instance != null && SkinService.Instance != null)
+        {
+            if (GameApiManager.Instance.IsLoggedIn)
+                StartCoroutine(LoadCharacterStateFromBackend());
+            else if (GameApiManager.Instance.HasSavedSession || GameApiManager.Instance.HasRememberedCredentials)
+                StartCoroutine(WaitForSessionThenLoadCharacterState());
+        }
+    }
+
+    private void HandleAuthStateChanged(UserData _)
+    {
+        if (!_isShopUiContext) return;
+        if (!isActiveAndEnabled) return;
+        if (SkinService.Instance == null) return;
+
+        _hasBackendCharacterState = false;
+        StartCoroutine(LoadCharacterStateFromBackend());
+    }
+
+    private void HandleLoggedOut()
+    {
+        _ownedCharacterIds.Clear();
+        _hasBackendCharacterState = false;
+
+        if (_isShopUiContext)
+            RefreshDisplay();
     }
 
     // ─── Navigation ───────────────────────────────────────────
@@ -116,31 +179,48 @@ public class Shop : MonoBehaviour
     public void BuyCharacter()
     {
         Characters character = characterDB.GetCharacter(_selectedIndex);
+        string characterId = GetCharacterId(character);
 
         if (character == null) return;
+        if (string.IsNullOrEmpty(characterId)) return;
         if (IsOwned(_selectedIndex)) return;                    // already owned
         if (TokenManager.GetTokens() < character.cost) return; // not enough tokens
 
-        // Deduct tokens via the unified token manager.
-        // SpendTokens returns false if balance is insufficient (shouldn't happen
-        // since BuyButton is disabled when balance is too low, but guard anyway).
-        if (!TokenManager.SpendTokens(character.cost))
+        EnsureGameApiStack();
+
+        if (GameApiManager.Instance == null || SkinService.Instance == null)
         {
-            Debug.LogWarning("[Shop] BuyCharacter: SpendTokens failed — insufficient balance.");
+            Debug.LogWarning("[Shop] Buy blocked: GameAPI stack is not ready.");
             return;
         }
 
-        // Mark as owned in PlayerPrefs — by both index and characterId so
-        // that the owned state survives logout (characterId-based key persists
-        // even after the index-based key is cleared on logout).
-        PlayerPrefs.SetInt("Character_" + _selectedIndex, 1);
-        if (!string.IsNullOrEmpty(character.characterId))
-            PlayerPrefs.SetInt("OwnedChar_" + character.characterId, 1);
-        PlayerPrefs.Save();
+        if (!GameApiManager.Instance.IsLoggedIn)
+        {
+            if (GameApiManager.Instance.HasSavedSession || GameApiManager.Instance.HasRememberedCredentials)
+            {
+                StartCoroutine(WaitForSessionThenBuy(characterId, character.CharacterName));
+            }
+            else
+            {
+                Debug.LogWarning("[Shop] Buy blocked: user must be logged in for DB-persistent purchase.");
+            }
+            return;
+        }
 
-        Debug.Log($"[Shop] Bought character '{character.CharacterName}' for {character.cost} tokens. Remaining: {TokenManager.GetTokens()}");
-
-        RefreshDisplay();
+        StartCoroutine(SkinService.Instance.BuyCharacter(
+            characterId,
+            onSuccess: state =>
+            {
+                ApplyCharacterState(state);
+                Debug.Log($"[Shop] Bought character '{character.CharacterName}' from backend.");
+                RefreshDisplay();
+            },
+            onError: err =>
+            {
+                Debug.LogWarning($"[Shop] Buy failed: {err}");
+                RefreshDisplay();
+            }
+        ));
     }
 
     /// <summary>
@@ -151,25 +231,26 @@ public class Shop : MonoBehaviour
     public void SelectCharacter()
     {
         Characters character = characterDB.GetCharacter(_selectedIndex);
+        string characterId = GetCharacterId(character);
         if (character == null || !IsOwned(_selectedIndex)) return;
+        if (string.IsNullOrEmpty(characterId)) return;
 
         // Save locally so CharacterManager in game scenes can read it.
         PlayerPrefs.SetInt("SelectedCharacter", _selectedIndex);
-        if (!string.IsNullOrEmpty(character.characterId))
-            PlayerPrefs.SetString("EquippedCharacter", character.characterId);
+        PlayerPrefs.SetString("EquippedCharacter", characterId);
         PlayerPrefs.Save();
 
         // Sync to backend — non-blocking, game continues even if offline.
-        if (SkinService.Instance != null && !string.IsNullOrEmpty(character.characterId))
+        if (SkinService.Instance != null)
         {
             StartCoroutine(SkinService.Instance.EquipCharacter(
-                character.characterId,
+                characterId,
                 onSuccess: id => Debug.Log($"[Shop] Equipped '{id}' on backend successfully."),
-                onError:  err => Debug.LogWarning($"[Shop] Equip backend sync failed (offline?): {err}")
+                onError: err => Debug.LogWarning($"[Shop] Equip backend sync failed (offline?): {err}")
             ));
         }
 
-        Debug.Log($"[Shop] Character selected: {character.CharacterName} (id={character.characterId})");
+        Debug.Log($"[Shop] Character selected: {character.CharacterName} (id={characterId})");
         RefreshDisplay();
     }
 
@@ -179,10 +260,52 @@ public class Shop : MonoBehaviour
     /// </summary>
     public void PlayCharacter()
     {
-        // Equip first (ensures DB is updated even if coming from a fresh selection).
-        SelectCharacter();
+        Characters character = characterDB.GetCharacter(_selectedIndex);
+        string characterId = GetCharacterId(character);
 
-        SceneManager.LoadSceneAsync(levelSelectionScene);
+        if (character == null || !IsOwned(_selectedIndex) || string.IsNullOrEmpty(characterId))
+            return;
+
+        // Apply locally first so gameplay visuals immediately use the selected character.
+        PlayerPrefs.SetInt("SelectedCharacter", _selectedIndex);
+        PlayerPrefs.SetString("EquippedCharacter", characterId);
+        PlayerPrefs.Save();
+
+        // In non-shop contexts (e.g., player prefab inside levels), just continue.
+        if (!_isShopUiContext)
+        {
+            SceneManager.LoadSceneAsync(levelSelectionScene);
+            return;
+        }
+
+        if (SkinService.Instance == null || GameApiManager.Instance == null)
+        {
+            SceneManager.LoadSceneAsync(levelSelectionScene);
+            return;
+        }
+
+        if (!GameApiManager.Instance.IsLoggedIn)
+        {
+            if (GameApiManager.Instance.HasSavedSession || GameApiManager.Instance.HasRememberedCredentials)
+            {
+                StartCoroutine(WaitForSessionThenEquipAndPlay(characterId));
+            }
+            else
+            {
+                SceneManager.LoadSceneAsync(levelSelectionScene);
+            }
+            return;
+        }
+
+        StartCoroutine(SkinService.Instance.EquipCharacter(
+            characterId,
+            onSuccess: _ => SceneManager.LoadSceneAsync(levelSelectionScene),
+            onError: err =>
+            {
+                Debug.LogWarning($"[Shop] Equip before play failed: {err}. Continuing with local equipped state.");
+                SceneManager.LoadSceneAsync(levelSelectionScene);
+            }
+        ));
     }
 
     /// <summary>Return to the main menu.</summary>
@@ -231,7 +354,7 @@ public class Shop : MonoBehaviour
         bool owned = IsOwned(_selectedIndex);
         bool isFree = character.cost == 0;
         bool canAfford = TokenManager.GetTokens() >= character.cost;
-        bool isEquipped = IsEquipped(character.characterId);
+        bool isEquipped = IsEquipped(GetCharacterId(character));
 
         // Cost label
         if (costText != null)
@@ -247,6 +370,7 @@ public class Shop : MonoBehaviour
         {
             buyButton.gameObject.SetActive(!owned && !isFree);
             buyButton.interactable = canAfford;
+            SetButtonLabel(buyButton, "BUY");
         }
 
         // Select button: enabled only if owned (and not already equipped)
@@ -261,7 +385,14 @@ public class Shop : MonoBehaviour
         {
             playButton.gameObject.SetActive(owned || isFree);
             playButton.interactable = true;
+            SetButtonLabel(playButton, "PLAY");
         }
+
+        if (owned && costText != null)
+            costText.text = isEquipped ? "EQUIPPED" : "OWNED";
+
+        if (!_isShopUiContext)
+            ApplyGameplayAnimatorMode();
     }
 
     // ─── Helpers ──────────────────────────────────────────────
@@ -277,23 +408,22 @@ public class Shop : MonoBehaviour
         if (index == 0) return true;
 
         Characters character = characterDB.GetCharacter(index);
+        string characterId = GetCharacterId(character);
         if (character == null || character.cost == 0) return true;
 
-        // Primary: index key (set on purchase in this session)
-        if (PlayerPrefs.GetInt("Character_" + index, 0) == 1) return true;
+        // Strict source of truth: backend user_characters only.
+        if (!_hasBackendCharacterState || string.IsNullOrEmpty(characterId))
+            return false;
 
-        // Fallback: characterId key (survives logout)
-        if (!string.IsNullOrEmpty(character.characterId))
-            return PlayerPrefs.GetInt("OwnedChar_" + character.characterId, 0) == 1;
-
-        return false;
+        return _ownedCharacterIds.Contains(characterId);
     }
 
     /// <summary>Returns true if the given characterId is the currently equipped one.</summary>
     private bool IsEquipped(string characterId)
     {
         if (string.IsNullOrEmpty(characterId)) return false;
-        return PlayerPrefs.GetString("EquippedCharacter", "default") == characterId;
+        string equipped = NormalizeCharacterId(PlayerPrefs.GetString("EquippedCharacter", "default"));
+        return equipped == characterId;
     }
 
     /// <summary>
@@ -304,14 +434,208 @@ public class Shop : MonoBehaviour
     private int FindIndexByEquippedId()
     {
         string equipped = PlayerPrefs.GetString("EquippedCharacter", "default");
+        equipped = NormalizeCharacterId(equipped);
 
         for (int i = 0; i < characterDB.CharacterCount; i++)
         {
             Characters c = characterDB.GetCharacter(i);
-            if (c != null && c.characterId == equipped)
+            if (c != null && GetCharacterId(c) == equipped)
                 return i;
         }
 
         return 0; // Default to first character if not matched
+    }
+
+    private IEnumerator LoadCharacterStateFromBackend()
+    {
+        yield return StartCoroutine(SkinService.Instance.GetCharacterState(
+            onSuccess: state =>
+            {
+                ApplyCharacterState(state);
+                _selectedIndex = FindIndexByEquippedId();
+                RefreshDisplay();
+            },
+            onError: err =>
+            {
+                Debug.LogWarning($"[Shop] Failed to load backend character state: {err}");
+                _hasBackendCharacterState = false;
+                RefreshDisplay();
+            }
+        ));
+    }
+
+    private IEnumerator WaitForSessionThenLoadCharacterState()
+    {
+        float timeout = 6f;
+        while (timeout > 0f)
+        {
+            if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
+            {
+                yield return StartCoroutine(LoadCharacterStateFromBackend());
+                yield break;
+            }
+
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Debug.LogWarning("[Shop] Session restore timed out before character state load.");
+    }
+
+    private IEnumerator WaitForSessionThenBuy(string characterId, string characterName)
+    {
+        float timeout = 6f;
+        while (timeout > 0f)
+        {
+            if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn)
+            {
+                StartCoroutine(SkinService.Instance.BuyCharacter(
+                    characterId,
+                    onSuccess: state =>
+                    {
+                        ApplyCharacterState(state);
+                        Debug.Log($"[Shop] Bought character '{characterName}' from backend after session restore.");
+                        RefreshDisplay();
+                    },
+                    onError: err =>
+                    {
+                        Debug.LogWarning($"[Shop] Buy failed: {err}");
+                        RefreshDisplay();
+                    }
+                ));
+                yield break;
+            }
+
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Debug.LogWarning("[Shop] Buy blocked: failed to restore session in time.");
+    }
+
+    private IEnumerator WaitForSessionThenEquipAndPlay(string characterId)
+    {
+        float timeout = 6f;
+        while (timeout > 0f)
+        {
+            if (GameApiManager.Instance != null && GameApiManager.Instance.IsLoggedIn && SkinService.Instance != null)
+            {
+                yield return StartCoroutine(SkinService.Instance.EquipCharacter(
+                    characterId,
+                    onSuccess: _ => SceneManager.LoadSceneAsync(levelSelectionScene),
+                    onError: err =>
+                    {
+                        Debug.LogWarning($"[Shop] Equip after session restore failed: {err}. Continuing.");
+                        SceneManager.LoadSceneAsync(levelSelectionScene);
+                    }
+                ));
+                yield break;
+            }
+
+            timeout -= Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        SceneManager.LoadSceneAsync(levelSelectionScene);
+    }
+
+    private void EnsureGameApiStack()
+    {
+        GameObject gameApiRoot = null;
+
+        if (GameApiManager.Instance != null)
+        {
+            gameApiRoot = GameApiManager.Instance.gameObject;
+        }
+        else
+        {
+            var existing = FindObjectOfType<GameApiManager>();
+            if (existing != null)
+            {
+                gameApiRoot = existing.gameObject;
+            }
+            else
+            {
+                gameApiRoot = new GameObject("GameAPI");
+                gameApiRoot.AddComponent<GameApiManager>();
+                Debug.Log("[Shop] Auto-created missing GameAPI root.");
+            }
+        }
+
+        // Ensure all required network components exist on the same persistent object.
+        if (gameApiRoot.GetComponent<ApiConfig>() == null) gameApiRoot.AddComponent<ApiConfig>();
+        if (gameApiRoot.GetComponent<ApiClient>() == null) gameApiRoot.AddComponent<ApiClient>();
+        if (gameApiRoot.GetComponent<AuthService>() == null) gameApiRoot.AddComponent<AuthService>();
+        if (gameApiRoot.GetComponent<ProgressService>() == null) gameApiRoot.AddComponent<ProgressService>();
+        if (gameApiRoot.GetComponent<SkinService>() == null) gameApiRoot.AddComponent<SkinService>();
+
+        if (gameApiRoot.GetComponent<LeaderboardService>() == null) gameApiRoot.AddComponent<LeaderboardService>();
+        if (gameApiRoot.GetComponent<AchievementService>() == null) gameApiRoot.AddComponent<AchievementService>();
+    }
+
+    private void ApplyCharacterState(CharacterStateData state)
+    {
+        if (state == null) return;
+
+        _ownedCharacterIds.Clear();
+        if (state.ownedCharacters != null)
+        {
+            foreach (var id in state.ownedCharacters)
+            {
+                string normalized = NormalizeCharacterId(id);
+                if (!string.IsNullOrEmpty(normalized))
+                    _ownedCharacterIds.Add(normalized);
+            }
+        }
+
+        _ownedCharacterIds.Add("ranger");
+        _hasBackendCharacterState = true;
+
+        if (!string.IsNullOrEmpty(state.equippedCharacter))
+            PlayerPrefs.SetString("EquippedCharacter", NormalizeCharacterId(state.equippedCharacter));
+
+        TokenManager.SyncFromBackend(state.totalTokens);
+        PlayerPrefs.Save();
+    }
+
+    private string GetCharacterId(Characters character)
+    {
+        if (character == null) return string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(character.characterId))
+            return NormalizeCharacterId(character.characterId);
+
+        // Fallback to name-based IDs to support existing ScriptableObject assets.
+        return NormalizeCharacterId(character.CharacterName);
+    }
+
+    private string NormalizeCharacterId(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+
+        string normalized = value.Trim().ToLowerInvariant();
+        if (normalized == "default") return "ranger";
+        return normalized;
+    }
+
+    private void SetButtonLabel(Button button, string text)
+    {
+        if (button == null) return;
+        var label = button.GetComponentInChildren<TextMeshProUGUI>(true);
+        if (label != null)
+            label.text = text;
+    }
+
+    private void ApplyGameplayAnimatorMode()
+    {
+        if (_cachedAnimator == null && artworkSprite != null)
+            _cachedAnimator = artworkSprite.GetComponent<Animator>();
+
+        if (_cachedAnimator == null)
+            return;
+
+        string equipped = NormalizeCharacterId(PlayerPrefs.GetString("EquippedCharacter", "default"));
+        bool useRangerAnimator = equipped == "ranger" || string.IsNullOrEmpty(equipped);
+        _cachedAnimator.enabled = useRangerAnimator;
     }
 }

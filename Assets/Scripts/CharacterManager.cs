@@ -54,7 +54,9 @@ public class CharacterManager : MonoBehaviour
             return;
         }
 
-        int index = PlayerPrefs.GetInt("SelectedCharacter", 0);
+        int index = PlayerPrefs.HasKey("SelectedCharacter")
+            ? PlayerPrefs.GetInt("SelectedCharacter", 0)
+            : FindIndexByEquippedId();
 
         // Clamp in case the database was resized after the player saved.
         index = Mathf.Clamp(index, 0, characterDB.CharacterCount - 1);
@@ -87,6 +89,36 @@ public class CharacterManager : MonoBehaviour
             nameText.text = character.CharacterName;
 
         Debug.Log($"[CharacterManager] Applied character '{character.CharacterName}' (index={index}, id={character.characterId}).");
+    }
+
+    private string NormalizeCharacterId(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+        string normalized = value.Trim().ToLowerInvariant();
+        if (normalized == "default") return "ranger";
+        return normalized;
+    }
+
+    private string GetCharacterId(Characters character)
+    {
+        if (character == null) return string.Empty;
+        if (!string.IsNullOrWhiteSpace(character.characterId))
+            return NormalizeCharacterId(character.characterId);
+        return NormalizeCharacterId(character.CharacterName);
+    }
+
+    private int FindIndexByEquippedId()
+    {
+        string equipped = NormalizeCharacterId(PlayerPrefs.GetString("EquippedCharacter", "default"));
+
+        for (int i = 0; i < characterDB.CharacterCount; i++)
+        {
+            Characters c = characterDB.GetCharacter(i);
+            if (c != null && GetCharacterId(c) == equipped)
+                return i;
+        }
+
+        return 0;
     }
 
     /// <summary>
