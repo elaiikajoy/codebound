@@ -13,4 +13,9 @@ public class Characters
     // Example: "default", "ninja", "wizard"
     // Set this in the Inspector for each character in CharacterDatabase.
     public string characterId;
+
+    // Animator Controller for this character's animations.
+    // Assign the character's .controller asset here in the CharacterDatabase ScriptableObject.
+    // If left empty, the player's existing Animator Controller will not be changed.
+    public RuntimeAnimatorController animatorController;
 }

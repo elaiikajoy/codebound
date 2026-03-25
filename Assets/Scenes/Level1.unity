@@ -2760,6 +2760,30 @@ PrefabInstance:
       objectReference: {fileID: 2255892171895067850, guid: 5440de1e9cbe31249965a7f913c2b19d, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bfb25fe8b36ae77489c541e2d83c6cc6, type: 3}
+--- !u!1 &945140499 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4025925460572891436, guid: bfb25fe8b36ae77489c541e2d83c6cc6, type: 3}
+  m_PrefabInstance: {fileID: 945140498}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &945140500 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 3246750631410837115, guid: bfb25fe8b36ae77489c541e2d83c6cc6, type: 3}
+  m_PrefabInstance: {fileID: 945140498}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &945140501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 945140499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45f3f24a7f90f2644ae2041d4ef4fd93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterDB: {fileID: 11400000, guid: d9bd255feee2d1e4b9d0ea48bd67b5d8, type: 2}
+  artworkSprite: {fileID: 945140500}
 --- !u!1001 &977747651
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3079,7 +3103,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1046538384}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -7.42, y: 0.05, z: -10}
+  m_LocalPosition: {x: -7.91, y: 0.05, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6998,6 +7022,10 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 696762931}
+    - target: {fileID: 2471717847932225426, guid: 1a43aeab6498fd644b0047adf8b0f896, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -464.4
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a43aeab6498fd644b0047adf8b0f896, type: 3}
 --- !u!1001 &5279577640414216000
