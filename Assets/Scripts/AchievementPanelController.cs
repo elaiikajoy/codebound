@@ -60,6 +60,12 @@ public class AchievementPanelController : MonoBehaviour
     [Tooltip("Optional viewport/mask RectTransform used for dynamic scroll limit calculation.")]
     [SerializeField] private RectTransform manualScrollViewport;
 
+    [Tooltip("Top area reserved for fixed UI (Achievement title/back icon). Rows are not allowed to overlap this zone.")]
+    [SerializeField] private float manualViewportTopInset = 100f;
+
+    [Tooltip("Optional bottom area reserved for fixed UI (e.g. footer).")]
+    [SerializeField] private float manualViewportBottomInset = 0f;
+
     [SerializeField] private float manualWheelScrollSpeed = 220f;
 
     [Tooltip("If enabled, wheel direction is inverted for projects where input feels reversed.")]
@@ -439,7 +445,7 @@ public class AchievementPanelController : MonoBehaviour
         Canvas.ForceUpdateCanvases();
 
         Bounds relativeBounds = RectTransformUtility.CalculateRelativeRectTransformBounds(viewport, manualScrollTarget);
-        float viewportTop = viewport.rect.yMax - manualScrollPadding;
+        float viewportTop = GetManualViewportTopLimit(viewport) - manualScrollPadding;
         float deltaY = viewportTop - relativeBounds.max.y;
 
         Vector2 anchored = manualScrollTarget.anchoredPosition;
@@ -468,6 +474,10 @@ public class AchievementPanelController : MonoBehaviour
             return;
 
         if (manualScrollTarget == null)
+            return;
+
+        RectTransform viewport = ResolveManualViewport();
+        if (!IsPointerInsideManualScrollArea(viewport))
             return;
 
         float wheel = Input.mouseScrollDelta.y;
@@ -506,7 +516,7 @@ public class AchievementPanelController : MonoBehaviour
         Bounds relativeBounds = RectTransformUtility.CalculateRelativeRectTransformBounds(viewport, manualScrollTarget);
         contentHeight = Mathf.Max(contentHeight, relativeBounds.size.y);
 
-        float viewportHeight = viewport.rect.height;
+        float viewportHeight = GetManualScrollableViewportHeight(viewport);
         if (contentHeight <= viewportHeight + 0.01f)
         {
             // If auto-detection says no overflow, fall back to manual limits.
@@ -568,8 +578,8 @@ public class AchievementPanelController : MonoBehaviour
         if (viewport == null)
             return;
 
-        float viewportTop = viewport.rect.yMax + rowCullingMargin;
-        float viewportBottom = viewport.rect.yMin - rowCullingMargin;
+        float viewportTop = GetManualViewportTopLimit(viewport) + rowCullingMargin;
+        float viewportBottom = GetManualViewportBottomLimit(viewport) - rowCullingMargin;
 
         for (int i = 0; i < rowViews.Length; i++)
         {
@@ -611,6 +621,56 @@ public class AchievementPanelController : MonoBehaviour
         canvasGroup.alpha = visible ? 1f : 0f;
         canvasGroup.interactable = visible;
         canvasGroup.blocksRaycasts = visible;
+    }
+
+    private bool IsPointerInsideManualScrollArea(RectTransform viewport)
+    {
+        if (viewport == null)
+            return false;
+
+        Camera eventCamera = ResolveViewportEventCamera(viewport);
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(viewport, Input.mousePosition, eventCamera, out Vector2 localPoint))
+            return false;
+
+        float top = GetManualViewportTopLimit(viewport);
+        float bottom = GetManualViewportBottomLimit(viewport);
+        return localPoint.y <= top && localPoint.y >= bottom;
+    }
+
+    private Camera ResolveViewportEventCamera(RectTransform viewport)
+    {
+        Canvas canvas = viewport.GetComponentInParent<Canvas>();
+        if (canvas == null || canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+            return null;
+
+        return canvas.worldCamera;
+    }
+
+    private float GetManualViewportTopLimit(RectTransform viewport)
+    {
+        if (viewport == null)
+            return 0f;
+
+        float maxInset = Mathf.Max(0f, viewport.rect.height - 24f);
+        float clampedInset = Mathf.Clamp(manualViewportTopInset, 0f, maxInset);
+        return viewport.rect.yMax - clampedInset;
+    }
+
+    private float GetManualViewportBottomLimit(RectTransform viewport)
+    {
+        if (viewport == null)
+            return 0f;
+
+        float maxInset = Mathf.Max(0f, viewport.rect.height - 24f);
+        float clampedInset = Mathf.Clamp(manualViewportBottomInset, 0f, maxInset);
+        return viewport.rect.yMin + clampedInset;
+    }
+
+    private float GetManualScrollableViewportHeight(RectTransform viewport)
+    {
+        float top = GetManualViewportTopLimit(viewport);
+        float bottom = GetManualViewportBottomLimit(viewport);
+        return Mathf.Max(1f, top - bottom);
     }
 
     private RectTransform ResolveManualScrollTarget(List<AchievementRowView> discoveredRows)

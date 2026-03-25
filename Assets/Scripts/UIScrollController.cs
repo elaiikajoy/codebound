@@ -7,8 +7,10 @@
 //   - Attach this script to the "Scroll" or "Scroll Menu" GameObject.
 //   - For Level Selection: Enable 'Use Grid Mode'.
 //   - For Achievements/Lists: Enable 'Use Vertical List Mode'.
+//   - Make sure a child named "Content" (or assign it manually) exists.
 // ============================================================
 
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,6 +35,13 @@ public class UIScrollController : MonoBehaviour
     public float verticalSpacing = 10f;
     public RectOffset listPadding;
     public bool forceExpandWidth = true;
+    [Tooltip("If enabled, VerticalLayoutGroup controls (overrides) each row's height via LayoutElement. Disable this for pre-placed rows with fixed heights.")]
+    public bool controlChildHeight = false;
+
+    [Header("Scroll Settings")]
+    [Tooltip("Mouse wheel / touch scroll sensitivity.")]
+    public float scrollSensitivity = 30f;
+    public float decelerationRate = 0.135f;
 
     private ScrollRect _scrollRect;
     private ContentSizeFitter _contentSizeFitter;
@@ -48,6 +57,13 @@ public class UIScrollController : MonoBehaviour
 
     private void OnEnable()
     {
+        StartCoroutine(DelayedRefresh());
+    }
+
+    // Wait one frame so Unity can calculate preferred sizes before we rebuild.
+    private IEnumerator DelayedRefresh()
+    {
+        yield return null;
         RefreshLayout();
     }
 
@@ -57,97 +73,139 @@ public class UIScrollController : MonoBehaviour
     [ContextMenu("Force Setup Components")]
     public void InitializeComponents()
     {
-        // 1. Resolve target graphic for dragging
-        // ScrollRect REQUIRES a graphic (Image) that receives raycasts to detect drags.
+        // -------------------------------------------------------
+        // 1. Ensure a RectMask2D clips content that scrolls out.
+        //    Must be added BEFORE ScrollRect so events route correctly.
+        // -------------------------------------------------------
+        if (GetComponent<RectMask2D>() == null && GetComponent<Mask>() == null)
+        {
+            gameObject.AddComponent<RectMask2D>();
+        }
+
+        // -------------------------------------------------------
+        // 2. Ensure we have a transparent Image so the ScrollRect
+        //    viewport can receive pointer / drag events.
+        // -------------------------------------------------------
         Image bgImg = GetComponent<Image>();
         if (bgImg == null)
         {
             bgImg = gameObject.AddComponent<Image>();
-            // Make it completely transparent so we don't block the background, 
-            // but it STILL catches raycasts for scrolling.
-            bgImg.color = new Color(1f, 1f, 1f, 0f);
         }
-        bgImg.raycastTarget = true;
+        bgImg.color = new Color(0f, 0f, 0f, 0f); // fully transparent
+        bgImg.raycastTarget = true;               // MUST catch pointer events
 
-        // 2. Resolve ScrollRect on this object (the viewport)
+        // -------------------------------------------------------
+        // 3. ScrollRect on this object (acts as the viewport too)
+        // -------------------------------------------------------
         _scrollRect = GetComponent<ScrollRect>();
         if (_scrollRect == null)
         {
             _scrollRect = gameObject.AddComponent<ScrollRect>();
         }
 
-        // 3. Resolve Content Transform
+        // -------------------------------------------------------
+        // 4. Resolve Content child
+        // -------------------------------------------------------
         if (content == null)
         {
             Transform found = transform.Find("Content");
             if (found != null)
-            {
                 content = found as RectTransform;
-            }
         }
 
-        if (content == null) return;
+        if (content == null)
+        {
+            Debug.LogWarning("[UIScrollController] No 'Content' child found. Assign it manually in the Inspector.", this);
+            return;
+        }
 
-        // Ensure Content anchors and pivot are set correctly for top-down vertical scrolling
-        content.anchorMin = new Vector2(0.5f, 1f);
-        content.anchorMax = new Vector2(0.5f, 1f);
-        content.pivot = new Vector2(0.5f, 1f);
+        // -------------------------------------------------------
+        // 5. Content anchoring
+        //    Vertical mode  → stretch full width, anchor to top.
+        //    Grid mode      → keep a centered top anchor (horizontal scroll can vary).
+        // -------------------------------------------------------
+        if (useVerticalListMode && !useGridMode)
+        {
+            // Full horizontal stretch anchored to top.
+            content.anchorMin = new Vector2(0f, 1f);
+            content.anchorMax = new Vector2(1f, 1f);
+            content.pivot     = new Vector2(0.5f, 1f);
+            // Zero out the horizontal offset so it stretches exactly.
+            content.sizeDelta = new Vector2(0f, content.sizeDelta.y);
+        }
+        else
+        {
+            // Grid / custom mode — top-center point anchor.
+            content.anchorMin = new Vector2(0.5f, 1f);
+            content.anchorMax = new Vector2(0.5f, 1f);
+            content.pivot     = new Vector2(0.5f, 1f);
+        }
 
-        // 4. Configure ScrollRect
-        _scrollRect.content = content;
-        _scrollRect.horizontal = false;
-        _scrollRect.vertical = true;
-        _scrollRect.viewport = GetComponent<RectTransform>();
-        _scrollRect.movementType = ScrollRect.MovementType.Elastic;
-        _scrollRect.inertia = true;
-        _scrollRect.decelerationRate = 0.135f;
-        _scrollRect.scrollSensitivity = 2.5f; // Adjusted sensitivity to 2.5f
+        // Always start content at the top-left of the viewport.
+        content.anchoredPosition = Vector2.zero;
 
-        // 5. Resolve/Add ContentSizeFitter to the Content object
+        // -------------------------------------------------------
+        // 6. Configure ScrollRect
+        // -------------------------------------------------------
+        _scrollRect.content          = content;
+        _scrollRect.viewport         = GetComponent<RectTransform>(); // self is viewport
+        _scrollRect.horizontal       = useGridMode;   // horizontal only for grids
+        _scrollRect.vertical         = true;
+        _scrollRect.movementType     = ScrollRect.MovementType.Elastic;
+        _scrollRect.elasticity       = 0.1f;
+        _scrollRect.inertia          = true;
+        _scrollRect.decelerationRate = decelerationRate;
+        _scrollRect.scrollSensitivity = scrollSensitivity;
+
+        // -------------------------------------------------------
+        // 7. ContentSizeFitter on Content — lets the layout group
+        //    drive the height automatically.
+        // -------------------------------------------------------
         _contentSizeFitter = content.GetComponent<ContentSizeFitter>();
         if (_contentSizeFitter == null)
-        {
             _contentSizeFitter = content.gameObject.AddComponent<ContentSizeFitter>();
-        }
-        _contentSizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-        _contentSizeFitter.horizontalFit = useGridMode ? ContentSizeFitter.FitMode.PreferredSize : ContentSizeFitter.FitMode.Unconstrained;
 
-        // 6. Layout Configuration
-        _gridLayoutGroup = content.GetComponent<GridLayoutGroup>();
+        _contentSizeFitter.verticalFit   = ContentSizeFitter.FitMode.PreferredSize;
+        _contentSizeFitter.horizontalFit = useGridMode
+            ? ContentSizeFitter.FitMode.PreferredSize
+            : ContentSizeFitter.FitMode.Unconstrained;
+
+        // -------------------------------------------------------
+        // 8. Layout group on Content
+        // -------------------------------------------------------
+        _gridLayoutGroup    = content.GetComponent<GridLayoutGroup>();
         _verticalLayoutGroup = content.GetComponent<VerticalLayoutGroup>();
 
         if (useGridMode)
         {
-            if (_verticalLayoutGroup != null) Destroy(_verticalLayoutGroup);
-            if (_gridLayoutGroup == null) _gridLayoutGroup = content.gameObject.AddComponent<GridLayoutGroup>();
+            if (_verticalLayoutGroup != null) DestroyImmediate(_verticalLayoutGroup);
+            if (_gridLayoutGroup == null)
+                _gridLayoutGroup = content.gameObject.AddComponent<GridLayoutGroup>();
 
-            _gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-            _gridLayoutGroup.constraintCount = gridColumns;
-            _gridLayoutGroup.cellSize = cellSize;
-            _gridLayoutGroup.spacing = spacing;
-            _gridLayoutGroup.padding = gridPadding;
-            _gridLayoutGroup.childAlignment = TextAnchor.UpperCenter;
-            _gridLayoutGroup.startCorner = GridLayoutGroup.Corner.UpperLeft;
-            _gridLayoutGroup.startAxis = GridLayoutGroup.Axis.Horizontal;
+            _gridLayoutGroup.constraint        = GridLayoutGroup.Constraint.FixedColumnCount;
+            _gridLayoutGroup.constraintCount   = gridColumns;
+            _gridLayoutGroup.cellSize          = cellSize;
+            _gridLayoutGroup.spacing           = spacing;
+            _gridLayoutGroup.padding           = gridPadding;
+            _gridLayoutGroup.childAlignment    = TextAnchor.UpperCenter;
+            _gridLayoutGroup.startCorner       = GridLayoutGroup.Corner.UpperLeft;
+            _gridLayoutGroup.startAxis         = GridLayoutGroup.Axis.Horizontal;
         }
         else if (useVerticalListMode)
         {
-            if (_gridLayoutGroup != null) Destroy(_gridLayoutGroup);
-            if (_verticalLayoutGroup == null) _verticalLayoutGroup = content.gameObject.AddComponent<VerticalLayoutGroup>();
+            if (_gridLayoutGroup != null) DestroyImmediate(_gridLayoutGroup);
+            if (_verticalLayoutGroup == null)
+                _verticalLayoutGroup = content.gameObject.AddComponent<VerticalLayoutGroup>();
 
-            _verticalLayoutGroup.spacing = verticalSpacing;
-            _verticalLayoutGroup.padding = listPadding;
-            _verticalLayoutGroup.childForceExpandWidth = forceExpandWidth;
+            _verticalLayoutGroup.spacing              = verticalSpacing;
+            _verticalLayoutGroup.padding              = listPadding;
+            _verticalLayoutGroup.childForceExpandWidth  = forceExpandWidth;
             _verticalLayoutGroup.childForceExpandHeight = false;
-            _verticalLayoutGroup.childControlWidth = forceExpandWidth;
-            _verticalLayoutGroup.childControlHeight = true;
-            _verticalLayoutGroup.childAlignment = TextAnchor.UpperCenter;
-        }
-
-        // Add a RectMask2D to this object to clip elements that scroll out of view
-        if (GetComponent<RectMask2D>() == null && GetComponent<Mask>() == null)
-        {
-            gameObject.AddComponent<RectMask2D>();
+            _verticalLayoutGroup.childControlWidth      = forceExpandWidth;
+            // controlChildHeight = false → respect each row's existing RectTransform height.
+            // Set to true ONLY if rows have LayoutElement components with explicit preferredHeight.
+            _verticalLayoutGroup.childControlHeight     = controlChildHeight;
+            _verticalLayoutGroup.childAlignment         = TextAnchor.UpperCenter;
         }
     }
 
@@ -155,13 +213,14 @@ public class UIScrollController : MonoBehaviour
     {
         if (content == null) return;
 
-        // Force fully rebuild layouts this frame so position calculations are flawless
+        // Force layout to recalculate so ContentSizeFitter sets the correct height.
         Canvas.ForceUpdateCanvases();
         LayoutRebuilder.ForceRebuildLayoutImmediate(content);
+        Canvas.ForceUpdateCanvases();
 
         if (_scrollRect != null)
         {
-            _scrollRect.verticalNormalizedPosition = 1f; // Always start scrolled to the very top
+            _scrollRect.verticalNormalizedPosition = 1f; // scroll to top
         }
     }
 }

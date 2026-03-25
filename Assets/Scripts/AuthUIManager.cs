@@ -446,6 +446,7 @@ public class AuthUIManager : MonoBehaviour
         gameApiRoot.AddComponent<ApiClient>();
         gameApiRoot.AddComponent<AuthService>();
         gameApiRoot.AddComponent<ProgressService>();
+        gameApiRoot.AddComponent<AchievementService>();
         gameApiRoot.AddComponent<GameApiManager>();
 
         Debug.Log("[Auth UI] Auto-created missing GameAPI stack.");

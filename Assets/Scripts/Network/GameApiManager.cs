@@ -72,6 +72,8 @@ public class GameApiManager : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        EnsureRequiredServices();
     }
 
     private void Start()
@@ -556,5 +558,29 @@ public class GameApiManager : MonoBehaviour
         {
             Debug.LogWarning($"[GameApiManager] Error while reconciling local progress: {ex.Message}");
         }
+    }
+
+    private void EnsureRequiredServices()
+    {
+        if (ApiConfig.Instance == null && GetComponent<ApiConfig>() == null)
+            gameObject.AddComponent<ApiConfig>();
+
+        if (ApiClient.Instance == null && GetComponent<ApiClient>() == null)
+            gameObject.AddComponent<ApiClient>();
+
+        if (AuthService.Instance == null && GetComponent<AuthService>() == null)
+            gameObject.AddComponent<AuthService>();
+
+        if (ProgressService.Instance == null && GetComponent<ProgressService>() == null)
+            gameObject.AddComponent<ProgressService>();
+
+        if (AchievementService.Instance == null && GetComponent<AchievementService>() == null)
+            gameObject.AddComponent<AchievementService>();
+
+        if (LeaderboardService.Instance == null && GetComponent<LeaderboardService>() == null)
+            gameObject.AddComponent<LeaderboardService>();
+
+        if (SkinService.Instance == null && GetComponent<SkinService>() == null)
+            gameObject.AddComponent<SkinService>();
     }
 }

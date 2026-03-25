@@ -96,12 +96,33 @@ public class AchievementScrollController : MonoBehaviour
             }
         }
 
+        // Some Achievement scenes use a wrapper Content object that contains a single
+        // row container (for example, AchievementRowPanle). ScrollRect needs the
+        // transform that actually expands with the rows, not the wrapper shell.
+        if (content.childCount == 1)
+        {
+            RectTransform nestedContent = content.GetChild(0) as RectTransform;
+            if (nestedContent != null && nestedContent.childCount > 0)
+            {
+                content = nestedContent;
+            }
+        }
+
         _scrollRect.content = content;
 
         // Set anchors for a vertical top-down list
-        content.anchorMin = new Vector2(0f, 1f);
-        content.anchorMax = new Vector2(1f, 1f);
+        content.anchorMin = new Vector2(0.5f, 1f);
+        content.anchorMax = new Vector2(0.5f, 1f);
         content.pivot = new Vector2(0.5f, 1f);
+
+        RectTransform viewport = _scrollRect.viewport != null ? _scrollRect.viewport : GetComponent<RectTransform>();
+        if (viewport != null)
+        {
+            Vector2 sizeDelta = content.sizeDelta;
+            sizeDelta.x = viewport.rect.width;
+            content.sizeDelta = sizeDelta;
+        }
+
         content.anchoredPosition = new Vector2(0f, content.anchoredPosition.y);
 
         // Configure Layout Group for automated dynamic spacing
