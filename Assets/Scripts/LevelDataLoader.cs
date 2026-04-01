@@ -13,7 +13,8 @@ using UnityEngine;
 public class LevelTestCase
 {
     public string input;
-    public string expectedOutput;
+    public string output; // Compatible with existing JSON data using "output"
+    public string expectedOutput; // Compatible with JSON data using "expectedOutput"
     public string[] requiredKeywords;
 }
 

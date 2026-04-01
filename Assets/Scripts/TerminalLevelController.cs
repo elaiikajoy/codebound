@@ -28,6 +28,7 @@ public class TerminalLevelController : MonoBehaviour
     [SerializeField] private TMP_Text descriptionText;
     [SerializeField] private TMP_InputField codeInputField;
     [SerializeField] private TMP_Text outputText;
+    [SerializeField] private TMP_InputField consoleInputField; // NEW: For Interactive Input
 
     [Header("Level Assignment")]
     [Tooltip("Set this to the level number of THIS scene. e.g. Level1 scene = 1, Level2 scene = 2. This is NOT the player's save progress.")]
@@ -54,6 +55,12 @@ public class TerminalLevelController : MonoBehaviour
         // The modal is opened only when the player interacts (presses E)
         // via TerminalTriggerZone -> OpenCurrentLevel().
         SetupCodeInputField();
+
+        if (consoleInputField != null)
+        {
+            consoleInputField.gameObject.SetActive(false);
+            consoleInputField.onSubmit.AddListener(OnConsoleInputSubmitted);
+        }
 
         if (terminalModal != null)
         {
@@ -261,6 +268,11 @@ public class TerminalLevelController : MonoBehaviour
             outputText.text = string.Empty; // Clear any existing errors/messages
             outputText.gameObject.SetActive(false); // Hide output text
         }
+        if (consoleInputField != null)
+        {
+            consoleInputField.gameObject.SetActive(false); // Hide interactive input array
+            consoleInputField.text = string.Empty;
+        }
     }
 
     // Hook this to your Run button in Unity inspector.
@@ -289,11 +301,27 @@ public class TerminalLevelController : MonoBehaviour
         bool hasCodeErrors = false;
         string validationMessage = string.Empty;
 
+        // 1. Validate Syntax & Keywords first
+        hasCodeErrors = !ValidateSubmittedCode(submittedCode, out validationMessage);
+
+        if (hasCodeErrors)
+        {
+            if (outputText != null) outputText.text = validationMessage;
+            HandleRunResult(true, string.Empty);
+            return;
+        }
+
+        // 2. Check if Level Requires Interactive Input (Data Injection)
+        if (LevelRequiresInput())
+        {
+            EnterDataInjectionPhase();
+            return; // Wait for user to submit input via consoleInputField
+        }
+
+        // 3. Standard Non-Interactive Run Mode
         if (autoRunUsesSimpleValidation)
         {
-            hasCodeErrors = !ValidateSubmittedCode(submittedCode, out validationMessage);
-
-            if (!hasCodeErrors && !ValidateExpectedOutput(submittedCode, out validationMessage))
+            if (!ValidateExpectedOutput(submittedCode, out validationMessage))
             {
                 hasCodeErrors = true;
             }
@@ -313,7 +341,94 @@ public class TerminalLevelController : MonoBehaviour
             UnlockNextLevelLocally();
         }
 
-        HandleRunResult(hasCodeErrors);
+        HandleRunResult(hasCodeErrors, string.Empty);
+    }
+
+    private bool LevelRequiresInput()
+    {
+        if (activeLevelData == null || activeLevelData.testCases == null) return false;
+        foreach (var tc in activeLevelData.testCases)
+        {
+            if (!string.IsNullOrEmpty(tc.input)) return true;
+        }
+        return false;
+    }
+
+    private void EnterDataInjectionPhase()
+    {
+        if (consoleInputField != null)
+        {
+            consoleInputField.gameObject.SetActive(true);
+            consoleInputField.text = "";
+            
+            // Re-select UI so player can just start typing
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(consoleInputField.gameObject);
+                consoleInputField.Select();
+                consoleInputField.ActivateInputField();
+            }
+
+            // Clear the terminal screen (output text) for a cleaner "blank" injection phase
+            if (outputText != null)
+            {
+                outputText.text = string.Empty; 
+            }
+        }
+        else
+        {
+            Debug.LogError("[TerminalLevelController] Cannot enter Data Injection Phase: consoleInputField is NOT assigned!");
+        }
+    }
+
+    public void OnConsoleInputSubmitted(string userInput)
+    {
+        // Only process if we are currently waiting for input
+        if (consoleInputField == null || !consoleInputField.gameObject.activeSelf) return;
+        if (!LevelRequiresInput()) return;
+
+        // Block empty submit
+        if (string.IsNullOrWhiteSpace(userInput)) return;
+
+        // Find matching test case by input mapping
+        LevelTestCase match = null;
+        foreach (var tc in activeLevelData.testCases)
+        {
+            if (tc.input == userInput)
+            {
+                match = tc;
+                break;
+            }
+        }
+
+        if (match != null)
+        {
+            consoleInputField.gameObject.SetActive(false);
+            
+            if (outputText != null)
+                outputText.text = "Data Injected Successfully! Validating...";
+
+            UnlockNextLevelLocally();
+            
+            // Prioritize expectedOutput, then fallback to output
+            string resultOutput = !string.IsNullOrEmpty(match.expectedOutput) ? match.expectedOutput : match.output;
+            HandleRunResult(false, resultOutput);
+        }
+        else
+        {
+            if (outputText != null)
+            {
+                outputText.text = $"[Engine Warning] This terminal only supports simulating predefined test cases.\nInput '{userInput}' is not recognized.\nPlease try a listed valid payload.";
+            }
+            
+            // Keep input field active, just re-focus
+            if (EventSystem.current != null)
+            {
+                EventSystem.current.SetSelectedGameObject(consoleInputField.gameObject);
+                consoleInputField.Select();
+                consoleInputField.ActivateInputField();
+            }
+        }
     }
 
     private void UnlockNextLevelLocally()
@@ -465,7 +580,7 @@ public class TerminalLevelController : MonoBehaviour
     }
 
     // Call this method from your real compiler/validator pipeline.
-    public void HandleRunResult(bool hasCodeErrors)
+    public void HandleRunResult(bool hasCodeErrors, string providedOutput)
     {
         if (hasCodeErrors)
         {
@@ -478,7 +593,10 @@ public class TerminalLevelController : MonoBehaviour
 
         int tokensEarned = activeLevelData != null ? activeLevelData.baseTokenReward : fallbackTokenReward;
 
-        string predictedOutput = ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty);
+        string predictedOutput = string.IsNullOrEmpty(providedOutput) 
+            ? ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty) 
+            : providedOutput;
+
         StartCoroutine(SuccessCountdownRoutine(predictedOutput));
     }
 
