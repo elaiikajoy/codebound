@@ -1,25 +1,41 @@
 {
     "levelNumber": 42,
-    "levelName": "Level 42: Multiplication Pt 1",
-    "category": "Basics",
+    "levelName": "Level 42: Switch Statements - Menu Selection",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Multiplying numbers.",
-    "objective": "Declare integers w = 2 and z = 7. Print their product (w * z).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "14",
+    "puzzleDescription": "Build a simple menu system using a switch statement. Based on the choice (1-3), print the corresponding food item.",
+    "objective": "Display a menu and print selected item: 1 for Burger, 2 for Pizza, 3 for Fries.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.println(\"1. Burger\");\n        System.out.println(\"2. Pizza\");\n        System.out.println(\"3. Fries\");\n        int choice = sc.nextInt();\n        \n        // Write your switch logic below:\n        \n    }\n}",
+    "expectedOutput": "Pizza",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Create a switch(choice) block.",
+        "Case 1 should print 'Burger', Case 2 'Pizza', and Case 3 'Fries'.",
+        "Don't forget the 'break;' for every case!"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "2",
+            "output": "Pizza"
+        },
+        {
+            "input": "1",
+            "output": "Burger"
+        },
+        {
+            "input": "3",
+            "output": "Fries"
+        }
+    ],
     "requiredKeywords": [
-        "w = 2",
-        "z = 7",
+        "switch",
+        "case",
+        "break",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 180,
+    "forbiddenKeywords": [
+        "if"
+    ],
+    "baseTokenReward": 260,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +43,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 41
 }

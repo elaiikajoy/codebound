@@ -1,25 +1,33 @@
 {
     "levelNumber": 62,
-    "levelName": "Level 62: For Loops Pt 1",
-    "category": "Basics",
+    "levelName": "Level 62: While Loops - Even Numbers",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Looping a specific number of times.",
-    "objective": "Write a for loop that prints \"Apple\" exactly 2 times on separate lines.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
-    "expectedOutput": "Apple\nApple",
+    "puzzleDescription": "Use a 'while' loop to filter numbers. Your goal is to print all even numbers from 1 to 20.",
+    "objective": "Use a while loop to check numbers 1-20. Print only the even numbers (2, 4, 6... 20).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int i = 1;\n        \n        // Write your while loop with an if statement inside:\n        \n    }\n}",
+    "expectedOutput": "",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Inside the while loop, use 'if (i % 2 == 0)' to check if a number is even.",
+        "Don't forget to increment 'i++' OUTSIDE the if statement but INSIDE the while loop.",
+        "The loop condition should be (i <= 20)."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "2\n4\n6\n8\n10\n12\n14\n16\n18\n20"
+        }
+    ],
     "requiredKeywords": [
-        "for",
-        "i < 2",
-        "\"Apple\""
+        "while",
+        "if",
+        "%",
+        "i++"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 220,
+    "forbiddenKeywords": [
+        "for"
+    ],
+    "baseTokenReward": 310,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 61
 }

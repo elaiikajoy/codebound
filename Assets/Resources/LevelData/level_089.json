@@ -1,24 +1,32 @@
 {
     "levelNumber": 89,
-    "levelName": "Level 89: Arrays Pt 8",
-    "category": "Basics",
-    "difficulty": 8,
-    "puzzleDescription": "Accessing array elements.",
-    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 178. Print arr[1].",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
-    "expectedOutput": "178",
+    "levelName": "Level 89: Strings - Replace Character",
+    "category": "Strings",
+    "difficulty": 7,
+    "puzzleDescription": "Learn how to swap specific characters or words in a String using the .replace() method.",
+    "objective": "Given the String 'text', replace all occurrences of 'a' with '@' and print the new string.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String text = \"java\";\n        \n        // Use the .replace() method to swap 'a' with '@':\n        String result = \n        \n        System.out.println(result);\n    }\n}",
+    "expectedOutput": "j@v@",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'text.replace('a', '@')'.",
+        "The first value is the old character, and the second is the new one.",
+        "Remember that characters use single quotes (' '), not double quotes (\" \")."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "j@v@"
+        }
+    ],
     "requiredKeywords": [
-        "arr[1] = 178",
-        "System.out.println(arr[1])"
+        ".replace(",
+        "'a'",
+        "'@'"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 270,
+    "forbiddenKeywords": [
+        "result = \"j@v@\""
+    ],
+    "baseTokenReward": 350,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -26,7 +34,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 88
 }

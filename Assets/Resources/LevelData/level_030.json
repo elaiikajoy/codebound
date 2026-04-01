@@ -1,33 +1,45 @@
 {
     "levelNumber": 30,
-    "levelName": "Level 30: Addition Pt 9",
+    "levelName": "Level 30: Time Conversion - Modulo Operator",
     "category": "Basics",
     "difficulty": 3,
-    "puzzleDescription": "Adding two numbers.",
-    "objective": "Declare integers a = 30 and b = 60. Print their sum.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "90",
+    "puzzleDescription": "Learn how to use division (/) to get hours and the modulo operator (%) to get the remaining minutes from a total number of minutes.",
+    "objective": "Convert minutes into hours and remaining minutes.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "2 hours and 10 minutes",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Divide the total minutes by 60 to get the hours (int hours = total / 60;).",
+        "Use the % operator to get the leftover minutes (int mins = total % 60;).",
+        "Print it in this format: hours + \" hours and \" + mins + \" minutes\""
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "130",
+            "output": "2 hours and 10 minutes"
+        },
+        {
+            "input": "65",
+            "output": "1 hours and 5 minutes"
+        }
+    ],
     "requiredKeywords": [
-        "a = 30",
-        "b = 60",
+        "Scanner",
+        "/",
+        "%",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 160,
-    "perfectBonus": 50,
-    "speedBonus": 25,
+    "forbiddenKeywords": [
+        "2 hours and 10 minutes"
+    ],
+    "baseTokenReward": 250,
+    "perfectBonus": 100,
+    "speedBonus": 50,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 29
 }

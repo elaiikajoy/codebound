@@ -1,25 +1,33 @@
 {
     "levelNumber": 53,
-    "levelName": "Level 53: If Statements Pt 2",
-    "category": "Basics",
+    "levelName": "Level 53: For Loops - Even Numbers",
+    "category": "Loops",
     "difficulty": 5,
-    "puzzleDescription": "Using an if statement.",
-    "objective": "If score is greater than 260, print \"Win\". The score is 265.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int score = 265;\n        // Write an if statement below:\n        \n    }\n}",
-    "expectedOutput": "Win",
+    "puzzleDescription": "Learn how to skip numbers in a loop. Your goal is to print all even numbers from 1 to 20.",
+    "objective": "Use a for loop to print even numbers from 2 to 20 (2, 4, 6... 20).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your loop below:\n        \n    }\n}",
+    "expectedOutput": "2\n4\n6\n8\n10\n12\n14\n16\n18\n20",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Start your loop at 2: 'int i = 2;'.",
+        "Instead of 'i++', use 'i += 2' to jump by two in each step.",
+        "The condition should remain 'i <= 20;'."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "2\n4\n6\n8\n10\n12\n14\n16\n18\n20"
+        }
+    ],
     "requiredKeywords": [
-        "if",
-        "score > 260",
-        "\"Win\""
+        "for",
+        "i += 2",
+        "<="
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 200,
+    "forbiddenKeywords": [
+        "System.out.println(2);",
+        "System.out.println(4);"
+    ],
+    "baseTokenReward": 310,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 52
 }

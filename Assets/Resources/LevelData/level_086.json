@@ -1,24 +1,34 @@
 {
     "levelNumber": 86,
-    "levelName": "Level 86: Arrays Pt 5",
-    "category": "Basics",
+    "levelName": "Level 86: Strings - Count Vowels",
+    "category": "Strings",
     "difficulty": 8,
-    "puzzleDescription": "Accessing array elements.",
-    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 172. Print arr[1].",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
-    "expectedOutput": "172",
+    "puzzleDescription": "Use a loop to check every character of a String and count how many vowels (a, e, i, o, u) it contains.",
+    "objective": "Given the String 'text', count the vowels and print the final count. (Note: Assume all letters are lowercase).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String text = \"apple pie\";\n        int count = 0;\n        \n        // Write a loop to check each character for vowels:\n        \n        System.out.println(count);\n    }\n}",
+    "expectedOutput": "4",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use a for loop: 'for (int i = 0; i < text.length(); i++)'.",
+        "Get the current character using 'char c = text.charAt(i);'.",
+        "Use an if statement with '||' (OR) to check if 'c' is 'a', 'e', 'i', 'o', or 'u'.",
+        "Increment 'count++' for every match found."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "4"
+        }
+    ],
     "requiredKeywords": [
-        "arr[1] = 172",
-        "System.out.println(arr[1])"
+        "for",
+        "charAt",
+        "||",
+        "count++"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 270,
+    "forbiddenKeywords": [
+        "count = 4"
+    ],
+    "baseTokenReward": 390,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -26,7 +36,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 85
 }

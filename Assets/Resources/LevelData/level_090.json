@@ -1,32 +1,39 @@
 {
     "levelNumber": 90,
-    "levelName": "Level 90: Arrays Pt 9",
-    "category": "Basics",
+    "levelName": "Level 90: String Boss - Substring Extraction",
+    "category": "Strings",
     "difficulty": 9,
-    "puzzleDescription": "Accessing array elements.",
-    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 180. Print arr[1].",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
-    "expectedOutput": "180",
+    "puzzleDescription": "The final String challenge! Use the .substring() method to extract a specific part of a text based on start and end indices.",
+    "objective": "Given the String 'filename' as 'Photo.jpg', extract only the extension '.jpg' and print it.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String filename = \"Photo.jpg\";\n        \n        // Use .substring() to get '.jpg' (starts at index 5):\n        String extension = \n        \n        System.out.println(extension);\n    }\n}",
+    "expectedOutput": ".jpg",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The syntax is 'string.substring(startIndex)'.",
+        "Counting starts at 0: P(0), h(1), o(2), t(3), o(4), .(5).",
+        "If you only provide one number, it will take everything from that index to the end."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": ".jpg"
+        }
+    ],
     "requiredKeywords": [
-        "arr[1] = 180",
-        "System.out.println(arr[1])"
+        ".substring(5)",
+        "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 280,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "extension = \".jpg\""
+    ],
+    "baseTokenReward": 500,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": ["String Master"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 89
 }

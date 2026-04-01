@@ -1,24 +1,27 @@
 {
     "levelNumber": 14,
-    "levelName": "Level 14: Strings Pt 3",
+    "levelName": "Level 14: Variables Pt 13",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Banana\", then print it.",
+    "puzzleDescription": "Learn how to use the 'boolean' data type to store values that can only be either 'true' or 'false'.",
+    "objective": "Create a boolean variable called `isStudent` and print its value.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Banana",
+    "expectedOutput": "true",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use the 'boolean' keyword for true or false values.",
+        "Assign the value 'true' or 'false' to the variable.",
+        "Example: boolean isJavaFun = true;"
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Banana\"",
-        "System.out.println"
+        "boolean isStudent",
+        "isStudent =",
+        "System.out.println(isStudent);"
     ],
-    "forbiddenKeywords": [],
+    "forbiddenKeywords": [
+        "String",
+        "int"
+    ],
     "baseTokenReward": 120,
     "perfectBonus": 50,
     "speedBonus": 25,

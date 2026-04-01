@@ -1,25 +1,41 @@
 {
     "levelNumber": 49,
-    "levelName": "Level 49: Multiplication Pt 8",
-    "category": "Basics",
+    "levelName": "Level 49: Switch Statements - Roman Numerals",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Multiplying numbers.",
-    "objective": "Declare integers w = 9 and z = 7. Print their product (w * z).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "63",
+    "puzzleDescription": "Use a switch statement to convert a number (1–5) into its corresponding Roman Numeral string.",
+    "objective": "Input a number from 1 to 5 and print the Roman Numeral (e.g., 1 = I, 5 = V).",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your switch logic below:\n        \n    }\n}",
+    "expectedOutput": "IV",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Each case should print the Roman Numeral string: I, II, III, IV, V.",
+        "Remember that Strings in Java use double quotes (e.g., \"IV\").",
+        "Don't forget the 'break;' for every case to ensure the correct output."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "1",
+            "output": "I"
+        },
+        {
+            "input": "4",
+            "output": "IV"
+        },
+        {
+            "input": "5",
+            "output": "V"
+        }
+    ],
     "requiredKeywords": [
-        "w = 9",
-        "z = 7",
+        "switch",
+        "case",
+        "break",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 190,
+    "forbiddenKeywords": [
+        "if"
+    ],
+    "baseTokenReward": 290,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +43,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 48
 }

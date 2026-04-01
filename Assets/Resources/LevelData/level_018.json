@@ -1,33 +1,38 @@
 {
     "levelNumber": 18,
-    "levelName": "Level 18: Strings Pt 7",
+    "levelName": "Level 18: Logic - Variable Swapping",
     "category": "Basics",
-    "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Plum\", then print it.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Plum",
+    "difficulty": 2,
+    "puzzleDescription": "Learn how to swap the values of two variables using a third 'temporary' variable as a middleman.",
+    "objective": "Swap the values of two variables using a temporary variable.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int a = 10;\n        int b = 20;\n        // Swap 'a' and 'b' below:\n        \n        System.out.println(a);\n        System.out.println(b);\n    }\n}",
+    "expectedOutput": "20\n10",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Create a 'temp' variable to hold the value of 'a' first.",
+        "Assign the value of 'b' to 'a'.",
+        "Finally, assign the value of 'temp' to 'b'.",
+        "Think of it like swapping juice between two glasses using an empty third glass."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Plum\"",
-        "System.out.println"
+        "int temp",
+        "temp = a",
+        "a = b",
+        "b = temp"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 130,
-    "perfectBonus": 50,
-    "speedBonus": 25,
+    "forbiddenKeywords": [
+        "a = 20",
+        "b = 10"
+    ],
+    "baseTokenReward": 160,
+    "perfectBonus": 60,
+    "speedBonus": 30,
     "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 17
 }

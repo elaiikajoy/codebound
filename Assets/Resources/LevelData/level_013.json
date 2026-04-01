@@ -1,24 +1,26 @@
 {
     "levelNumber": 13,
-    "levelName": "Level 13: Strings Pt 2",
+    "levelName": "Level 13: Variables Pt 12",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Orange\", then print it.",
+    "puzzleDescription": "Learn how to use the 'char' data type to store a single character. Remember to use single quotes for characters!",
+    "objective": "Store the letter `A` in a variable and print it.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Orange",
+    "expectedOutput": "A",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use the 'char' keyword for single characters.",
+        "Characters must be enclosed in single quotes like 'A'.",
+        "Don't forget to name your variable (e.g., char grade = 'A';)."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Orange\"",
+        "char",
+        "'A'",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
+    "forbiddenKeywords": [
+        "String"
+    ],
     "baseTokenReward": 120,
     "perfectBonus": 50,
     "speedBonus": 25,

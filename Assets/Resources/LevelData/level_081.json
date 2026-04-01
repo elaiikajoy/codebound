@@ -1,25 +1,31 @@
 {
     "levelNumber": 81,
-    "levelName": "Level 81: While Loops Pt 10",
-    "category": "Basics",
-    "difficulty": 8,
-    "puzzleDescription": "Looping downwards.",
-    "objective": "Use a while loop to print numbers from 11 down to 1.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int count = 11;\n        // Your while loop here:\n        \n    }\n}",
-    "expectedOutput": "11\n10\n9\n8\n7\n6\n5\n4\n3\n2\n1",
+    "levelName": "Level 81: Strings - Length of Text",
+    "category": "Strings",
+    "difficulty": 6,
+    "puzzleDescription": "Learn how to use the .length() method to count how many characters are in a String, including spaces.",
+    "objective": "Given the String 'message', find its length and print the total number of characters.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String message = \"Hello TSU!\";\n        \n        // Use the .length() method to get the size of the String:\n        int size = \n        \n        System.out.println(size);\n    }\n}",
+    "expectedOutput": "10",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "To get the length of a String, use 'variableName.length()'.",
+        "Don't forget the parentheses () after length, unlike in Arrays where it's just .length.",
+        "The count includes spaces and punctuation like the exclamation mark."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "10"
+        }
+    ],
     "requiredKeywords": [
-        "while",
-        "count >",
-        "count--"
+        "message.length()",
+        "int"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 260,
+    "forbiddenKeywords": [
+        "size = 10"
+    ],
+    "baseTokenReward": 300,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +33,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 80
 }

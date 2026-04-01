@@ -1,25 +1,37 @@
 {
     "levelNumber": 24,
-    "levelName": "Level 24: Addition Pt 3",
+    "levelName": "Level 24: Input Arithmetic - Subtraction",
     "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Adding two numbers.",
-    "objective": "Declare integers a = 24 and b = 48. Print their sum.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "72",
+    "puzzleDescription": "Learn how to subtract one user-inputted number from another and display the difference.",
+    "objective": "Input two numbers and print the difference.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "10",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'sc.nextInt()' twice to store two different numbers.",
+        "Use the '-' operator to find the difference (e.g., a - b).",
+        "Make sure to print the result using System.out.println();"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "20 10",
+            "output": "10"
+        },
+        {
+            "input": "50 5",
+            "output": "45"
+        }
+    ],
     "requiredKeywords": [
-        "a = 24",
-        "b = 48",
-        "System.out.println"
+        "Scanner",
+        "nextInt()",
+        "System.out.println",
+        "-"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 140,
+    "forbiddenKeywords": [
+        "System.out.println(10)"
+    ],
+    "baseTokenReward": 180,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +39,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 23
 }

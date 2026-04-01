@@ -1,25 +1,37 @@
 {
     "levelNumber": 23,
-    "levelName": "Level 23: Addition Pt 2",
+    "levelName": "Level 23: Input Arithmetic - Addition",
     "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Adding two numbers.",
-    "objective": "Declare integers a = 23 and b = 46. Print their sum.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "69",
+    "puzzleDescription": "Learn how to collect two different integer inputs from a user and calculate their sum.",
+    "objective": "Ask the user to input two numbers and print the sum.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "30",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'sc.nextInt()' twice to get two different numbers.",
+        "Store them in variables (e.g., int x = sc.nextInt(); int y = sc.nextInt();).",
+        "Print the sum using System.out.println(x + y);"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "10 20",
+            "output": "30"
+        },
+        {
+            "input": "5 5",
+            "output": "10"
+        }
+    ],
     "requiredKeywords": [
-        "a = 23",
-        "b = 46",
-        "System.out.println"
+        "Scanner",
+        "nextInt()",
+        "System.out.println",
+        "+"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 140,
+    "forbiddenKeywords": [
+        "System.out.println(30)"
+    ],
+    "baseTokenReward": 180,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +39,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 22
 }

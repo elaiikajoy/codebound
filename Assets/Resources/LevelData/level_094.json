@@ -1,23 +1,33 @@
 {
     "levelNumber": 94,
-    "levelName": "Level 94: Methods Pt 3",
-    "category": "Basics",
-    "difficulty": 9,
-    "puzzleDescription": "Calling a method with parameters.",
-    "objective": "Call printNumber(282) inside main().",
-    "starterCode": "public class Solution {\n    public static void printNumber(int x) {\n        System.out.println(x);\n    }\n    public static void main(String[] args) {\n        // Call printNumber below:\n        \n    }\n}",
-    "expectedOutput": "282",
+    "levelName": "Level 94: Methods - Factorial Calculator",
+    "category": "Methods",
+    "difficulty": 8,
+    "puzzleDescription": "Create a method that calculates the factorial of a number (e.g., 5! = 5 * 4 * 3 * 2 * 1 = 120).",
+    "objective": "Complete the 'getFactorial' method using a loop. It should return the product of all numbers from 1 to n.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int result = getFactorial(5);\n        System.out.println(result);\n    }\n\n    // Complete the factorial method below:\n    public static int getFactorial(int n) {\n        int fact = 1;\n        \n        // Write your loop here:\n        \n        return fact;\n    }\n}",
+    "expectedOutput": "120",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use a for loop: 'for (int i = 1; i <= n; i++)'.",
+        "Inside the loop, multiply 'fact' by 'i' using 'fact *= i;'.",
+        "The starting value of 'fact' must be 1 because multiplying by 0 will always result in 0."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "120"
+        }
+    ],
     "requiredKeywords": [
-        "printNumber(282);"
+        "for",
+        "fact *=",
+        "return",
+        "<="
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 280,
+    "forbiddenKeywords": [
+        "fact = 120"
+    ],
+    "baseTokenReward": 420,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -25,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 93
 }

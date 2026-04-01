@@ -1,33 +1,50 @@
 {
     "levelNumber": 40,
-    "levelName": "Level 40: Subtraction Pt 9",
-    "category": "Basics",
+    "levelName": "Level 40: Conditionals - Final Exam",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Subtracting two numbers.",
-    "objective": "Declare integers x = 120 and y = 40. Print their difference (x - y).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "80",
+    "puzzleDescription": "The final test for conditionals! Determine if a student passed or failed based on the standard passing mark of 75.",
+    "objective": "Print 'Pass' if the grade is 75 or higher, otherwise print 'Fail'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int grade = sc.nextInt();\n        \n        // Write your final if-else logic here:\n        \n    }\n}",
+    "expectedOutput": "Pass",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'if (grade >= 75)' to check the passing condition.",
+        "The 'else' block should handle any grade below 75.",
+        "Make sure to capitalize 'Pass' and 'Fail' exactly as requested."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "85",
+            "output": "Pass"
+        },
+        {
+            "input": "75",
+            "output": "Pass"
+        },
+        {
+            "input": "70",
+            "output": "Fail"
+        }
+    ],
     "requiredKeywords": [
-        "x = 120",
-        "y = 40",
+        "if",
+        "else",
+        ">=",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 180,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "System.out.println(\"Pass\")",
+        "System.out.println(\"Fail\")"
+    ],
+    "baseTokenReward": 300,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": ["Condition Master"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 39
 }

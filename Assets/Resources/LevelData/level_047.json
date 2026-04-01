@@ -1,25 +1,42 @@
 {
     "levelNumber": 47,
-    "levelName": "Level 47: Multiplication Pt 6",
-    "category": "Basics",
+    "levelName": "Level 47: Switch Statements - Default Case",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Multiplying numbers.",
-    "objective": "Declare integers w = 7 and z = 7. Print their product (w * z).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "49",
+    "puzzleDescription": "Learn how to use the 'default' keyword to handle unexpected inputs in a switch statement.",
+    "objective": "Input a number: 1 for Burger, 2 for Pizza. For any other number, print 'Invalid Choice'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int choice = sc.nextInt();\n        \n        // Write your switch logic with a default case below:\n        \n    }\n}",
+    "expectedOutput": "Invalid Choice",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The 'default:' case doesn't need a specific value; it catches everything else.",
+        "Use 'default:' at the end of your switch block.",
+        "Print exactly 'Invalid Choice' for the default scenario."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "1",
+            "output": "Burger"
+        },
+        {
+            "input": "2",
+            "output": "Pizza"
+        },
+        {
+            "input": "99",
+            "output": "Invalid Choice"
+        }
+    ],
     "requiredKeywords": [
-        "w = 7",
-        "z = 7",
-        "System.out.println"
+        "switch",
+        "case",
+        "default",
+        "break"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 190,
+    "forbiddenKeywords": [
+        "if",
+        "else"
+    ],
+    "baseTokenReward": 280,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +44,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 46
 }

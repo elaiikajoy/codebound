@@ -1,20 +1,21 @@
 {
     "levelNumber": 9,
-    "levelName": "Level 9: Basic Arithmetic",
+    "levelName": "Level 9: Basic Arithmetic with Variables",
     "category": "Basics",
     "difficulty": 0,
-    "puzzleDescription": "Learn to print the result of a multiplication operation.",
-    "objective": "Print the result of 6 * 8.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "puzzleDescription": "Learn to store numbers in variables and print their product.",
+    "objective": "Declare two integer variables, assign them the values 6 and 8, then print their product.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Declare your variables and print the result below:\n        \n    }\n}",
     "expectedOutput": "48",
     "hints": [
-        "Use System.out.println() to display the result.",
-        "You can directly place the expression inside println().",
-        "6 * 8 equals 48."
+        "Use 'int' to declare your variables, e.g., int x = 6;",
+        "Multiply the two variables using the '*' operator.",
+        "Pass the result or the expression to System.out.println()."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "6 * 8",
+        "int",
+        "*",
         "System.out.println"
     ],
     "forbiddenKeywords": [],

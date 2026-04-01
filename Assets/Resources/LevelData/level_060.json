@@ -1,33 +1,42 @@
 {
     "levelNumber": 60,
-    "levelName": "Level 60: If Statements Pt 9",
-    "category": "Basics",
+    "levelName": "Level 60: Nested Loops - Star Triangle",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Using an if statement.",
-    "objective": "If score is greater than 300, print \"Win\". The score is 305.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int score = 305;\n        // Write an if statement below:\n        \n    }\n}",
-    "expectedOutput": "Win",
+    "puzzleDescription": "The ultimate loop challenge! Use a loop inside another loop (Nested Loop) to print a right-angled triangle of stars (*).",
+    "objective": "Print a 3-row triangle: \n*\n**\n***",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Use a nested loop (a loop inside a loop):\n        \n    }\n}",
+    "expectedOutput": "*\n**\n***",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The outer loop handles the rows (i = 1 to 3).",
+        "The inner loop handles the stars in each row (j = 1 to i).",
+        "Use System.out.print(\"*\") for the inner loop and System.out.println() for the outer loop to move to the next line."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "*\n**\n***"
+        }
+    ],
     "requiredKeywords": [
-        "if",
-        "score > 300",
-        "\"Win\""
+        "for",
+        "print",
+        "println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 220,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "System.out.println(\"*\")",
+        "System.out.println(\"**\")",
+        "System.out.println(\"***\")"
+    ],
+    "baseTokenReward": 400,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": ["Loop Master"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 59
 }

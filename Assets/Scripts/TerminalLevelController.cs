@@ -13,11 +13,14 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using System;
 using System.Text.RegularExpressions;
 using UnityEngine.EventSystems;
 
 public class TerminalLevelController : MonoBehaviour
 {
+    public static event Action<bool> OnTerminalModalVisibilityChanged;
+
     [Header("UI")]
     [SerializeField] private GameObject terminalModal;
     [SerializeField] private TMP_Text levelTitleText;
@@ -43,6 +46,8 @@ public class TerminalLevelController : MonoBehaviour
     private int activeLevelNumber;
     private LevelData activeLevelData;
 
+    public bool IsTerminalOpen => terminalModal != null && terminalModal.activeSelf;
+
     private void Start()
     {
         // Ensure the terminal modal is hidden at scene start.
@@ -53,6 +58,7 @@ public class TerminalLevelController : MonoBehaviour
         if (terminalModal != null)
         {
             terminalModal.SetActive(false);
+            NotifyTerminalModalVisibilityChanged(false);
         }
         else
         {
@@ -201,6 +207,7 @@ public class TerminalLevelController : MonoBehaviour
         {
             Debug.Log("[TerminalLevelController] Activating terminalModal UI Panel...");
             terminalModal.SetActive(true);
+            NotifyTerminalModalVisibilityChanged(true);
         }
         else
         {
@@ -232,7 +239,13 @@ public class TerminalLevelController : MonoBehaviour
         if (terminalModal != null)
         {
             terminalModal.SetActive(false);
+            NotifyTerminalModalVisibilityChanged(false);
         }
+    }
+
+    private void NotifyTerminalModalVisibilityChanged(bool visible)
+    {
+        OnTerminalModalVisibilityChanged?.Invoke(visible);
     }
 
     // Hook this to your Retry button in Unity inspector.

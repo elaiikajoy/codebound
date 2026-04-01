@@ -1,25 +1,27 @@
 {
     "levelNumber": 19,
-    "levelName": "Level 19: Strings Pt 8",
+    "levelName": "Level 19: Basic Arithmetic - Multi-Addition",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Berry\", then print it.",
+    "puzzleDescription": "Learn how to calculate the total sum of three different integer variables.",
+    "objective": "Store three integers and print their total.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Berry",
+    "expectedOutput": "",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Declare three separate 'int' variables (e.g., int a, b, c;).",
+        "Assign values to each variable so that their sum equals 60.",
+        "Use System.out.println(a + b + c);"
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Berry\"",
+        "int",
+        "+",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 130,
+    "forbiddenKeywords": [
+        "String"
+    ],
+    "baseTokenReward": 140,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],

@@ -1,33 +1,45 @@
 {
     "levelNumber": 70,
-    "levelName": "Level 70: For Loops Pt 9",
-    "category": "Basics",
+    "levelName": "Level 70: While Loop Boss - Fibonacci Sequence",
+    "category": "Loops",
     "difficulty": 7,
-    "puzzleDescription": "Looping a specific number of times.",
-    "objective": "Write a for loop that prints \"Cherry\" exactly 10 times on separate lines.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
-    "expectedOutput": "Cherry\nCherry\nCherry\nCherry\nCherry\nCherry\nCherry\nCherry\nCherry\nCherry",
+    "puzzleDescription": "The final While Loop challenge! Generate the Fibonacci sequence up to a certain number of terms. Each number is the sum of the two preceding ones (0, 1, 1, 2, 3, 5...).",
+    "objective": "Input a number N and print the first N terms of the Fibonacci sequence, starting with 0 and 1.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int first = 0, second = 1, count = 0;\n        \n        // Write your Fibonacci logic using a while loop below:\n        \n    }\n}",
+    "expectedOutput": "0\n1\n1\n2\n3",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The loop condition should be 'while (count < n)'.",
+        "Inside the loop: 1. Print 'first'. 2. Calculate 'next = first + second'. 3. Update 'first = second'. 4. Update 'second = next'. 5. Increment 'count++'.",
+        "This is called 'variable swapping' or 'sliding window' logic."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "5",
+            "output": "0\n1\n1\n2\n3"
+        },
+        {
+            "input": "3",
+            "output": "0\n1\n1"
+        }
+    ],
     "requiredKeywords": [
-        "for",
-        "i < 10",
-        "\"Cherry\""
+        "while",
+        "count <",
+        "first + second",
+        "count++"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 240,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "for"
+    ],
+    "baseTokenReward": 450,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": ["While Loop Grandmaster"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 69
 }

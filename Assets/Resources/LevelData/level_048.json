@@ -1,25 +1,42 @@
 {
     "levelNumber": 48,
-    "levelName": "Level 48: Multiplication Pt 7",
-    "category": "Basics",
+    "levelName": "Level 48: Switch Statements - Weekend Checker",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Multiplying numbers.",
-    "objective": "Declare integers w = 8 and z = 7. Print their product (w * z).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "56",
+    "puzzleDescription": "Use a switch statement to group days 1-5 as 'Weekday' and days 6-7 as 'Weekend'. Use a default case for any other number.",
+    "objective": "Input a number (1-7). Print 'Weekday' for 1-5, 'Weekend' for 6-7, and 'Invalid' for others.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int day = sc.nextInt();\n        \n        // Write your grouped switch logic below:\n        \n    }\n}",
+    "expectedOutput": "Weekend",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Group cases 1, 2, 3, 4, and 5 to print 'Weekday'.",
+        "Group cases 6 and 7 to print 'Weekend'.",
+        "Use 'default:' to print 'Invalid' if the number is not between 1 and 7."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "3",
+            "output": "Weekday"
+        },
+        {
+            "input": "6",
+            "output": "Weekend"
+        },
+        {
+            "input": "10",
+            "output": "Invalid"
+        }
+    ],
     "requiredKeywords": [
-        "w = 8",
-        "z = 7",
-        "System.out.println"
+        "switch",
+        "case",
+        "break",
+        "default"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 190,
+    "forbiddenKeywords": [
+        "if",
+        "else"
+    ],
+    "baseTokenReward": 290,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +44,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 47
 }

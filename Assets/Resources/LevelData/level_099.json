@@ -1,23 +1,33 @@
 {
     "levelNumber": 99,
-    "levelName": "Level 99: Methods Pt 8",
-    "category": "Basics",
+    "levelName": "Level 99: Methods - Fibonacci Sequence",
+    "category": "Methods",
     "difficulty": 9,
-    "puzzleDescription": "Calling a method with parameters.",
-    "objective": "Call printNumber(297) inside main().",
-    "starterCode": "public class Solution {\n    public static void printNumber(int x) {\n        System.out.println(x);\n    }\n    public static void main(String[] args) {\n        // Call printNumber below:\n        \n    }\n}",
-    "expectedOutput": "297",
+    "puzzleDescription": "Create a method that returns the nth Fibonacci number. (Example: for n=6, the sequence is 0, 1, 1, 2, 3, 5. The answer is 5).",
+    "objective": "Complete the 'getFibonacci' method. Use a loop to calculate the sequence up to n.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int result = getFibonacci(6);\n        System.out.println(result);\n    }\n\n    public static int getFibonacci(int n) {\n        if (n <= 1) return 0;\n        int a = 0, b = 1;\n        \n        for (int i = 2; i < n; i++) {\n            int next = a + b;\n            // Update values of a and b here:\n            \n        }\n        return b;\n    }\n}",
+    "expectedOutput": "5",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Inside the loop, 'next = a + b'.",
+        "Update 'a' to the value of 'b', and 'b' to the value of 'next'.",
+        "This shifting of values allows the loop to calculate the next number in the sequence."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "5"
+        }
+    ],
     "requiredKeywords": [
-        "printNumber(297);"
+        "for",
+        "a = b",
+        "b = next",
+        "return b"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 290,
+    "forbiddenKeywords": [
+        "return 5"
+    ],
+    "baseTokenReward": 490,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -25,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 98
 }

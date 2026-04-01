@@ -1,25 +1,37 @@
 {
     "levelNumber": 68,
-    "levelName": "Level 68: For Loops Pt 7",
-    "category": "Basics",
+    "levelName": "Level 68: While Loops - Multiplication Table",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Looping a specific number of times.",
-    "objective": "Write a for loop that prints \"Plum\" exactly 8 times on separate lines.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
-    "expectedOutput": "Plum\nPlum\nPlum\nPlum\nPlum\nPlum\nPlum\nPlum",
+    "puzzleDescription": "Use a while loop to generate a multiplication table for a given number N, from 1 to 10.",
+    "objective": "Input a number N and print the products from N * 1 to N * 10 (e.g., if N=5, print 5, 10... 50).",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int i = 1; // Your counter\n        \n        // Write your while loop logic below:\n        \n    }\n}",
+    "expectedOutput": "5\n10\n15\n20\n25\n30\n35\n40\n45\n50",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Inside the loop, multiply 'n' by 'i' and print the result.",
+        "Don't forget to increment 'i++' at the end of the loop block.",
+        "The condition should be 'while (i <= 10)'."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "5",
+            "output": "5\n10\n15\n20\n25\n30\n35\n40\n45\n50"
+        },
+        {
+            "input": "2",
+            "output": "2\n4\n6\n8\n10\n12\n14\n16\n18\n20"
+        }
+    ],
     "requiredKeywords": [
-        "for",
-        "i < 8",
-        "\"Plum\""
+        "while",
+        "n * i",
+        "i++",
+        "<="
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 230,
+    "forbiddenKeywords": [
+        "for"
+    ],
+    "baseTokenReward": 340,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +39,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 67
 }

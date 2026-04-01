@@ -1,25 +1,32 @@
 {
     "levelNumber": 22,
-    "levelName": "Level 22: Addition Pt 1",
+    "levelName": "Level 22: User Input - Strings",
     "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Adding two numbers.",
-    "objective": "Declare integers a = 22 and b = 44. Print their sum.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "66",
+    "puzzleDescription": "Learn how to use sc.nextLine() to capture a full line of text from the user and combine it with a greeting.",
+    "objective": "Ask the user for their name and print a greeting.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "Hello Joy",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'sc.nextLine()' to get a String input.",
+        "Combine the greeting 'Hello ' and the variable using the '+' operator.",
+        "Example: System.out.println(\"Hello \" + name);"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "Joy",
+            "output": "Hello Joy"
+        }
+    ],
     "requiredKeywords": [
-        "a = 22",
-        "b = 44",
+        "Scanner",
+        "sc.nextLine()",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 140,
+    "forbiddenKeywords": [
+        "System.out.println(\"Hello Joy\")"
+    ],
+    "baseTokenReward": 160,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +34,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 21
 }

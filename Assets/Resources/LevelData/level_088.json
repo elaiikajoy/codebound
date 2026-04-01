@@ -1,24 +1,35 @@
 {
     "levelNumber": 88,
-    "levelName": "Level 88: Arrays Pt 7",
-    "category": "Basics",
+    "levelName": "Level 88: Strings - Word Counter",
+    "category": "Strings",
     "difficulty": 8,
-    "puzzleDescription": "Accessing array elements.",
-    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 176. Print arr[1].",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
-    "expectedOutput": "176",
+    "puzzleDescription": "Learn how to estimate the number of words in a sentence by counting the spaces between them.",
+    "objective": "Given the String 'sentence', count how many words it contains and print the result. (Hint: Words = Spaces + 1).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String sentence = \"Java is a programming language\";\n        int spaces = 0;\n        \n        // Write a loop to count the spaces (' '):\n        \n        // Print spaces + 1 to get the word count:\n        System.out.println(spaces + 1);\n    }\n}",
+    "expectedOutput": "5",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use a for loop to check each character: 'sentence.charAt(i)'.",
+        "If the character is a space (' '), increment your 'spaces' variable.",
+        "Since the last word doesn't have a space after it, we add 1 to the final total."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "5"
+        }
+    ],
     "requiredKeywords": [
-        "arr[1] = 176",
-        "System.out.println(arr[1])"
+        "for",
+        "charAt",
+        "==",
+        "' '",
+        "spaces + 1"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 270,
+    "forbiddenKeywords": [
+        ".split(",
+        "StringTokenizer"
+    ],
+    "baseTokenReward": 400,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -26,7 +37,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 87
 }

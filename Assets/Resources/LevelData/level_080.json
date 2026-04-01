@@ -1,33 +1,41 @@
 {
     "levelNumber": 80,
-    "levelName": "Level 80: While Loops Pt 9",
-    "category": "Basics",
+    "levelName": "Level 80: Array Boss - Average Calculator",
+    "category": "Arrays",
     "difficulty": 8,
-    "puzzleDescription": "Looping downwards.",
-    "objective": "Use a while loop to print numbers from 10 down to 1.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int count = 10;\n        // Your while loop here:\n        \n    }\n}",
-    "expectedOutput": "10\n9\n8\n7\n6\n5\n4\n3\n2\n1",
+    "puzzleDescription": "The final Array challenge! Calculate the average of all numbers in the array. Average = (Sum of all elements) / (Number of elements).",
+    "objective": "Given the array 'grades', calculate and print the average value.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] grades = {85, 90, 80, 95, 100};\n        int sum = 0;\n        \n        // 1. Write a loop to calculate the sum:\n        \n        // 2. Calculate the average and print it:\n        int average = sum / grades.length;\n        System.out.println(average);\n    }\n}",
+    "expectedOutput": "90",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "First, use a for loop to add every element of 'grades' to 'sum'.",
+        "The formula for average is 'sum / grades.length'.",
+        "Make sure the 'println' happens after the loop is completely finished."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "90"
+        }
+    ],
     "requiredKeywords": [
-        "while",
-        "count >",
-        "count--"
+        "for",
+        "sum +=",
+        "grades.length",
+        "/"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 260,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "average = 90"
+    ],
+    "baseTokenReward": 500,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": ["Data Analyst"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 79
 }

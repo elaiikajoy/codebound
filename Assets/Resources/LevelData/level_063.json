@@ -1,25 +1,37 @@
 {
     "levelNumber": 63,
-    "levelName": "Level 63: For Loops Pt 2",
-    "category": "Basics",
+    "levelName": "Level 63: While Loops - Sum Until Zero",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Looping a specific number of times.",
-    "objective": "Write a for loop that prints \"Orange\" exactly 3 times on separate lines.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
-    "expectedOutput": "Orange\nOrange\nOrange",
+    "puzzleDescription": "Create a loop that keeps asking for numbers and adds them together. The loop should stop only when the user enters 0.",
+    "objective": "Input numbers one by one and add them to 'sum'. Stop and print the final 'sum' when the input is 0.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int sum = 0;\n        int num = sc.nextInt();\n        \n        // Write your while loop here:\n        \n        System.out.println(sum);\n    }\n}",
+    "expectedOutput": "15",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The condition should be 'while (num != 0)'.",
+        "Inside the loop, add 'num' to 'sum' and then get the next input: 'num = sc.nextInt();'.",
+        "Make sure 'sum += num' happens before you ask for the next number."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "5 10 0",
+            "output": "15"
+        },
+        {
+            "input": "2 2 2 0",
+            "output": "6"
+        }
+    ],
     "requiredKeywords": [
-        "for",
-        "i < 3",
-        "\"Orange\""
+        "while",
+        "!=",
+        "sum +=",
+        "sc.nextInt()"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 220,
+    "forbiddenKeywords": [
+        "for"
+    ],
+    "baseTokenReward": 350,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +39,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 62
 }

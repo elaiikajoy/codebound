@@ -1,33 +1,50 @@
 {
     "levelNumber": 41,
-    "levelName": "Level 41: Subtraction Pt 10",
-    "category": "Basics",
+    "levelName": "Level 41: Switch Statements - Days of the Week",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Subtracting two numbers.",
-    "objective": "Declare integers x = 123 and y = 41. Print their difference (x - y).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "82",
+    "puzzleDescription": "Learn how to use a 'switch' statement to select one of many code blocks to be executed based on a number input.",
+    "objective": "Input a number (1–7) and display the day (1 = Monday, 7 = Sunday).",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int day = sc.nextInt();\n        \n        // Write your switch logic below:\n        \n    }\n}",
+    "expectedOutput": "Wednesday",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'switch(day) { ... }' to start the block.",
+        "Each day is a 'case' (e.g., case 1: System.out.println(\"Monday\"); break;).",
+        "Don't forget the 'break;' statement after each case to prevent fall-through!"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "1",
+            "output": "Monday"
+        },
+        {
+            "input": "3",
+            "output": "Wednesday"
+        },
+        {
+            "input": "7",
+            "output": "Sunday"
+        }
+    ],
     "requiredKeywords": [
-        "x = 123",
-        "y = 41",
+        "switch",
+        "case",
+        "break",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 180,
+    "forbiddenKeywords": [
+        "if",
+        "else if"
+    ],
+    "baseTokenReward": 250,
     "perfectBonus": 50,
     "speedBonus": 25,
-    "unlockedAchievements": [],
+    "unlockedAchievements": ["Switch Master"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 40
 }

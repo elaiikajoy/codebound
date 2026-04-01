@@ -1,25 +1,39 @@
 {
     "levelNumber": 64,
-    "levelName": "Level 64: For Loops Pt 3",
-    "category": "Basics",
+    "levelName": "Level 64: While Loops - Reverse a Number",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Looping a specific number of times.",
-    "objective": "Write a for loop that prints \"Banana\" exactly 4 times on separate lines.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
-    "expectedOutput": "Banana\nBanana\nBanana\nBanana",
+    "puzzleDescription": "Learn how to flip a number using a while loop. For example, 123 becomes 321.",
+    "objective": "Input an integer and print its digits in reverse order using a while loop.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your while loop logic below:\n        while (num > 0) {\n            int digit = // Get the last digit\n            System.out.print(digit);\n            num = // Remove the last digit\n        }\n    }\n}",
+    "expectedOutput": "54321",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'num % 10' to get the last digit of the number.",
+        "Use 'num / 10' to remove the last digit from the number.",
+        "Use 'System.out.print()' instead of 'println()' to keep the digits on the same line."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "12345",
+            "output": "54321"
+        },
+        {
+            "input": "987",
+            "output": "789"
+        }
+    ],
     "requiredKeywords": [
-        "for",
-        "i < 4",
-        "\"Banana\""
+        "while",
+        "%",
+        "/",
+        "10"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 220,
+    "forbiddenKeywords": [
+        "for",
+        "StringBuilder",
+        "reverse"
+    ],
+    "baseTokenReward": 360,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +41,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 63
 }

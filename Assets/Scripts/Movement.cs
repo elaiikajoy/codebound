@@ -14,6 +14,11 @@ public class Movement : MonoBehaviour
     private new Camera camera;
     private new Rigidbody2D rigidbody;
 
+    [Header("Input")]
+    [SerializeField] private bool useMobileButtonInput = true;
+    [SerializeField] private bool allowKeyboardFallback = false;
+    [SerializeField] private bool disableInputWhenTerminalOpen = true;
+
     public float moveSpeed = 8f;
     public float maxJumpHeight = 3f;
     public float maxJumpTime = 0.75f;
@@ -24,6 +29,12 @@ public class Movement : MonoBehaviour
     private float inputAxis;
     public Vector2 velocity;
 
+    private bool forwardHeld;
+    private bool backwardHeld;
+    private bool jumpHeld;
+    private bool jumpQueued;
+    private bool inputLocked;
+
     public Animator animator;
 
     private void Awake()
@@ -31,6 +42,16 @@ public class Movement : MonoBehaviour
         rigidbody = GetComponent<Rigidbody2D>();
         camera = Camera.main;
         animator = GetComponent<Animator>();
+    }
+
+    private void OnEnable()
+    {
+        TerminalLevelController.OnTerminalModalVisibilityChanged += HandleTerminalModalVisibilityChanged;
+    }
+
+    private void OnDisable()
+    {
+        TerminalLevelController.OnTerminalModalVisibilityChanged -= HandleTerminalModalVisibilityChanged;
     }
 
     private void Update()
@@ -56,18 +77,26 @@ public class Movement : MonoBehaviour
         velocity.y = Mathf.Max(velocity.y, 0f);
         Jumping = velocity.y > 0f;
 
+        if (inputLocked)
+        {
+            return;
+        }
 
-        if (Input.GetButtonDown("Jump"))
+        bool keyboardJumpPressed = !useMobileButtonInput || allowKeyboardFallback ? Input.GetButtonDown("Jump") : false;
+        if (jumpQueued || keyboardJumpPressed)
         {
             velocity.y = jumpForce;
             Jumping = true;
+            jumpQueued = false;
             AudioManager.instance.Play("Jump");
         }
     }
 
     private void ApplyGravity()
     {
-        bool falling = velocity.y < 0f || !Input.GetButton("Jump");
+        bool keyboardJumpHeld = !useMobileButtonInput || allowKeyboardFallback ? Input.GetButton("Jump") : false;
+        bool activeJumpHold = !inputLocked && ((useMobileButtonInput && jumpHeld) || keyboardJumpHeld);
+        bool falling = velocity.y < 0f || !activeJumpHold;
         float multiplier = falling ? 3f : 1f;
 
         velocity.y += Gravity * multiplier * Time.deltaTime;
@@ -76,7 +105,31 @@ public class Movement : MonoBehaviour
 
     private void HorizontalMovement()
     {
-        inputAxis = Input.GetAxis("Horizontal");
+        if (inputLocked)
+        {
+            inputAxis = 0f;
+            velocity.x = Mathf.MoveTowards(velocity.x, 0f, moveSpeed * Time.deltaTime);
+            return;
+        }
+
+        if (useMobileButtonInput)
+        {
+            inputAxis = GetMobileHorizontalInput();
+
+            if (allowKeyboardFallback)
+            {
+                float keyboardAxis = Input.GetAxisRaw("Horizontal");
+                if (Mathf.Abs(keyboardAxis) > Mathf.Abs(inputAxis))
+                {
+                    inputAxis = keyboardAxis;
+                }
+            }
+        }
+        else
+        {
+            inputAxis = Input.GetAxis("Horizontal");
+        }
+
         velocity.x = Mathf.MoveTowards(velocity.x, inputAxis * moveSpeed, moveSpeed * Time.deltaTime);
 
         if (rigidbody.Raycast(Vector2.right * velocity.x))
@@ -118,6 +171,79 @@ public class Movement : MonoBehaviour
                 velocity.y = 0f;
             }
         }
+    }
+
+    private float GetMobileHorizontalInput()
+    {
+        if (forwardHeld == backwardHeld)
+        {
+            return 0f;
+        }
+
+        return forwardHeld ? 1f : -1f;
+    }
+
+    // UI Button Hook: Forward button OnPointerDown
+    public void OnForwardDown()
+    {
+        if (inputLocked) return;
+        forwardHeld = true;
+    }
+
+    // UI Button Hook: Forward button OnPointerUp
+    public void OnForwardUp()
+    {
+        forwardHeld = false;
+    }
+
+    // UI Button Hook: Backward button OnPointerDown
+    public void OnBackwardDown()
+    {
+        if (inputLocked) return;
+        backwardHeld = true;
+    }
+
+    // UI Button Hook: Backward button OnPointerUp
+    public void OnBackwardUp()
+    {
+        backwardHeld = false;
+    }
+
+    // UI Button Hook: Jump button OnPointerDown
+    public void OnJumpDown()
+    {
+        if (inputLocked) return;
+        jumpHeld = true;
+        jumpQueued = true;
+    }
+
+    // UI Button Hook: Jump button OnPointerUp
+    public void OnJumpUp()
+    {
+        jumpHeld = false;
+    }
+
+    private void HandleTerminalModalVisibilityChanged(bool visible)
+    {
+        if (!disableInputWhenTerminalOpen)
+        {
+            return;
+        }
+
+        inputLocked = visible;
+
+        if (inputLocked)
+        {
+            ClearBufferedInput();
+        }
+    }
+
+    private void ClearBufferedInput()
+    {
+        forwardHeld = false;
+        backwardHeld = false;
+        jumpHeld = false;
+        jumpQueued = false;
     }
 
 }

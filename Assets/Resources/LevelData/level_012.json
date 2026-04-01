@@ -1,24 +1,26 @@
 {
     "levelNumber": 12,
-    "levelName": "Level 12: Strings Pt 1",
+    "levelName": "Level 12: Variables Pt 11",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Apple\", then print it.",
+    "puzzleDescription": "Learn how to use the 'double' data type to store and display decimal numbers (floating-point values).",
+    "objective": "Declare a `double` variable called `price` and print it.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Apple",
+    "expectedOutput": "19.99",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use the 'double' keyword for numbers with decimals.",
+        "Assign a decimal value (e.g., 19.99) to your variable.",
+        "Use System.out.println(price); to see the output."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Apple\"",
-        "System.out.println"
+        "double price",
+        "price =",
+        "System.out.println(price);"
     ],
-    "forbiddenKeywords": [],
+    "forbiddenKeywords": [
+        "int"
+    ],
     "baseTokenReward": 120,
     "perfectBonus": 50,
     "speedBonus": 25,

@@ -1,33 +1,51 @@
 {
     "levelNumber": 50,
-    "levelName": "Level 50: Multiplication Pt 9",
-    "category": "Basics",
+    "levelName": "Level 50: Switch Boss - Grade Descriptor",
+    "category": "Conditionals",
     "difficulty": 5,
-    "puzzleDescription": "Multiplying numbers.",
-    "objective": "Declare integers w = 10 and z = 7. Print their product (w * z).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "70",
+    "puzzleDescription": "The final test for Switch Statements! Convert a letter grade (A, B, C, F) into a performance description.",
+    "objective": "Input a grade (A, B, C, or F). Print 'Excellent' for A, 'Good' for B, 'Average' for C, and 'Fail' for F. For any other character, print 'Invalid Grade'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        char grade = sc.next().charAt(0);\n        \n        // Final Switch Logic below:\n        \n    }\n}",
+    "expectedOutput": "Excellent",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'switch(grade) { ... }'.",
+        "Remember to use single quotes for char cases: case 'A':",
+        "Include a 'default:' case to handle 'Invalid Grade' for letters not in the list.",
+        "Don't forget the 'break;' after each description!"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "A",
+            "output": "Excellent"
+        },
+        {
+            "input": "C",
+            "output": "Average"
+        },
+        {
+            "input": "Z",
+            "output": "Invalid Grade"
+        }
+    ],
     "requiredKeywords": [
-        "w = 10",
-        "z = 7",
-        "System.out.println"
+        "switch",
+        "case",
+        "break",
+        "default"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 200,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "if",
+        "else"
+    ],
+    "baseTokenReward": 350,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": ["Condition Grandmaster"],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 49
 }

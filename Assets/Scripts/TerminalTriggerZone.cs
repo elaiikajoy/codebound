@@ -9,10 +9,14 @@
 
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TerminalTriggerZone : MonoBehaviour
 {
     [SerializeField] private TerminalLevelController terminalController;
+    [SerializeField] private bool useMobilePressButton = true;
+    [SerializeField] private Button pressMeButton;
+    [SerializeField] private GameObject pressMeButtonRoot;
     [SerializeField] private bool requireInteractKey = true;
     [SerializeField] private KeyCode interactKey = KeyCode.E;
     [SerializeField] private string playerTag = "Player";
@@ -20,11 +24,30 @@ public class TerminalTriggerZone : MonoBehaviour
 
     private bool playerInside;
 
+    private void Start()
+    {
+        if (pressMeButton != null)
+        {
+            pressMeButton.onClick.RemoveListener(OnPressMeClicked);
+            pressMeButton.onClick.AddListener(OnPressMeClicked);
+        }
+
+        SetPressMeButtonVisible(false);
+    }
+
+    private void OnDestroy()
+    {
+        if (pressMeButton != null)
+        {
+            pressMeButton.onClick.RemoveListener(OnPressMeClicked);
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log($"[TerminalTriggerZone] Something touched the computer! It was: {other.gameObject.name} with Tag: {other.tag}");
 
-        if (!other.CompareTag(playerTag)) 
+        if (!other.CompareTag(playerTag))
         {
             Debug.Log($"[TerminalTriggerZone] Ignored {other.gameObject.name} because its tag is '{other.tag}' instead of '{playerTag}'.");
             return;
@@ -35,10 +58,19 @@ public class TerminalTriggerZone : MonoBehaviour
         if (interactPromptText != null)
         {
             interactPromptText.gameObject.SetActive(true);
-            interactPromptText.text = requireInteractKey ? $"Press {interactKey} to open terminal" : "Opening terminal...";
+            if (useMobilePressButton)
+            {
+                interactPromptText.text = "Tap Press Me to open terminal";
+            }
+            else
+            {
+                interactPromptText.text = requireInteractKey ? $"Press {interactKey} to open terminal" : "Opening terminal...";
+            }
         }
 
-        if (!requireInteractKey)
+        SetPressMeButtonVisible(useMobilePressButton);
+
+        if (!useMobilePressButton && !requireInteractKey)
         {
             OpenTerminal();
         }
@@ -54,17 +86,30 @@ public class TerminalTriggerZone : MonoBehaviour
         {
             interactPromptText.gameObject.SetActive(false);
         }
+
+        SetPressMeButtonVisible(false);
     }
 
     private void Update()
     {
-        if (!playerInside || !requireInteractKey) return;
+        if (!playerInside || !requireInteractKey || useMobilePressButton) return;
 
         if (Input.GetKeyDown(interactKey))
         {
             Debug.Log($"[TerminalTriggerZone] Player pressed {interactKey} while inside the zone! Calling OpenTerminal...");
             OpenTerminal();
         }
+    }
+
+    // UI Button Hook: Press Me button OnClick
+    public void OnPressMeClicked()
+    {
+        if (!useMobilePressButton || !playerInside)
+        {
+            return;
+        }
+
+        OpenTerminal();
     }
 
     private void OpenTerminal()
@@ -75,6 +120,21 @@ public class TerminalTriggerZone : MonoBehaviour
             return;
         }
 
+        SetPressMeButtonVisible(false);
         terminalController.OpenCurrentLevel();
+    }
+
+    private void SetPressMeButtonVisible(bool visible)
+    {
+        if (pressMeButtonRoot != null)
+        {
+            pressMeButtonRoot.SetActive(visible);
+            return;
+        }
+
+        if (pressMeButton != null)
+        {
+            pressMeButton.gameObject.SetActive(visible);
+        }
     }
 }

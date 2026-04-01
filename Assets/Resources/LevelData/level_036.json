@@ -1,25 +1,38 @@
 {
     "levelNumber": 36,
-    "levelName": "Level 36: Subtraction Pt 5",
-    "category": "Basics",
+    "levelName": "Level 36: Conditionals - Logical AND",
+    "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Subtracting two numbers.",
-    "objective": "Declare integers x = 108 and y = 36. Print their difference (x - y).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "72",
+    "puzzleDescription": "Learn how to use the logical AND (&&) operator to check if a number is divisible by both 5 AND 11.",
+    "objective": "Check if a number is divisible by both 5 and 11. Print 'Yes' if it is, otherwise print 'No'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your logic below:\n        \n    }\n}",
+    "expectedOutput": "Yes",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use '&&' to combine two conditions.",
+        "Check 'num % 5 == 0' AND 'num % 11 == 0'.",
+        "Both conditions must be true for the 'if' block to run."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "55",
+            "output": "Yes"
+        },
+        {
+            "input": "25",
+            "output": "No"
+        }
+    ],
     "requiredKeywords": [
-        "x = 108",
-        "y = 36",
-        "System.out.println"
+        "if",
+        "&&",
+        "%",
+        "else"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 170,
+    "forbiddenKeywords": [
+        "System.out.println(\"Yes\")",
+        "System.out.println(\"No\")"
+    ],
+    "baseTokenReward": 230,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +40,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 35
 }

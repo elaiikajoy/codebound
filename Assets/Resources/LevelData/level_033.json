@@ -1,25 +1,38 @@
 {
     "levelNumber": 33,
-    "levelName": "Level 33: Subtraction Pt 2",
-    "category": "Basics",
+    "levelName": "Level 33: If Statements - Max of Two",
+    "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Subtracting two numbers.",
-    "objective": "Declare integers x = 99 and y = 33. Print their difference (x - y).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "66",
+    "puzzleDescription": "Learn how to compare two numbers and display the larger one using an if-else statement.",
+    "objective": "Input two numbers and print the larger number.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        \n        // Write your logic below:\n        \n    }\n}",
+    "expectedOutput": "50",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Compare the two numbers: 'if (a > b)'.",
+        "If the condition is true, print 'a'. Otherwise, print 'b'.",
+        "Make sure your if and else blocks are properly closed with braces {}."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "50 20",
+            "output": "50"
+        },
+        {
+            "input": "15 100",
+            "output": "100"
+        }
+    ],
     "requiredKeywords": [
-        "x = 99",
-        "y = 33",
+        "if",
+        "else",
+        ">",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 160,
+    "forbiddenKeywords": [
+        "System.out.println(50)",
+        "System.out.println(100)"
+    ],
+    "baseTokenReward": 220,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +40,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 32
 }

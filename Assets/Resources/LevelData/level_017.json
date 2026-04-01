@@ -1,25 +1,26 @@
 {
     "levelNumber": 17,
-    "levelName": "Level 17: Strings Pt 6",
+    "levelName": "Level 17: Basic Arithmetic - Multiplication",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Peach\", then print it.",
+    "puzzleDescription": "Learn how to use the '*' operator to multiply two numbers and display the product.",
+    "objective": "Create two numbers and print their product.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Peach",
+    "expectedOutput": "50",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use the '*' symbol to multiply variables.",
+        "Example: int result = a * b;",
+        "You can use either 'int' or 'double' for the numbers."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Peach\"",
+        "*",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 130,
+    "forbiddenKeywords": [
+        "String"
+    ],
+    "baseTokenReward": 140,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],

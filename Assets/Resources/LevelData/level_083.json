@@ -1,24 +1,31 @@
 {
     "levelNumber": 83,
-    "levelName": "Level 83: Arrays Pt 2",
-    "category": "Basics",
-    "difficulty": 8,
-    "puzzleDescription": "Accessing array elements.",
-    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 166. Print arr[1].",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
-    "expectedOutput": "166",
+    "levelName": "Level 83: Strings - Lowercase Conversion",
+    "category": "Strings",
+    "difficulty": 6,
+    "puzzleDescription": "Learn how to normalize text by converting a String to all lowercase letters using the .toLowerCase() method.",
+    "objective": "Given the String 'input', convert it to lowercase and print the result.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String input = \"JAVA IS FUN\";\n        \n        // Convert the String to lowercase below:\n        String result = \n        \n        System.out.println(result);\n    }\n}",
+    "expectedOutput": "java is fun",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'input.toLowerCase()' to create the small-letter version.",
+        "Just like toUpperCase, this does not change the original 'input' string.",
+        "Make sure your expected output is exactly 'java is fun' in all small letters."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "java is fun"
+        }
+    ],
     "requiredKeywords": [
-        "arr[1] = 166",
-        "System.out.println(arr[1])"
+        ".toLowerCase()",
+        "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 260,
+    "forbiddenKeywords": [
+        "result = \"java is fun\""
+    ],
+    "baseTokenReward": 310,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -26,7 +33,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 82
 }

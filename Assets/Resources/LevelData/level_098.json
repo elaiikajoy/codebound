@@ -1,23 +1,33 @@
 {
     "levelNumber": 98,
-    "levelName": "Level 98: Methods Pt 7",
-    "category": "Basics",
+    "levelName": "Level 98: Methods - Prime Number Checker",
+    "category": "Methods",
     "difficulty": 9,
-    "puzzleDescription": "Calling a method with parameters.",
-    "objective": "Call printNumber(294) inside main().",
-    "starterCode": "public class Solution {\n    public static void printNumber(int x) {\n        System.out.println(x);\n    }\n    public static void main(String[] args) {\n        // Call printNumber below:\n        \n    }\n}",
-    "expectedOutput": "294",
+    "puzzleDescription": "Create a method that determines if a number is prime. A prime number is only divisible by 1 and itself.",
+    "objective": "Complete the 'isPrime' method. Loop from 2 to n-1. If n is divisible by any of these numbers, return false.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        System.out.println(isPrime(7));\n        System.out.println(isPrime(10));\n    }\n\n    // Complete the prime checker method below:\n    public static boolean isPrime(int n) {\n        if (n <= 1) return false;\n        \n        // Write a for loop to check for divisors:\n        \n        return true;\n    }\n}",
+    "expectedOutput": "true\nfalse",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use a for loop: 'for (int i = 2; i < n; i++)'.",
+        "Inside the loop, check if 'n % i == 0'. If true, it means 'n' is not prime, so 'return false;'.",
+        "If the loop finishes without finding a divisor, the method will 'return true;'."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "true\nfalse"
+        }
+    ],
     "requiredKeywords": [
-        "printNumber(294);"
+        "for",
+        "% i == 0",
+        "return false",
+        "return true"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 290,
+    "forbiddenKeywords": [
+        "isPrime = true"
+    ],
+    "baseTokenReward": 480,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -25,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 97
 }

@@ -1,23 +1,35 @@
 {
     "levelNumber": 95,
-    "levelName": "Level 95: Methods Pt 4",
-    "category": "Basics",
+    "levelName": "Level 95: Methods - Reverse Number",
+    "category": "Methods",
     "difficulty": 9,
-    "puzzleDescription": "Calling a method with parameters.",
-    "objective": "Call printNumber(285) inside main().",
-    "starterCode": "public class Solution {\n    public static void printNumber(int x) {\n        System.out.println(x);\n    }\n    public static void main(String[] args) {\n        // Call printNumber below:\n        \n    }\n}",
-    "expectedOutput": "285",
+    "puzzleDescription": "Create a method that reverses the digits of an integer (e.g., 123 becomes 321).",
+    "objective": "Complete the 'reverseNum' method. Use a while loop to extract digits and rebuild the number.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int result = reverseNum(1234);\n        System.out.println(result);\n    }\n\n    public static int reverseNum(int n) {\n        int reversed = 0;\n        \n        while (n != 0) {\n            int digit = n % 10;\n            reversed = reversed * 10 + digit;\n            n /= 10;\n        }\n        \n        return reversed;\n    }\n}",
+    "expectedOutput": "4321",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The modulo operator 'n % 10' gets the last digit of a number.",
+        "To move the current digits to the left, multiply 'reversed' by 10 before adding the new digit.",
+        "Dividing 'n /= 10' removes the last digit so you can get the next one in the next loop."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "4321"
+        }
+    ],
     "requiredKeywords": [
-        "printNumber(285);"
+        "while",
+        "% 10",
+        "* 10",
+        "/= 10",
+        "return"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 290,
+    "forbiddenKeywords": [
+        "reversed = 4321",
+        "StringBuilder"
+    ],
+    "baseTokenReward": 450,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -25,7 +37,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 94
 }

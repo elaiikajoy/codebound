@@ -1,25 +1,36 @@
 {
     "levelNumber": 31,
-    "levelName": "Level 31: Addition Pt 10",
-    "category": "Basics",
+    "levelName": "Level 31: If Statements - Positive or Negative",
+    "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Adding two numbers.",
-    "objective": "Declare integers a = 31 and b = 62. Print their sum.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "93",
+    "puzzleDescription": "Learn how to use 'if' and 'else' to check if a number is Positive (greater than 0) or Negative (less than 0).",
+    "objective": "Input a number and print 'Positive' if it's 0 or more, otherwise print 'Negative'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your if-else logic below:\n        \n    }\n}",
+    "expectedOutput": "Positive",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'if (num >= 0)' to check if a number is positive.",
+        "Use 'else' to handle the case where the condition is false.",
+        "Don't forget the curly braces {} for your blocks of code."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "10",
+            "output": "Positive"
+        },
+        {
+            "input": "-5",
+            "output": "Negative"
+        }
+    ],
     "requiredKeywords": [
-        "a = 31",
-        "b = 62",
+        "if",
+        "else",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 160,
+    "forbiddenKeywords": [
+        "Scanner sc = new Scanner(System.in); int num = 10;"
+    ],
+    "baseTokenReward": 200,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +38,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 30
 }

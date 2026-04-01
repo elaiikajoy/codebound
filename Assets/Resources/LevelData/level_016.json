@@ -1,25 +1,27 @@
 {
     "levelNumber": 16,
-    "levelName": "Level 16: Strings Pt 5",
+    "levelName": "Level 16: Basic Arithmetic - Addition",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Working with text variables.",
-    "objective": "Declare a String named 'fruit' with value \"Mango\", then print it.",
+    "puzzleDescription": "Learn how to use the '+' operator to add two integer variables together and display the result.",
+    "objective": "Create two integers and print their sum.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Mango",
+    "expectedOutput": "15",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Declare two 'int' variables (e.g., int a = 5; int b = 10;).",
+        "Use the '+' sign to add them together.",
+        "Print the result using System.out.println(a + b);"
     ],
     "testCases": [],
     "requiredKeywords": [
-        "String fruit",
-        "\"Mango\"",
+        "int",
+        "+",
         "System.out.println"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 130,
+    "forbiddenKeywords": [
+        "String"
+    ],
+    "baseTokenReward": 140,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],

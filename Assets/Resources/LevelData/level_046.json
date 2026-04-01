@@ -1,25 +1,41 @@
 {
     "levelNumber": 46,
-    "levelName": "Level 46: Multiplication Pt 5",
-    "category": "Basics",
+    "levelName": "Level 46: Switch Statements - Grouping Cases",
+    "category": "Conditionals",
     "difficulty": 4,
-    "puzzleDescription": "Multiplying numbers.",
-    "objective": "Declare integers w = 6 and z = 7. Print their product (w * z).",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "42",
+    "puzzleDescription": "Learn how to group multiple cases together in a switch statement to produce the same output for different inputs.",
+    "objective": "Input a month number (1-12) and display the season: 12, 1, 2 = Winter; 3, 4, 5 = Spring; 6, 7, 8 = Summer; 9, 10, 11 = Fall.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int month = sc.nextInt();\n        \n        // Group your cases here:\n        \n    }\n}",
+    "expectedOutput": "Summer",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "You can stack cases like this: case 6: case 7: case 8: System.out.println(\"Summer\"); break;",
+        "This avoids repeating the same print statement for different months.",
+        "Make sure to use 'break;' only after the group is finished."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "1",
+            "output": "Winter"
+        },
+        {
+            "input": "7",
+            "output": "Summer"
+        },
+        {
+            "input": "10",
+            "output": "Fall"
+        }
+    ],
     "requiredKeywords": [
-        "w = 6",
-        "z = 7",
-        "System.out.println"
+        "switch",
+        "case",
+        "break"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 190,
+    "forbiddenKeywords": [
+        "if",
+        "else"
+    ],
+    "baseTokenReward": 280,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +43,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 45
 }

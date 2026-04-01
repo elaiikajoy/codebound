@@ -1,25 +1,33 @@
 {
     "levelNumber": 54,
-    "levelName": "Level 54: If Statements Pt 3",
-    "category": "Basics",
+    "levelName": "Level 54: For Loops - Odd Numbers",
+    "category": "Loops",
     "difficulty": 5,
-    "puzzleDescription": "Using an if statement.",
-    "objective": "If score is greater than 270, print \"Win\". The score is 275.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int score = 275;\n        // Write an if statement below:\n        \n    }\n}",
-    "expectedOutput": "Win",
+    "puzzleDescription": "Master the step logic! Your goal is to print all odd numbers from 1 to 20.",
+    "objective": "Use a for loop to print odd numbers starting from 1 up to 20 (1, 3, 5... 19).",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your loop below:\n        \n    }\n}",
+    "expectedOutput": "1\n3\n5\n7\n9\n11\n13\n15\n17\n19",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Start your loop at 1: 'int i = 1;'.",
+        "Use 'i += 2' to skip the even numbers.",
+        "Your condition should be 'i < 20' or 'i <= 20'."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "1\n3\n5\n7\n9\n11\n13\n15\n17\n19"
+        }
+    ],
     "requiredKeywords": [
-        "if",
-        "score > 270",
-        "\"Win\""
+        "for",
+        "int i = 1",
+        "i += 2"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 200,
+    "forbiddenKeywords": [
+        "System.out.println(1);",
+        "System.out.println(3);"
+    ],
+    "baseTokenReward": 310,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 53
 }

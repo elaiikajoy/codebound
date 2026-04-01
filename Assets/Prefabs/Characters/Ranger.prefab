@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 2106974850685714669}
   - component: {fileID: 1834120694}
   - component: {fileID: 5046453932860453247}
+  - component: {fileID: 945140501}
   m_Layer: 3
   m_Name: Ranger
   m_TagString: Player
@@ -139,7 +140,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4869ee35d4960043be92e11d6656ce9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 7
+  useMobileButtonInput: 1
+  allowKeyboardFallback: 1
+  disableInputWhenTerminalOpen: 1
+  moveSpeed: 5
   maxJumpHeight: 3.5
   maxJumpTime: 1.5
   velocity: {x: 0, y: 0}
@@ -176,6 +180,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3613592a7dabad84eb2f63232ddbfec5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerTag: Player
 --- !u!114 &5046453932860453247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -190,5 +195,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   characterDB: {fileID: 11400000, guid: d9bd255feee2d1e4b9d0ea48bd67b5d8, type: 2}
   artworkSprite: {fileID: 3246750631410837115}
-  artworkImage: {fileID: 0}
+  artworkImage: {fileID: 2255892171895067850, guid: 5440de1e9cbe31249965a7f913c2b19d, type: 3}
   nameText: {fileID: 0}
+--- !u!114 &945140501
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4025925460572891436}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45f3f24a7f90f2644ae2041d4ef4fd93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterDB: {fileID: 11400000, guid: d9bd255feee2d1e4b9d0ea48bd67b5d8, type: 2}
+  artworkSprite: {fileID: 3246750631410837115}

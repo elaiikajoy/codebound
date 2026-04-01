@@ -1,25 +1,32 @@
 {
     "levelNumber": 61,
-    "levelName": "Level 61: If Statements Pt 10",
-    "category": "Basics",
+    "levelName": "Level 61: While Loops - Counting Up",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Using an if statement.",
-    "objective": "If score is greater than 300, print \"Win\". The score is 305.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int score = 305;\n        // Write an if statement below:\n        \n    }\n}",
-    "expectedOutput": "Win",
+    "puzzleDescription": "Learn the basics of a 'while' loop. Your goal is to print numbers from 1 to 10 using this new loop structure.",
+    "objective": "Use a while loop to count from 1 to 10 and print each number.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int i = 1; // Initialization\n        \n        // Write your while loop below:\n        \n    }\n}",
+    "expectedOutput": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The syntax is: while(condition) { ... }",
+        "Inside the loop, don't forget to increment i (i++) or you will create an infinite loop!",
+        "The condition should be (i <= 10)."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10"
+        }
+    ],
     "requiredKeywords": [
-        "if",
-        "score > 300",
-        "\"Win\""
+        "while",
+        "i <= 10",
+        "i++"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 220,
+    "forbiddenKeywords": [
+        "for"
+    ],
+    "baseTokenReward": 300,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +34,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 60
 }

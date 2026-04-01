@@ -1,23 +1,33 @@
 {
     "levelNumber": 93,
-    "levelName": "Level 93: Methods Pt 2",
-    "category": "Basics",
-    "difficulty": 9,
-    "puzzleDescription": "Calling a method with parameters.",
-    "objective": "Call printNumber(279) inside main().",
-    "starterCode": "public class Solution {\n    public static void printNumber(int x) {\n        System.out.println(x);\n    }\n    public static void main(String[] args) {\n        // Call printNumber below:\n        \n    }\n}",
-    "expectedOutput": "279",
+    "levelName": "Level 93: Methods - Find the Largest",
+    "category": "Methods",
+    "difficulty": 7,
+    "puzzleDescription": "Create a method that compares two numbers and returns the larger one.",
+    "objective": "Complete the 'getMax' method. If 'a' is greater than 'b', return 'a'. Otherwise, return 'b'.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int result = getMax(50, 85);\n        System.out.println(result);\n    }\n\n    // Complete the method below:\n    public static int getMax(int a, int b) {\n        \n    }\n}",
+    "expectedOutput": "85",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use an 'if-else' statement to check which number is larger.",
+        "The condition should be 'if (a > b)'.",
+        "Make sure every possible path in your method has a 'return' statement."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "85"
+        }
+    ],
     "requiredKeywords": [
-        "printNumber(279);"
+        "if",
+        "else",
+        "return",
+        ">"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 280,
+    "forbiddenKeywords": [
+        "System.out.println(85)"
+    ],
+    "baseTokenReward": 380,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -25,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 92
 }

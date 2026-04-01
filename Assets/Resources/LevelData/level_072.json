@@ -1,25 +1,33 @@
 {
     "levelNumber": 72,
-    "levelName": "Level 72: While Loops Pt 1",
-    "category": "Basics",
+    "levelName": "Level 72: Arrays - Sum of Elements",
+    "category": "Arrays",
     "difficulty": 7,
-    "puzzleDescription": "Looping downwards.",
-    "objective": "Use a while loop to print numbers from 2 down to 1.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int count = 2;\n        // Your while loop here:\n        \n    }\n}",
-    "expectedOutput": "2\n1",
+    "puzzleDescription": "Use a for loop to iterate through an array and calculate the total sum of its elements.",
+    "objective": "Given the array 'prices', use a for loop to add all elements together and print the final sum.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] prices = {100, 250, 150};\n        int total = 0;\n        \n        // Write your for loop to calculate the sum below:\n        \n        System.out.println(total);\n    }\n}",
+    "expectedOutput": "500",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "The loop should run from 'i = 0' to 'i < prices.length'.",
+        "Inside the loop, use 'total += prices[i];' to add each element to the sum.",
+        "Remember: 'prices.length' tells you how many elements are in the array."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "500"
+        }
+    ],
     "requiredKeywords": [
-        "while",
-        "count >",
-        "count--"
+        "for",
+        "prices.length",
+        "total +=",
+        "prices[i]"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 240,
+    "forbiddenKeywords": [
+        "total = 500"
+    ],
+    "baseTokenReward": 360,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 71
 }

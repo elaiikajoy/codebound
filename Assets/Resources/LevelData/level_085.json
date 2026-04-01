@@ -1,24 +1,35 @@
 {
     "levelNumber": 85,
-    "levelName": "Level 85: Arrays Pt 4",
-    "category": "Basics",
+    "levelName": "Level 85: Strings - Palindrome Checker",
+    "category": "Strings",
     "difficulty": 8,
-    "puzzleDescription": "Accessing array elements.",
-    "objective": "Given int[] arr = {10, 20, 30}. Change index 1 to 170. Print arr[1].",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] arr = {10, 20, 30};\n        // Modify and print:\n        \n    }\n}",
-    "expectedOutput": "170",
+    "puzzleDescription": "A palindrome is a word that reads the same backward as forward. Use a loop to reverse the string and check if it matches the original.",
+    "objective": "Given the String 'word', print 'Palindrome' if it is a palindrome, otherwise print 'Not Palindrome'.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String word = \"radar\";\n        String reversed = \"\";\n        \n        // 1. Write a loop to build the 'reversed' string:\n        \n        // 2. Use an if-else to compare 'word' and 'reversed':\n        \n    }\n}",
+    "expectedOutput": "Palindrome",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use a for loop starting from 'word.length() - 1' down to 0.",
+        "Inside the loop, use 'reversed += word.charAt(i);' to build the string.",
+        "Use 'word.equals(reversed)' to compare two Strings in Java. Do not use '=='!",
+        "Print 'Palindrome' or 'Not Palindrome' based on the result."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "Palindrome"
+        }
+    ],
     "requiredKeywords": [
-        "arr[1] = 170",
-        "System.out.println(arr[1])"
+        "for",
+        "charAt",
+        ".equals(",
+        "if"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 270,
+    "forbiddenKeywords": [
+        "word == reversed",
+        "StringBuilder"
+    ],
+    "baseTokenReward": 400,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -26,7 +37,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 84
 }

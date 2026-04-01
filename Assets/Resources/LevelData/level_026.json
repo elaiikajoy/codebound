@@ -1,25 +1,37 @@
 {
     "levelNumber": 26,
-    "levelName": "Level 26: Addition Pt 5",
+    "levelName": "Level 26: Input Arithmetic - Division",
     "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Adding two numbers.",
-    "objective": "Declare integers a = 26 and b = 52. Print their sum.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "78",
+    "puzzleDescription": "Learn how to divide two numbers provided by the user using the forward slash (/) operator.",
+    "objective": "Input two numbers and print the division result.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
+    "expectedOutput": "5",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'sc.nextInt()' to get the two numbers.",
+        "Use the '/' operator for division.",
+        "Example: System.out.println(num1 / num2);"
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "10 2",
+            "output": "5"
+        },
+        {
+            "input": "100 10",
+            "output": "10"
+        }
+    ],
     "requiredKeywords": [
-        "a = 26",
-        "b = 52",
-        "System.out.println"
+        "Scanner",
+        "nextInt()",
+        "System.out.println",
+        "/"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 150,
+    "forbiddenKeywords": [
+        "System.out.println(5)"
+    ],
+    "baseTokenReward": 180,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +39,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 25
 }

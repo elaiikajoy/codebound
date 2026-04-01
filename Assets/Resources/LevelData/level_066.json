@@ -1,25 +1,40 @@
 {
     "levelNumber": 66,
-    "levelName": "Level 66: For Loops Pt 5",
-    "category": "Basics",
+    "levelName": "Level 66: While Loops - Sum of Digits",
+    "category": "Loops",
     "difficulty": 6,
-    "puzzleDescription": "Looping a specific number of times.",
-    "objective": "Write a for loop that prints \"Mango\" exactly 6 times on separate lines.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Your loop here:\n        \n    }\n}",
-    "expectedOutput": "Mango\nMango\nMango\nMango\nMango\nMango",
+    "puzzleDescription": "Use a while loop to extract each digit of a number and calculate their total sum.",
+    "objective": "Input an integer and print the sum of its digits (e.g., 125 results in 8).",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        int sum = 0;\n        \n        // Write your while loop logic below:\n        \n        System.out.println(sum);\n    }\n}",
+    "expectedOutput": "6",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use 'num % 10' to get the last digit.",
+        "Add that digit to your 'sum' variable.",
+        "Use 'num /= 10' to remove the digit you just added.",
+        "The loop should run while 'num > 0'."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "123",
+            "output": "6"
+        },
+        {
+            "input": "456",
+            "output": "15"
+        }
+    ],
     "requiredKeywords": [
-        "for",
-        "i < 6",
-        "\"Mango\""
+        "while",
+        "%",
+        "sum +=",
+        "/="
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 230,
+    "forbiddenKeywords": [
+        "for",
+        "String",
+        "charAt"
+    ],
+    "baseTokenReward": 360,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +42,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 65
 }

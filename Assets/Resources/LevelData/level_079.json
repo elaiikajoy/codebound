@@ -1,25 +1,33 @@
 {
     "levelNumber": 79,
-    "levelName": "Level 79: While Loops Pt 8",
-    "category": "Basics",
+    "levelName": "Level 79: Arrays - Copying Elements",
+    "category": "Arrays",
     "difficulty": 7,
-    "puzzleDescription": "Looping downwards.",
-    "objective": "Use a while loop to print numbers from 9 down to 1.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int count = 9;\n        // Your while loop here:\n        \n    }\n}",
-    "expectedOutput": "9\n8\n7\n6\n5\n4\n3\n2\n1",
+    "puzzleDescription": "Learn how to copy all elements from one array to a new one using a loop.",
+    "objective": "Copy the elements of 'source' into 'target' and print each element of the 'target' array.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] source = {5, 10, 15};\n        int[] target = new int[source.length];\n        \n        // Write a loop to copy elements from source to target:\n        \n        // Print target elements:\n        for(int x : target) {\n            System.out.println(x);\n        }\n    }\n}",
+    "expectedOutput": "5\n10\n15",
     "hints": [
-        "Read the objective carefully.",
-        "Make sure your syntax is correct.",
-        "Check for missing semicolons."
+        "Use a for loop: 'for (int i = 0; i < source.length; i++)'.",
+        "Inside the loop, set 'target[i] = source[i];'.",
+        "This ensures that the value at each index is transferred correctly."
     ],
-    "testCases": [],
+    "testCases": [
+        {
+            "input": "",
+            "output": "5\n10\n15"
+        }
+    ],
     "requiredKeywords": [
-        "while",
-        "count >",
-        "count--"
+        "for",
+        "target[i]",
+        "source[i]",
+        "="
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 250,
+    "forbiddenKeywords": [
+        "target = source"
+    ],
+    "baseTokenReward": 390,
     "perfectBonus": 50,
     "speedBonus": 25,
     "unlockedAchievements": [],
@@ -27,7 +35,7 @@
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 78
 }
