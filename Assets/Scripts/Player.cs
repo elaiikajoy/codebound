@@ -60,6 +60,8 @@ public class Player : MonoBehaviour
 
         Characters character = characterDB.GetCharacter(selectedOption);
         artworkSprite.sprite = character.characterSprite;
+
+        ApplyCharacterAnimator(character);
     }
 
     private int ResolveSelectedCharacterIndex()
@@ -119,11 +121,28 @@ public class Player : MonoBehaviour
         return -1;
     }
 
+    private void ApplyCharacterAnimator(Characters character)
+    {
+        if (artworkSprite == null || character == null || character.animatorController == null)
+        {
+            return;
+        }
+
+        Animator animator = artworkSprite.GetComponent<Animator>();
+        if (animator == null)
+        {
+            return;
+        }
+
+        animator.runtimeAnimatorController = character.animatorController;
+        animator.enabled = true;
+    }
+
     private string NormalizeCharacterId(string id)
     {
         if (string.IsNullOrWhiteSpace(id))
         {
-            return "";
+            return string.Empty;
         }
 
         string normalized = id.Trim().ToLowerInvariant();

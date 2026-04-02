@@ -631,11 +631,17 @@ public class Shop : MonoBehaviour
         if (_cachedAnimator == null && artworkSprite != null)
             _cachedAnimator = artworkSprite.GetComponent<Animator>();
 
-        if (_cachedAnimator == null)
+        if (_cachedAnimator == null || characterDB == null || characterDB.CharacterCount == 0)
             return;
 
-        string equipped = NormalizeCharacterId(PlayerPrefs.GetString("EquippedCharacter", "default"));
-        bool useRangerAnimator = equipped == "ranger" || string.IsNullOrEmpty(equipped);
-        _cachedAnimator.enabled = useRangerAnimator;
+        int index = Mathf.Clamp(_selectedIndex, 0, characterDB.CharacterCount - 1);
+        Characters character = characterDB.GetCharacter(index);
+        if (character == null)
+            return;
+
+        if (character.animatorController != null)
+            _cachedAnimator.runtimeAnimatorController = character.animatorController;
+
+        _cachedAnimator.enabled = true;
     }
 }

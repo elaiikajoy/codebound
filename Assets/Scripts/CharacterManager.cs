@@ -98,6 +98,8 @@ public class CharacterManager : MonoBehaviour
         if (nameText != null)
             nameText.text = character.CharacterName;
 
+        ApplyCharacterAnimator(character);
+
         Debug.Log($"[CharacterManager] Applied character '{character.CharacterName}' (index={index}, id={character.characterId}).");
     }
 
@@ -155,6 +157,19 @@ public class CharacterManager : MonoBehaviour
         }
 
         return -1;
+    }
+
+    private void ApplyCharacterAnimator(Characters character)
+    {
+        if (artworkSprite == null || character == null || character.animatorController == null)
+            return;
+
+        var animator = artworkSprite.GetComponent<Animator>();
+        if (animator == null)
+            return;
+
+        animator.runtimeAnimatorController = character.animatorController;
+        animator.enabled = true;
     }
 
     /// <summary>
