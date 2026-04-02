@@ -14,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine.EventSystems;
 
@@ -346,11 +347,28 @@ public class TerminalLevelController : MonoBehaviour
 
     private bool LevelRequiresInput()
     {
-        if (activeLevelData == null || activeLevelData.testCases == null) return false;
-        foreach (var tc in activeLevelData.testCases)
+        if (activeLevelData == null) return false;
+
+        // 1. If the level requires Scanner, it definitely needs interactive input
+        if (activeLevelData.requiredKeywords != null)
         {
-            if (!string.IsNullOrEmpty(tc.input)) return true;
+            foreach (var kw in activeLevelData.requiredKeywords)
+            {
+                if (kw.Contains("Scanner") || kw.Contains(".next") || kw.Contains("terminalInput"))
+                    return true;
+            }
         }
+
+        // 2. If test cases have explicit inputs or the wildcard '*'
+        if (activeLevelData.testCases != null)
+        {
+            foreach (var tc in activeLevelData.testCases)
+            {
+                if (!string.IsNullOrEmpty(tc.input) || tc.input == "*")
+                    return true;
+            }
+        }
+
         return false;
     }
 
@@ -360,7 +378,7 @@ public class TerminalLevelController : MonoBehaviour
         {
             consoleInputField.gameObject.SetActive(true);
             consoleInputField.text = "";
-            
+
             // Re-select UI so player can just start typing
             if (EventSystem.current != null)
             {
@@ -372,7 +390,7 @@ public class TerminalLevelController : MonoBehaviour
             // Clear the terminal screen (output text) for a cleaner "blank" injection phase
             if (outputText != null)
             {
-                outputText.text = string.Empty; 
+                outputText.text = string.Empty;
             }
         }
         else
@@ -392,6 +410,8 @@ public class TerminalLevelController : MonoBehaviour
 
         // Find matching test case by input mapping
         LevelTestCase match = null;
+        bool isWildcard = false;
+
         foreach (var tc in activeLevelData.testCases)
         {
             if (tc.input == userInput)
@@ -399,19 +419,36 @@ public class TerminalLevelController : MonoBehaviour
                 match = tc;
                 break;
             }
+            if (tc.input == "*" || tc.input == "")
+            {
+                match = tc;
+                isWildcard = true;
+                // Don't break, in case another test case is an exact match.
+            }
         }
 
         if (match != null)
         {
             consoleInputField.gameObject.SetActive(false);
-            
+
             if (outputText != null)
                 outputText.text = "Data Injected Successfully! Validating...";
 
             UnlockNextLevelLocally();
-            
-            // Prioritize expectedOutput, then fallback to output
-            string resultOutput = !string.IsNullOrEmpty(match.expectedOutput) ? match.expectedOutput : match.output;
+
+            string resultOutput = "";
+            if (isWildcard)
+            {
+                // Calculate dynamic expected output from submitted code using wildcard input
+                string submittedCode = codeInputField != null ? codeInputField.text : string.Empty;
+                resultOutput = ExtractPredictedOutput(submittedCode, userInput);
+            }
+            else
+            {
+                // Prioritize expectedOutput, then fallback to output
+                resultOutput = !string.IsNullOrEmpty(match.expectedOutput) ? match.expectedOutput : match.output;
+            }
+
             HandleRunResult(false, resultOutput);
         }
         else
@@ -420,7 +457,7 @@ public class TerminalLevelController : MonoBehaviour
             {
                 outputText.text = $"[Engine Warning] This terminal only supports simulating predefined test cases.\nInput '{userInput}' is not recognized.\nPlease try a listed valid payload.";
             }
-            
+
             // Keep input field active, just re-focus
             if (EventSystem.current != null)
             {
@@ -472,14 +509,31 @@ public class TerminalLevelController : MonoBehaviour
             return false;
         }
 
+        string codeWithoutComments = StripComments(submittedCode);
+
+        if (!ValidateBasicSyntaxHeuristics(codeWithoutComments, out message))
+        {
+            return false;
+        }
+
         if (activeLevelData != null)
         {
-            if (!ContainsRequiredKeywords(submittedCode, activeLevelData.requiredKeywords, out message))
+            if (!ContainsRequiredKeywords(codeWithoutComments, activeLevelData.requiredKeywords, out message))
             {
                 return false;
             }
 
-            if (ContainsForbiddenKeywords(submittedCode, activeLevelData.forbiddenKeywords, out message))
+            if (!ValidateRequiredCodePattern(codeWithoutComments, activeLevelData.requiredCodePattern, out message))
+            {
+                return false;
+            }
+
+            if (!ValidateRequiredPrintlnCount(codeWithoutComments, activeLevelData.requiredPrintlnCount, out message))
+            {
+                return false;
+            }
+
+            if (ContainsForbiddenKeywords(codeWithoutComments, activeLevelData.forbiddenKeywords, out message))
             {
                 return false;
             }
@@ -491,7 +545,7 @@ public class TerminalLevelController : MonoBehaviour
                     LevelTestCase testCase = activeLevelData.testCases[i];
                     if (testCase == null || testCase.requiredKeywords == null) continue;
 
-                    if (!ContainsRequiredKeywords(submittedCode, testCase.requiredKeywords, out message))
+                    if (!ContainsRequiredKeywords(codeWithoutComments, testCase.requiredKeywords, out message))
                     {
                         message = $"Test case {i + 1} failed: {message}";
                         return false;
@@ -554,6 +608,394 @@ public class TerminalLevelController : MonoBehaviour
         return false;
     }
 
+    private bool ValidateRequiredPrintlnCount(string code, int requiredPrintlnCount, out string message)
+    {
+        if (requiredPrintlnCount <= 0)
+        {
+            message = string.Empty;
+            return true;
+        }
+
+        int actualPrintlnCount = Regex.Matches(code, @"\bSystem\.out\.println\s*\(").Count;
+        if (actualPrintlnCount < requiredPrintlnCount)
+        {
+            message = $"Expected at least {requiredPrintlnCount} println statement(s), found {actualPrintlnCount}.";
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private bool ValidateRequiredCodePattern(string code, string requiredCodePattern, out string message)
+    {
+        if (string.IsNullOrWhiteSpace(requiredCodePattern))
+        {
+            message = string.Empty;
+            return true;
+        }
+
+        if (!Regex.IsMatch(code, requiredCodePattern, RegexOptions.Singleline))
+        {
+            message = "Code structure does not match the required output pattern.";
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private bool ValidateBasicSyntaxHeuristics(string code, out string message)
+    {
+        string[] lines = code.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
+        HashSet<string> declaredIdentifiers = CollectDeclaredIdentifiers(code);
+
+        for (int i = 0; i < lines.Length; i++)
+        {
+            string line = lines[i].Trim();
+            if (string.IsNullOrWhiteSpace(line))
+            {
+                continue;
+            }
+
+            if (line.EndsWith("{") || line.EndsWith("}"))
+            {
+                continue;
+            }
+
+            if (IsStructuralLine(line))
+            {
+                continue;
+            }
+
+            if (LooksLikeStatementThatNeedsSemicolon(line) && !line.EndsWith(";"))
+            {
+                message = $"Syntax check failed: missing semicolon near line {i + 1}.";
+                return false;
+            }
+        }
+
+        if (!ValidateReferencedIdentifiers(code, declaredIdentifiers, out message))
+        {
+            return false;
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private HashSet<string> CollectDeclaredIdentifiers(string code)
+    {
+        HashSet<string> identifiers = new HashSet<string>(System.StringComparer.OrdinalIgnoreCase);
+
+        Match mainArgs = Regex.Match(code, @"\bmain\s*\(\s*String\s*\[\]\s*(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*\)");
+        if (mainArgs.Success)
+        {
+            identifiers.Add(mainArgs.Groups["name"].Value);
+        }
+
+        MatchCollection declarationMatches = Regex.Matches(code, @"\b(?:final\s+)?(?<type>String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\s+(?<rest>[^;]+);");
+        foreach (Match declaration in declarationMatches)
+        {
+            string rest = declaration.Groups["rest"].Value;
+            string[] parts = rest.Split(',');
+            for (int i = 0; i < parts.Length; i++)
+            {
+                string segment = parts[i].Trim();
+                if (string.IsNullOrWhiteSpace(segment))
+                {
+                    continue;
+                }
+
+                string candidate = segment;
+                int equalsIndex = candidate.IndexOf('=');
+                if (equalsIndex >= 0)
+                {
+                    candidate = candidate.Substring(0, equalsIndex).Trim();
+                }
+
+                int arrayIndex = candidate.IndexOf('[');
+                if (arrayIndex >= 0)
+                {
+                    candidate = candidate.Substring(0, arrayIndex).Trim();
+                }
+
+                if (Regex.IsMatch(candidate, @"^[A-Za-z_][A-Za-z0-9_]*$"))
+                {
+                    identifiers.Add(candidate);
+                }
+            }
+        }
+
+        return identifiers;
+    }
+
+    private bool ValidateReferencedIdentifiers(string code, HashSet<string> declaredIdentifiers, out string message)
+    {
+        MatchCollection expressionMatches = Regex.Matches(code, @"System\.out\.(?:println|print)\s*\((?<expr>.*?)\)|\breturn\s+(?<expr>[^;]+);|\b(?:final\s+)?(?:String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\s+[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?<expr>[^;]+);", RegexOptions.Singleline);
+
+        foreach (Match expressionMatch in expressionMatches)
+        {
+            Group exprGroup = expressionMatch.Groups["expr"];
+            if (exprGroup == null || !exprGroup.Success)
+            {
+                continue;
+            }
+
+            string expression = StripStringAndCharLiterals(exprGroup.Value);
+            MatchCollection identifiers = Regex.Matches(expression, @"\b[A-Za-z_][A-Za-z0-9_]*\b");
+
+            for (int i = 0; i < identifiers.Count; i++)
+            {
+                Match identifierMatch = identifiers[i];
+                string identifier = identifierMatch.Value;
+
+                if (IsKnownIdentifier(identifier))
+                {
+                    continue;
+                }
+
+                int startIndex = identifierMatch.Index;
+                if (startIndex > 0 && expression[startIndex - 1] == '.')
+                {
+                    continue;
+                }
+
+                if (!declaredIdentifiers.Contains(identifier))
+                {
+                    message = $"Syntax check failed: undeclared identifier '{identifier}' used in an expression.";
+                    return false;
+                }
+            }
+        }
+
+        message = string.Empty;
+        return true;
+    }
+
+    private bool IsKnownIdentifier(string identifier)
+    {
+        switch (identifier)
+        {
+            case "System":
+            case "out":
+            case "print":
+            case "println":
+            case "String":
+            case "int":
+            case "double":
+            case "float":
+            case "long":
+            case "char":
+            case "boolean":
+            case "var":
+            case "Scanner":
+            case "StringBuilder":
+            case "Math":
+            case "Integer":
+            case "Double":
+            case "Float":
+            case "Long":
+            case "Boolean":
+            case "Character":
+            case "Object":
+            case "args":
+            case "new":
+            case "return":
+            case "if":
+            case "else":
+            case "for":
+            case "while":
+            case "do":
+            case "switch":
+            case "case":
+            case "default":
+            case "break":
+            case "continue":
+            case "class":
+            case "public":
+            case "private":
+            case "protected":
+            case "static":
+            case "void":
+            case "true":
+            case "false":
+            case "null":
+            case "in":
+            case "nextInt":
+            case "nextDouble":
+            case "nextFloat":
+            case "nextLine":
+            case "equals":
+            case "length":
+            case "toString":
+            case "parseInt":
+            case "parseDouble":
+            case "parseFloat":
+            case "parseLong":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private bool IsStructuralLine(string line)
+    {
+        return line.StartsWith("if ", System.StringComparison.Ordinal) ||
+               line.StartsWith("if(", System.StringComparison.Ordinal) ||
+               line.StartsWith("else ", System.StringComparison.Ordinal) ||
+               line == "else" ||
+               line.StartsWith("else if", System.StringComparison.Ordinal) ||
+               line.StartsWith("for ", System.StringComparison.Ordinal) ||
+               line.StartsWith("for(", System.StringComparison.Ordinal) ||
+               line.StartsWith("while ", System.StringComparison.Ordinal) ||
+               line.StartsWith("while(", System.StringComparison.Ordinal) ||
+             line == "do" ||
+             line.StartsWith("do ", System.StringComparison.Ordinal) ||
+             line.StartsWith("do{", System.StringComparison.Ordinal) ||
+             line.StartsWith("do(", System.StringComparison.Ordinal) ||
+               line.StartsWith("switch ", System.StringComparison.Ordinal) ||
+               line.StartsWith("switch(", System.StringComparison.Ordinal) ||
+               line.StartsWith("case ", System.StringComparison.Ordinal) ||
+               line.StartsWith("default:", System.StringComparison.Ordinal) ||
+               line.StartsWith("try", System.StringComparison.Ordinal) ||
+               line.StartsWith("catch", System.StringComparison.Ordinal) ||
+               line.StartsWith("finally", System.StringComparison.Ordinal) ||
+               line.StartsWith("import ", System.StringComparison.Ordinal) ||
+               line.StartsWith("package ", System.StringComparison.Ordinal) ||
+               line.StartsWith("public class", System.StringComparison.Ordinal) ||
+               line.StartsWith("class ", System.StringComparison.Ordinal) ||
+               line.StartsWith("enum ", System.StringComparison.Ordinal) ||
+               line.StartsWith("interface ", System.StringComparison.Ordinal);
+    }
+
+    private bool LooksLikeStatementThatNeedsSemicolon(string line)
+    {
+        return Regex.IsMatch(line, @"^(?:return|break|continue|throw|System\.out\.(?:println|print)|(?:final\s+)?(?:String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\b|[A-Za-z_][A-Za-z0-9_]*\s*=)");
+    }
+
+    private string StripStringAndCharLiterals(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
+        string withoutStrings = Regex.Replace(text, "\"(?:\\\\.|[^\"\\\\])*\"", "");
+        return Regex.Replace(withoutStrings, "'(?:\\\\.|[^'\\\\])*'", "");
+    }
+
+    private string StripComments(string code)
+    {
+        if (string.IsNullOrEmpty(code))
+        {
+            return string.Empty;
+        }
+
+        System.Text.StringBuilder result = new System.Text.StringBuilder(code.Length);
+        bool inSingleLineComment = false;
+        bool inBlockComment = false;
+        bool inString = false;
+        bool inChar = false;
+        bool escapeNext = false;
+
+        for (int i = 0; i < code.Length; i++)
+        {
+            char current = code[i];
+            char next = i + 1 < code.Length ? code[i + 1] : '\0';
+
+            if (inSingleLineComment)
+            {
+                if (current == '\n')
+                {
+                    inSingleLineComment = false;
+                    result.Append(current);
+                }
+                continue;
+            }
+
+            if (inBlockComment)
+            {
+                if (current == '\n')
+                {
+                    result.Append(current);
+                }
+
+                if (current == '*' && next == '/')
+                {
+                    inBlockComment = false;
+                    i++;
+                }
+                continue;
+            }
+
+            if (inString)
+            {
+                result.Append(current);
+                if (escapeNext)
+                {
+                    escapeNext = false;
+                }
+                else if (current == '\\')
+                {
+                    escapeNext = true;
+                }
+                else if (current == '"')
+                {
+                    inString = false;
+                }
+                continue;
+            }
+
+            if (inChar)
+            {
+                result.Append(current);
+                if (escapeNext)
+                {
+                    escapeNext = false;
+                }
+                else if (current == '\\')
+                {
+                    escapeNext = true;
+                }
+                else if (current == '\'')
+                {
+                    inChar = false;
+                }
+                continue;
+            }
+
+            if (current == '/' && next == '/')
+            {
+                inSingleLineComment = true;
+                i++;
+                continue;
+            }
+
+            if (current == '/' && next == '*')
+            {
+                inBlockComment = true;
+                i++;
+                continue;
+            }
+
+            result.Append(current);
+
+            if (current == '"')
+            {
+                inString = true;
+                escapeNext = false;
+            }
+            else if (current == '\'')
+            {
+                inChar = true;
+                escapeNext = false;
+            }
+        }
+
+        return result.ToString();
+    }
+
     private bool HasBalancedPairs(string code)
     {
         int braces = 0;
@@ -579,7 +1021,6 @@ public class TerminalLevelController : MonoBehaviour
         return braces == 0 && parens == 0 && brackets == 0;
     }
 
-    // Call this method from your real compiler/validator pipeline.
     public void HandleRunResult(bool hasCodeErrors, string providedOutput)
     {
         if (hasCodeErrors)
@@ -593,9 +1034,15 @@ public class TerminalLevelController : MonoBehaviour
 
         int tokensEarned = activeLevelData != null ? activeLevelData.baseTokenReward : fallbackTokenReward;
 
-        string predictedOutput = string.IsNullOrEmpty(providedOutput) 
-            ? ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty) 
+        string predictedOutput = string.IsNullOrEmpty(providedOutput)
+            ? ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty)
             : providedOutput;
+
+        // Bypass for Level 18 display since regex cannot statically evaluate reassignments
+        if (activeLevelData != null && activeLevelData.levelNumber == 18)
+        {
+            predictedOutput = activeLevelData.expectedOutput;
+        }
 
         StartCoroutine(SuccessCountdownRoutine(predictedOutput));
     }
@@ -679,10 +1126,23 @@ public class TerminalLevelController : MonoBehaviour
 
     private bool ValidateExpectedOutput(string submittedCode, out string message)
     {
+        // Bypass for Level 18 static analysis due to variable swapping
+        if (activeLevelData != null && activeLevelData.levelNumber == 18)
+        {
+            message = string.Empty;
+            return true;
+        }
+
         string expected = string.Empty;
+        string expectedPattern = string.Empty;
 
         if (activeLevelData != null)
         {
+            if (!string.IsNullOrWhiteSpace(activeLevelData.expectedOutputPattern))
+            {
+                expectedPattern = activeLevelData.expectedOutputPattern;
+            }
+
             if (!string.IsNullOrWhiteSpace(activeLevelData.expectedOutput))
             {
                 expected = activeLevelData.expectedOutput;
@@ -698,6 +1158,36 @@ public class TerminalLevelController : MonoBehaviour
                     }
                 }
             }
+        }
+
+        if (!string.IsNullOrWhiteSpace(expectedPattern))
+        {
+            string predictedPatternValue = ExtractPredictedOutput(submittedCode);
+            if (string.IsNullOrWhiteSpace(predictedPatternValue) && TryPredictSimpleSentenceOutput(submittedCode, out string fallbackPredictedPatternValue))
+            {
+                predictedPatternValue = fallbackPredictedPatternValue;
+            }
+
+            if (string.IsNullOrWhiteSpace(predictedPatternValue))
+            {
+                message = "Expected output check failed: no recognizable output statement found.";
+                return false;
+            }
+
+            string normalizedPredictedPatternValue = Normalize(predictedPatternValue);
+            if (!Regex.IsMatch(normalizedPredictedPatternValue, expectedPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase) && TryPredictSimpleSentenceOutput(submittedCode, out string sentenceFallbackValue))
+            {
+                normalizedPredictedPatternValue = Normalize(sentenceFallbackValue);
+            }
+
+            if (!Regex.IsMatch(normalizedPredictedPatternValue, expectedPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase))
+            {
+                message = $"Output mismatch. Expected pattern: {expectedPattern} | Found: {predictedPatternValue}";
+                return false;
+            }
+
+            message = string.Empty;
+            return true;
         }
 
         if (string.IsNullOrWhiteSpace(expected))
@@ -732,20 +1222,100 @@ public class TerminalLevelController : MonoBehaviour
         return true;
     }
 
-    private string ExtractPredictedOutput(string code)
+    private string ResolveVariableValue(string id, string code, string injectedInput, out bool isDouble, int depth = 0)
     {
-        // Find a print call: System.out.println(...), System.out.print(...), or print(...)
-        Match call = Regex.Match(code, @"System\.out\.(?:println|print)\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
-        if (!call.Success)
-            call = Regex.Match(code, @"\bprint\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+        isDouble = false;
+        if (depth > 5) return string.Empty; // Prevent infinite recursion
 
-        if (!call.Success)
+        // Look for assignment: [type] id = [val]; or id = [val];
+        var match = Regex.Match(code, $@"(?<type>double|int|float|long|var|String|char)?\s*{Regex.Escape(id)}\s*=\s*(?<val>[^;]+)\s*;", RegexOptions.Singleline);
+        if (!match.Success) return string.Empty;
+
+        string type = match.Groups["type"].Value;
+        string val = match.Groups["val"].Value.Trim();
+
+        if (type == "double" || type == "float") isDouble = true;
+
+        // 1. Is it a numeric literal?
+        if (double.TryParse(val, out double d))
+        {
+            if (isDouble && !val.Contains(".")) return d.ToString("F1");
+            return val;
+        }
+
+        // 2. Is it a string literal?
+        if (val.StartsWith("\"") && val.EndsWith("\""))
+        {
+            return val.Substring(1, val.Length - 2);
+        }
+
+        // 2.5 Is it a boolean literal?
+        if (val == "true" || val == "false")
+        {
+            return val;
+        }
+
+        // 2.6 Is it a char literal? (single quotes)
+        if (val.StartsWith("'") && val.EndsWith("'"))
+        {
+            return val.Substring(1, val.Length - 2);
+        }
+
+        if (TryEvaluateArithmeticExpression(val, code, injectedInput, out string arithmeticValue))
+        {
+            if (double.TryParse(arithmeticValue, out double arithmeticDouble))
+            {
+                isDouble = arithmeticValue.Contains(".");
+                return isDouble ? JavaFormat(arithmeticDouble) : arithmeticValue;
+            }
+
+            return arithmeticValue;
+        }
+
+        // 3. Is it another identifier?
+        if (Regex.IsMatch(val, @"^[A-Za-z_][A-Za-z0-9_]*$"))
+        {
+            bool parentIsDouble;
+            string resolved = ResolveVariableValue(val, code, injectedInput, out parentIsDouble, depth + 1);
+            if (isDouble && !resolved.Contains("."))
+            {
+                if (double.TryParse(resolved, out double rd)) return rd.ToString("F1");
+            }
+            return resolved;
+        }
+
+        return string.Empty;
+    }
+
+    private string ExtractPredictedOutput(string code, string injectedInput = "")
+    {
+        var matches = Regex.Matches(code, @"System\.out\.(?:println|print)\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+        if (matches.Count == 0)
+            matches = Regex.Matches(code, @"\bprint\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+
+        if (matches.Count == 0)
             return string.Empty;
 
-        string expr = call.Groups["expr"].Value.Trim();
+        System.Text.StringBuilder finalOutput = new System.Text.StringBuilder();
 
+        foreach (Match call in matches)
+        {
+            string expr = call.Groups["expr"].Value.Trim();
+            string lineResult = EvaluateSingleExpression(expr, code, injectedInput);
+            if (!string.IsNullOrEmpty(lineResult))
+            {
+                finalOutput.AppendLine(lineResult);
+            }
+        }
+
+        // Return all combined lines
+        return finalOutput.ToString().TrimEnd();
+    }
+
+    private string EvaluateSingleExpression(string expr, string code, string injectedInput)
+    {
         // 1) Exact string literal: "text"
-        Match strLit = Regex.Match(expr, "^\"(?<txt>[\\s\\S]*)\"$");
+        Match strLit = Regex.Match(expr, "^\"(?<txt>(?:[^\"\\\\]|\\\\.)*)\"$");
         if (strLit.Success)
             return strLit.Groups["txt"].Value;
 
@@ -754,55 +1324,144 @@ public class TerminalLevelController : MonoBehaviour
         if (numLit.Success)
             return numLit.Groups["num"].Value;
 
-        // 3) Expression with concatenation using + — collect tokens
-        // Tokenize: string literals, numbers, identifiers
-        var tokenRegex = new Regex("\"(?<str>[^\"]*)\"|(?<num>-?\\d+(?:\\.\\d+)?)|(?<id>[A-Za-z_][A-Za-z0-9_]*)");
+        // 2.5) Char literal: 'A'
+        Match charLit = Regex.Match(expr, "^'(?<txt>.*)'$");
+        if (charLit.Success)
+            return charLit.Groups["txt"].Value;
+
+        if (TryEvaluateArithmeticExpression(expr, code, injectedInput, out string arithmeticResult))
+        {
+            return arithmeticResult;
+        }
+
+        // 3) Expression with concatenation or arithmetic using + — collect tokens
+        // Split injected input into multiple parts to support sc.nextInt() multiple times.
+        string[] inputs = injectedInput.Split(new[] { ' ', ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        int inputIdx = 0;
+
+        // Tokenize: string literals, numbers, identifiers, and operators
+        var tokenRegex = new Regex("\"(?<str>[^\"]*)\"|'(?<chr>[^']*)'|(?<num>-?\\d+(?:\\.\\d+)?)|(?<id>[A-Za-z_][A-Za-z0-9_]*)|(?<op>\\+)");
         var matches = tokenRegex.Matches(expr);
+
         if (matches.Count > 0)
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
-            bool any = false;
+            object currentResult = null; // Can be string or double
+            bool lastWasOp = false;
+            bool exprHasDouble = false;
+
             foreach (Match mm in matches)
             {
+                if (mm.Groups["op"].Success)
+                {
+                    lastWasOp = true;
+                    continue;
+                }
+
+                object tokenVal = null;
+                bool isNumber = false;
+
                 if (mm.Groups["str"].Success)
                 {
-                    sb.Append(mm.Groups["str"].Value);
-                    any = true;
-                    continue;
+                    tokenVal = mm.Groups["str"].Value;
+                    isNumber = false;
                 }
-                if (mm.Groups["num"].Success)
+                else if (mm.Groups["chr"].Success)
                 {
-                    sb.Append(mm.Groups["num"].Value);
-                    any = true;
-                    continue;
+                    tokenVal = mm.Groups["chr"].Value;
+                    isNumber = false;
                 }
-                if (mm.Groups["id"].Success)
+                else if (mm.Groups["num"].Success)
+                {
+                    string v = mm.Groups["num"].Value;
+                    if (v.Contains(".")) exprHasDouble = true;
+
+                    if (double.TryParse(v, out double d))
+                    {
+                        tokenVal = d;
+                        isNumber = true;
+                    }
+                }
+                else if (mm.Groups["id"].Success)
                 {
                     string id = mm.Groups["id"].Value;
-                    // Look for a literal assignment to this identifier earlier in the code
-                    var assign = Regex.Match(code, $"\\b(?:int|long|float|double|var)?\\s*{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;",
-                        RegexOptions.Singleline);
-                    if (assign.Success)
+
+                    // 1. Look for a Scanner assignment mapped to injected input
+                    bool resolved = false;
+                    var scannerAssign = Regex.Match(code, $"\\b(?:String|int|long|float|double|var|char)?\\s*{Regex.Escape(id)}\\s*=\\s*[A-Za-z0-9_]+\\.next(?:Line|Int|Double|Float)?\\s*\\(\\)\\s*;", RegexOptions.Singleline);
+                    if (scannerAssign.Success)
                     {
-                        sb.Append(assign.Groups["val"].Value);
-                        any = true;
-                        continue;
+                        if (code.Contains("nextDouble") || code.Contains("nextFloat")) exprHasDouble = true;
+
+                        string valStr = (inputs != null && inputIdx < inputs.Length) ? inputs[inputIdx++] : "0";
+                        if (valStr.Contains(".")) exprHasDouble = true;
+
+                        if (double.TryParse(valStr, out double d))
+                        {
+                            tokenVal = d;
+                            isNumber = true;
+                        }
+                        else
+                        {
+                            tokenVal = valStr;
+                            isNumber = false;
+                        }
+                        resolved = true;
                     }
-                    // Also try simple assignment without type
-                    assign = Regex.Match(code, $"\\b{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;", RegexOptions.Singleline);
-                    if (assign.Success)
+
+                    if (!resolved)
                     {
-                        sb.Append(assign.Groups["val"].Value);
-                        any = true;
-                        continue;
+                        // Use recursive resolver
+                        string rVal = ResolveVariableValue(id, code, injectedInput, out bool idIsDouble);
+                        if (idIsDouble) exprHasDouble = true;
+
+                        if (!string.IsNullOrEmpty(rVal))
+                        {
+                            if (double.TryParse(rVal, out double rd))
+                            {
+                                tokenVal = rd;
+                                isNumber = true;
+                                resolved = true;
+                            }
+                            else
+                            {
+                                tokenVal = rVal;
+                                isNumber = false;
+                                resolved = true;
+                            }
+                        }
                     }
-                    // If identifier can't be resolved, we can't predict output
-                    return string.Empty;
+
+                    if (!resolved) return string.Empty; // Cannot predict
+                }
+
+                if (currentResult == null)
+                {
+                    currentResult = tokenVal;
+                }
+                else if (lastWasOp)
+                {
+                    // Java Style Evaluation: If either is string, concat. If both are numbers, add.
+                    if (currentResult is string || tokenVal is string)
+                    {
+                        currentResult = currentResult.ToString() + tokenVal.ToString();
+                    }
+                    else if (currentResult is double && tokenVal is double)
+                    {
+                        currentResult = (double)currentResult + (double)tokenVal;
+                    }
+                    lastWasOp = false;
                 }
             }
 
-            if (any)
-                return sb.ToString();
+            if (currentResult != null)
+            {
+                if (currentResult is double resD)
+                {
+                    if (exprHasDouble) return JavaFormat(resD);
+                    return resD.ToString();
+                }
+                return currentResult.ToString();
+            }
         }
 
         // 4) Single identifier: try to resolve assignment
@@ -810,18 +1469,654 @@ public class TerminalLevelController : MonoBehaviour
         if (idOnly.Success)
         {
             string id = idOnly.Groups["id"].Value;
-            var assign = Regex.Match(code, $"\\b(?:int|long|float|double|var)?\\s*{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;", RegexOptions.Singleline);
-            if (assign.Success)
-                return assign.Groups["val"].Value;
-            assign = Regex.Match(code, $"\\b{Regex.Escape(id)}\\s*=\\s*(?<val>-?\\d+(?:\\.\\d+)?)\\s*;", RegexOptions.Singleline);
-            if (assign.Success)
-                return assign.Groups["val"].Value;
+
+            if (TryResolveScannerInputValue(id, code, injectedInput, out string scannerValue))
+            {
+                return scannerValue;
+            }
+
+            string rVal = ResolveVariableValue(id, code, injectedInput, out bool idIsDouble);
+            if (idIsDouble && double.TryParse(rVal, out double rd)) return JavaFormat(rd);
+            return rVal;
         }
 
         // Unknown/unhandled expression
         return string.Empty;
+    }
 
+    private bool TryEvaluateArithmeticExpression(string expr, string code, string injectedInput, out string result)
+    {
+        result = string.Empty;
 
+        if (string.IsNullOrWhiteSpace(expr))
+        {
+            return false;
+        }
+
+        if (Regex.IsMatch(expr, "[\"']"))
+        {
+            return false;
+        }
+
+        string normalizedExpr = expr.Trim();
+        var tokens = new System.Collections.Generic.List<string>();
+        var tokenRegex = new Regex(@"-?\d+(?:\.\d+)?|[A-Za-z_][A-Za-z0-9_]*|[+\-*/%^()]");
+        MatchCollection matches = tokenRegex.Matches(normalizedExpr);
+
+        if (matches.Count == 0)
+        {
+            return false;
+        }
+
+        bool expectUnaryMinus = true;
+        foreach (Match match in matches)
+        {
+            string token = match.Value;
+            if (token == "-")
+            {
+                if (expectUnaryMinus)
+                {
+                    tokens.Add("u-");
+                }
+                else
+                {
+                    tokens.Add(token);
+                }
+                expectUnaryMinus = true;
+                continue;
+            }
+
+            if (token == "+" || token == "*" || token == "/" || token == "%" || token == "^" || token == "(" || token == ")")
+            {
+                tokens.Add(token);
+                expectUnaryMinus = token != ")";
+                continue;
+            }
+
+            if (Regex.IsMatch(token, @"^-?\d+(?:\.\d+)?$"))
+            {
+                tokens.Add(token);
+                expectUnaryMinus = false;
+                continue;
+            }
+
+            if (Regex.IsMatch(token, @"^[A-Za-z_][A-Za-z0-9_]*$"))
+            {
+                if (!TryResolveNumericToken(token, code, injectedInput, out string numericToken))
+                {
+                    return false;
+                }
+
+                tokens.Add(numericToken);
+                expectUnaryMinus = false;
+                continue;
+            }
+
+            return false;
+        }
+
+        if (tokens.Count == 0)
+        {
+            return false;
+        }
+
+        var output = new System.Collections.Generic.List<string>();
+        var operators = new System.Collections.Generic.Stack<string>();
+
+        int Precedence(string op)
+        {
+            switch (op)
+            {
+                case "u-": return 4;
+                case "^": return 3;
+                case "*":
+                case "%":
+                case "/": return 2;
+                case "+":
+                case "-": return 1;
+                default: return 0;
+            }
+        }
+
+        bool IsRightAssociative(string op)
+        {
+            return op == "^" || op == "u-";
+        }
+
+        foreach (string token in tokens)
+        {
+            if (Regex.IsMatch(token, @"^-?\d+(?:\.\d+)?$"))
+            {
+                output.Add(token);
+                continue;
+            }
+
+            if (token == "(")
+            {
+                operators.Push(token);
+                continue;
+            }
+
+            if (token == ")")
+            {
+                while (operators.Count > 0 && operators.Peek() != "(")
+                {
+                    output.Add(operators.Pop());
+                }
+
+                if (operators.Count == 0)
+                {
+                    return false;
+                }
+
+                operators.Pop();
+                continue;
+            }
+
+            while (operators.Count > 0 && operators.Peek() != "(" &&
+                   (Precedence(operators.Peek()) > Precedence(token) ||
+                    (Precedence(operators.Peek()) == Precedence(token) && !IsRightAssociative(token))))
+            {
+                output.Add(operators.Pop());
+            }
+
+            operators.Push(token);
+        }
+
+        while (operators.Count > 0)
+        {
+            string op = operators.Pop();
+            if (op == "(" || op == ")")
+            {
+                return false;
+            }
+
+            output.Add(op);
+        }
+
+        var values = new System.Collections.Generic.Stack<NumericValue>();
+        foreach (string token in output)
+        {
+            if (Regex.IsMatch(token, @"^-?\d+(?:\.\d+)?$"))
+            {
+                if (!TryParseNumericValue(token, out NumericValue numericValue))
+                {
+                    return false;
+                }
+
+                values.Push(numericValue);
+                continue;
+            }
+
+            if (token == "u-")
+            {
+                if (values.Count < 1)
+                {
+                    return false;
+                }
+
+                NumericValue operand = values.Pop();
+                values.Push(NumericValue.Negate(operand));
+                continue;
+            }
+
+            if (values.Count < 2)
+            {
+                return false;
+            }
+
+            NumericValue right = values.Pop();
+            NumericValue left = values.Pop();
+            if (!TryApplyNumericOperator(left, right, token, out NumericValue computed))
+            {
+                return false;
+            }
+
+            values.Push(computed);
+        }
+
+        if (values.Count != 1)
+        {
+            return false;
+        }
+
+        result = values.Pop().ToDisplayString();
+        return true;
+    }
+
+    private bool TryResolveNumericToken(string identifier, string code, string injectedInput, out string value)
+    {
+        value = string.Empty;
+
+        if (TryResolveScannerInputValue(identifier, code, injectedInput, out string scannerValue))
+        {
+            if (!Regex.IsMatch(scannerValue, @"^-?\d+(?:\.\d+)?$"))
+            {
+                return false;
+            }
+
+            value = scannerValue;
+            return true;
+        }
+
+        string resolved = ResolveVariableValue(identifier, code, injectedInput, out bool isDouble);
+        if (string.IsNullOrWhiteSpace(resolved))
+        {
+            return false;
+        }
+
+        if (!TryParseNumericValue(resolved, out NumericValue numericValue))
+        {
+            return false;
+        }
+
+        if (isDouble && !numericValue.IsDouble)
+        {
+            numericValue = NumericValue.FromDouble(numericValue.DoubleValue);
+        }
+
+        value = numericValue.ToDisplayString();
+        return true;
+    }
+
+    private bool TryParseNumericValue(string text, out NumericValue value)
+    {
+        value = default;
+
+        if (text.Contains("."))
+        {
+            if (double.TryParse(text, out double doubleValue))
+            {
+                value = NumericValue.FromDouble(doubleValue);
+                return true;
+            }
+            return false;
+        }
+
+        if (long.TryParse(text, out long longValue))
+        {
+            value = NumericValue.FromLong(longValue);
+            return true;
+        }
+
+        if (double.TryParse(text, out double fallbackDouble))
+        {
+            value = NumericValue.FromDouble(fallbackDouble);
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryResolveScannerInputValue(string identifier, string code, string injectedInput, out string value)
+    {
+        value = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(identifier) || string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(injectedInput))
+        {
+            return false;
+        }
+
+        string[] inputs = injectedInput.Split(new[] { ' ', ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        if (inputs.Length == 0)
+        {
+            return false;
+        }
+
+        MatchCollection scannerAssignments = Regex.Matches(
+            code,
+            @"\b(?:String|int|long|float|double|var|char)?\s*(?<id>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*[A-Za-z0-9_]+\.next(?:Line|Int|Double|Float)?\s*\(\)\s*;",
+            RegexOptions.Singleline);
+
+        int inputIndex = 0;
+        foreach (Match assignment in scannerAssignments)
+        {
+            if (inputIndex >= inputs.Length)
+            {
+                return false;
+            }
+
+            string assignedId = assignment.Groups["id"].Value;
+            if (assignedId.Equals(identifier, System.StringComparison.OrdinalIgnoreCase))
+            {
+                value = inputs[inputIndex];
+                return true;
+            }
+
+            inputIndex++;
+        }
+
+        return false;
+    }
+
+    private bool TryApplyNumericOperator(NumericValue left, NumericValue right, string op, out NumericValue result)
+    {
+        result = default;
+
+        switch (op)
+        {
+            case "+":
+                if (left.IsDouble || right.IsDouble)
+                {
+                    result = NumericValue.FromDouble(left.AsDouble + right.AsDouble);
+                }
+                else
+                {
+                    result = NumericValue.FromLong(left.AsLong + right.AsLong);
+                }
+                return true;
+            case "-":
+                if (left.IsDouble || right.IsDouble)
+                {
+                    result = NumericValue.FromDouble(left.AsDouble - right.AsDouble);
+                }
+                else
+                {
+                    result = NumericValue.FromLong(left.AsLong - right.AsLong);
+                }
+                return true;
+            case "*":
+                if (left.IsDouble || right.IsDouble)
+                {
+                    result = NumericValue.FromDouble(left.AsDouble * right.AsDouble);
+                }
+                else
+                {
+                    result = NumericValue.FromLong(left.AsLong * right.AsLong);
+                }
+                return true;
+            case "/":
+                if (left.IsDouble || right.IsDouble)
+                {
+                    if (Math.Abs(right.AsDouble) < double.Epsilon)
+                    {
+                        return false;
+                    }
+
+                    result = NumericValue.FromDouble(left.AsDouble / right.AsDouble);
+                }
+                else
+                {
+                    if (right.AsLong == 0)
+                    {
+                        return false;
+                    }
+
+                    result = NumericValue.FromLong(left.AsLong / right.AsLong);
+                }
+                return true;
+            case "%":
+                if (left.IsDouble || right.IsDouble)
+                {
+                    if (Math.Abs(right.AsDouble) < double.Epsilon)
+                    {
+                        return false;
+                    }
+
+                    result = NumericValue.FromDouble(left.AsDouble % right.AsDouble);
+                }
+                else
+                {
+                    if (right.AsLong == 0)
+                    {
+                        return false;
+                    }
+
+                    result = NumericValue.FromLong(left.AsLong % right.AsLong);
+                }
+                return true;
+            case "^":
+                if (left.IsDouble || right.IsDouble)
+                {
+                    return false;
+                }
+
+                result = NumericValue.FromLong(left.AsLong ^ right.AsLong);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private struct NumericValue
+    {
+        public bool IsDouble;
+        public double DoubleValue;
+        public long LongValue;
+
+        public static NumericValue FromLong(long value)
+        {
+            return new NumericValue
+            {
+                IsDouble = false,
+                LongValue = value,
+                DoubleValue = value
+            };
+        }
+
+        public static NumericValue FromDouble(double value)
+        {
+            return new NumericValue
+            {
+                IsDouble = true,
+                DoubleValue = value,
+                LongValue = (long)value
+            };
+        }
+
+        public static NumericValue Negate(NumericValue value)
+        {
+            if (value.IsDouble)
+            {
+                return FromDouble(-value.DoubleValue);
+            }
+
+            return FromLong(-value.LongValue);
+        }
+
+        public double AsDouble => IsDouble ? DoubleValue : LongValue;
+        public long AsLong => IsDouble ? (long)DoubleValue : LongValue;
+
+        public string ToDisplayString()
+        {
+            if (IsDouble)
+            {
+                if (DoubleValue == (long)DoubleValue)
+                {
+                    return DoubleValue.ToString("F1");
+                }
+
+                return DoubleValue.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            }
+
+            return LongValue.ToString();
+        }
+    }
+    private bool TryPredictSimpleSentenceOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        MatchCollection matches = Regex.Matches(code, @"System\.out\.(?:println|print)\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+        foreach (Match call in matches)
+        {
+            string expr = call.Groups["expr"].Value.Trim();
+            string sentence = EvaluateSimpleSentenceExpression(expr, code);
+            if (!string.IsNullOrWhiteSpace(sentence))
+            {
+                predictedOutput = sentence;
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private string EvaluateSimpleSentenceExpression(string expr, string code)
+    {
+        if (string.IsNullOrWhiteSpace(expr))
+        {
+            return string.Empty;
+        }
+
+        string[] parts = SplitOnTopLevelPlus(expr);
+        if (parts.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        System.Text.StringBuilder output = new System.Text.StringBuilder();
+        for (int i = 0; i < parts.Length; i++)
+        {
+            string part = parts[i].Trim();
+            if (string.IsNullOrWhiteSpace(part))
+            {
+                continue;
+            }
+
+            Match strLit = Regex.Match(part, "^\"(?<txt>(?:[^\"\\\\]|\\\\.)*)\"$");
+            if (strLit.Success)
+            {
+                output.Append(strLit.Groups["txt"].Value);
+                continue;
+            }
+
+            Match charLit = Regex.Match(part, "^'(?<txt>.*)'$");
+            if (charLit.Success)
+            {
+                output.Append(charLit.Groups["txt"].Value);
+                continue;
+            }
+
+            Match numLit = Regex.Match(part, "^(?<num>-?\\d+(?:\\.\\d+)?)$");
+            if (numLit.Success)
+            {
+                output.Append(numLit.Groups["num"].Value);
+                continue;
+            }
+
+            if (Regex.IsMatch(part, @"^[A-Za-z_][A-Za-z0-9_]*$"))
+            {
+                string resolved = ResolveVariableValue(part, code, string.Empty, out bool isDouble);
+                if (string.IsNullOrWhiteSpace(resolved))
+                {
+                    return string.Empty;
+                }
+
+                if (isDouble && double.TryParse(resolved, out double resolvedDouble))
+                {
+                    output.Append(JavaFormat(resolvedDouble));
+                }
+                else
+                {
+                    output.Append(resolved);
+                }
+
+                continue;
+            }
+
+            return string.Empty;
+        }
+
+        return output.ToString();
+    }
+
+    private string[] SplitOnTopLevelPlus(string expr)
+    {
+        if (string.IsNullOrWhiteSpace(expr))
+        {
+            return System.Array.Empty<string>();
+        }
+
+        System.Collections.Generic.List<string> parts = new System.Collections.Generic.List<string>();
+        System.Text.StringBuilder current = new System.Text.StringBuilder();
+        bool inString = false;
+        bool inChar = false;
+        bool escapeNext = false;
+
+        for (int i = 0; i < expr.Length; i++)
+        {
+            char c = expr[i];
+
+            if (inString)
+            {
+                current.Append(c);
+                if (escapeNext)
+                {
+                    escapeNext = false;
+                }
+                else if (c == '\\')
+                {
+                    escapeNext = true;
+                }
+                else if (c == '"')
+                {
+                    inString = false;
+                }
+                continue;
+            }
+
+            if (inChar)
+            {
+                current.Append(c);
+                if (escapeNext)
+                {
+                    escapeNext = false;
+                }
+                else if (c == '\\')
+                {
+                    escapeNext = true;
+                }
+                else if (c == '\'')
+                {
+                    inChar = false;
+                }
+                continue;
+            }
+
+            if (c == '"')
+            {
+                current.Append(c);
+                inString = true;
+                escapeNext = false;
+                continue;
+            }
+
+            if (c == '\'')
+            {
+                current.Append(c);
+                inChar = true;
+                escapeNext = false;
+                continue;
+            }
+
+            if (c == '+')
+            {
+                parts.Add(current.ToString());
+                current.Clear();
+                continue;
+            }
+
+            current.Append(c);
+        }
+
+        if (current.Length > 0)
+        {
+            parts.Add(current.ToString());
+        }
+
+        return parts.ToArray();
+    }
+
+    private string JavaFormat(object val)
+    {
+        if (val == null) return string.Empty;
+        if (val is double d)
+        {
+            // Mimic Java double string: always includes .0 if whole number
+            if (d == (long)d) return d.ToString("F1");
+            return d.ToString();
+        }
+        return val.ToString();
     }
 
     // -------------------------------------------------------

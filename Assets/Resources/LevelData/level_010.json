@@ -7,6 +7,8 @@
     "objective": "Create a variable for name and age, then print: My name is (name) and I am (age) years old.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
     "expectedOutput": "",
+    "expectedOutputPattern": "^My name is [A-Za-z][A-Za-z ]* and I am [0-9]+ years old\\.$",
+    "requiredCodePattern": "System\\.out\\.println\\s*\\(\\s*\"My name is \"\\s*\\+\\s*name\\s*\\+\\s*\" and I am \"\\s*\\+\\s*age\\s*\\+\\s*\" years old\\.\"\\s*\\)",
     "hints": [
         "Use String for name and int for age.",
         "Use + to combine variables with text.",

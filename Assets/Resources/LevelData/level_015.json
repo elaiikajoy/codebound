@@ -6,7 +6,10 @@
     "puzzleDescription": "Combine what you've learned! Practice declaring multiple variables with different data types (String, int, and double) to represent a person's profile.",
     "objective": "Create variables for name, age, and height then print them.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "Alex\n21\n5.7",
+    "expectedOutput": "",
+    "expectedOutputPattern": "^.+\\n.+\\n.+$",
+    "requiredPrintlnCount": 3,
+    "requiredCodePattern": "System\\.out\\.println\\s*\\(.*name.*\\).*System\\.out\\.println\\s*\\(.*age.*\\).*System\\.out\\.println\\s*\\(.*height.*\\)",
     "hints": [
         "Use String for name, int for age, and double for height.",
         "Example structure: String name = \"Alex\";",

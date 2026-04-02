@@ -4,30 +4,26 @@
     "category": "Basics",
     "difficulty": 2,
     "puzzleDescription": "Apply your multiplication skills to calculate the area of a rectangle (Length × Width).",
-    "objective": "Ask the user for length and width and calculate the area.",
+    "objective": "Input numeric values for length and width (int or double) and calculate the area.",
     "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "50",
+    "expectedOutput": "",
     "hints": [
-        "Capture two integers: one for length and one for width.",
+        "Use sc.nextInt() or sc.nextDouble() twice depending on whether you want whole numbers or decimals.",
         "Multiply the length by the width to get the area.",
-        "Example: int area = length * width;"
+        "Example: double area = length * width;"
     ],
     "testCases": [
         {
-            "input": "10 5",
-            "output": "50"
-        },
-        {
-            "input": "4 3",
-            "output": "12"
+            "input": "",
+            "output": ""
         }
     ],
     "requiredKeywords": [
         "Scanner",
-        "nextInt()",
         "*",
         "System.out.println"
     ],
+    "requiredCodePattern": "(?s).*sc\\.(?:nextInt|nextDouble)\\s*\\(\\s*\\)\\s*;.*sc\\.(?:nextInt|nextDouble)\\s*\\(\\s*\\)\\s*;.*",
     "forbiddenKeywords": [
         "System.out.println(50)"
     ],

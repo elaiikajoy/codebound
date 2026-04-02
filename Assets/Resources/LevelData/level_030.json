@@ -4,9 +4,9 @@
     "category": "Basics",
     "difficulty": 3,
     "puzzleDescription": "Learn how to use division (/) to get hours and the modulo operator (%) to get the remaining minutes from a total number of minutes.",
-    "objective": "Convert minutes into hours and remaining minutes.",
+    "objective": "Convert the value of 130 into hours and remaining minutes.",
     "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "2 hours and 10 minutes",
+    "expectedOutput": "",
     "hints": [
         "Divide the total minutes by 60 to get the hours (int hours = total / 60;).",
         "Use the % operator to get the leftover minutes (int mins = total % 60;).",
@@ -16,10 +16,6 @@
         {
             "input": "130",
             "output": "2 hours and 10 minutes"
-        },
-        {
-            "input": "65",
-            "output": "1 hours and 5 minutes"
         }
     ],
     "requiredKeywords": [

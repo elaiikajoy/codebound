@@ -4,9 +4,9 @@
     "category": "Basics",
     "difficulty": 2,
     "puzzleDescription": "Learn how to divide two numbers provided by the user using the forward slash (/) operator.",
-    "objective": "Input two numbers and print the division result.",
+    "objective": "Input two numbers 20 and 10 then print the division result.",
     "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "5",
+    "expectedOutput": "2",
     "hints": [
         "Use 'sc.nextInt()' to get the two numbers.",
         "Use the '/' operator for division.",
@@ -14,12 +14,12 @@
     ],
     "testCases": [
         {
-            "input": "10 2",
-            "output": "5"
+            "input": "20 10",
+            "output": "2"
         },
         {
-            "input": "100 10",
-            "output": "10"
+            "input": "10 20",
+            "output": "0"
         }
     ],
     "requiredKeywords": [

@@ -6,22 +6,22 @@
     "puzzleDescription": "Learn how data travels from the terminal into a variable, and back to the screen using the 4-step Interactive Input-Output Flow.",
     "objective": "Use the terminalInput Scanner to read a number, then print it out with the prefix 'Output: '.",
     "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // --- STEP 1: Coding Phase ---\n        // Define an empty variable (box) to hold the future value\n        int playerValue;\n\n        // --- STEP 2: Execution Phase ---\n        // The program creates a Scanner to \"listen\" for user input\n        Scanner terminalInput = new Scanner(System.in);\n        System.out.println(\"Status: Waiting for Data Injection...\");\n\n        // --- STEP 3: Data Injection ---\n        // Type your answer below to inject the terminalInput into playerValue:\n        \n\n        // --- STEP 4: Result Phase ---\n        // Display playerValue back to the screen\n        \n    }\n}",
-    "expectedOutput": "Output: 10",
+    "expectedOutput": "",
     "hints": [
         "Use 'playerValue = terminalInput.nextInt();' to capture the number.",
         "Print the variable using 'System.out.println(\"Output: \" + playerValue);'"
     ],
     "testCases": [
         {
-            "input": "10",
-            "output": "Output: 10",
-            "expectedOutput": "Output: 10",
+            "input": "",
+            "output": "",
+            "expectedOutput": "",
             "requiredKeywords": []
         },
         {
-            "input": "99",
-            "output": "Output: 99",
-            "expectedOutput": "Output: 99",
+            "input": "",
+            "output": "",
+            "expectedOutput": "",
             "requiredKeywords": []
         }
     ],

@@ -4,30 +4,30 @@
     "category": "Basics",
     "difficulty": 2,
     "puzzleDescription": "Calculate the area of a circle using the formula: Area = 3.14 * radius * radius.",
-    "objective": "Ask for radius and calculate the area of a circle.",
+    "objective": "Ask for a numeric radius (int or double) and calculate the area of a circle.",
     "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "78.5",
+    "expectedOutput": "",
     "hints": [
-        "Use 'sc.nextDouble()' to capture the radius with decimals.",
+        "Use 'sc.nextInt()' or 'sc.nextDouble()' to capture the radius.",
         "The formula is: 3.14 * radius * radius.",
         "Store the result in a double variable (e.g., double area = ...);"
     ],
     "testCases": [
         {
-            "input": "5.0",
-            "output": "78.5"
+            "input": "",
+            "output": ""
         },
         {
-            "input": "10.0",
-            "output": "314.0"
+            "input": "",
+            "output": ""
         }
     ],
     "requiredKeywords": [
         "Scanner",
-        "nextDouble()",
         "3.14",
         "*"
     ],
+    "requiredCodePattern": "(?s).*sc\\.(?:nextInt|nextDouble)\\s*\\(\\s*\\)\\s*;.*",
     "forbiddenKeywords": [
         "78.5"
     ],

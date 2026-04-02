@@ -28,6 +28,9 @@ public class LevelData
     public string puzzleDescription;
     public string objective;
     public string expectedOutput;
+    public string expectedOutputPattern;
+    public int requiredPrintlnCount;
+    public string requiredCodePattern;
     public string starterCode;
     public string[] hints;
     public LevelTestCase[] testCases;
