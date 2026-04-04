@@ -727,6 +727,20 @@ public class TerminalLevelController : MonoBehaviour
             }
         }
 
+        MatchCollection methodDeclarationMatches = Regex.Matches(
+            code,
+            @"\b(?:public|private|protected|internal)?\s*(?:static\s+)?(?:async\s+)?(?:final\s+)?(?:void|bool|boolean|byte|short|int|long|float|double|char|String|var|Scanner|StringBuilder|[A-Za-z_][A-Za-z0-9_<>,\[\]\s?]*)\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*\(",
+            RegexOptions.Singleline);
+
+        foreach (Match methodDeclaration in methodDeclarationMatches)
+        {
+            string methodName = methodDeclaration.Groups["name"].Value;
+            if (Regex.IsMatch(methodName, @"^[A-Za-z_][A-Za-z0-9_]*$"))
+            {
+                identifiers.Add(methodName);
+            }
+        }
+
         return identifiers;
     }
 
@@ -791,6 +805,7 @@ public class TerminalLevelController : MonoBehaviour
             case "var":
             case "Scanner":
             case "StringBuilder":
+            case "Arrays":
             case "Math":
             case "Integer":
             case "Double":
@@ -1261,6 +1276,11 @@ public class TerminalLevelController : MonoBehaviour
             return val.Substring(1, val.Length - 2);
         }
 
+        if (TryEvaluateKnownMethodCall(val, code, injectedInput, out string methodValue))
+        {
+            return methodValue;
+        }
+
         if (TryEvaluateArithmeticExpression(val, code, injectedInput, out string arithmeticValue))
         {
             if (double.TryParse(arithmeticValue, out double arithmeticDouble))
@@ -1289,9 +1309,15 @@ public class TerminalLevelController : MonoBehaviour
 
     private string ExtractPredictedOutput(string code, string injectedInput = "")
     {
-        var matches = Regex.Matches(code, @"System\.out\.(?:println|print)\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+        var matches = Regex.Matches(
+            code,
+            @"System\.out\.(?:println|print)\s*\(\s*(?<expr>(?:[^()]|\((?<open>)|\)(?<-open>))*(?(open)(?!)))\)",
+            RegexOptions.Singleline);
         if (matches.Count == 0)
-            matches = Regex.Matches(code, @"\bprint\s*\(\s*(?<expr>.*?)\s*\)", RegexOptions.Singleline);
+            matches = Regex.Matches(
+                code,
+                @"\bprint\s*\(\s*(?<expr>(?:[^()]|\((?<open>)|\)(?<-open>))*(?(open)(?!)))\)",
+                RegexOptions.Singleline);
 
         if (matches.Count == 0)
             return string.Empty;
@@ -1328,6 +1354,11 @@ public class TerminalLevelController : MonoBehaviour
         Match charLit = Regex.Match(expr, "^'(?<txt>.*)'$");
         if (charLit.Success)
             return charLit.Groups["txt"].Value;
+
+        if (TryEvaluateKnownMethodCall(expr, code, injectedInput, out string methodResult))
+        {
+            return methodResult;
+        }
 
         if (TryEvaluateArithmeticExpression(expr, code, injectedInput, out string arithmeticResult))
         {
@@ -1482,6 +1513,177 @@ public class TerminalLevelController : MonoBehaviour
 
         // Unknown/unhandled expression
         return string.Empty;
+    }
+
+    private bool TryEvaluateKnownMethodCall(string expr, string code, string injectedInput, out string result)
+    {
+        result = string.Empty;
+
+        Match callMatch = Regex.Match(expr.Trim(), @"^(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*\((?<args>.*)\)$", RegexOptions.Singleline);
+        if (!callMatch.Success)
+        {
+            return false;
+        }
+
+        string methodName = callMatch.Groups["name"].Value;
+        if (!TrySplitMethodArguments(callMatch.Groups["args"].Value, out List<string> arguments))
+        {
+            return false;
+        }
+
+        switch (methodName)
+        {
+            case "isPrime":
+                if (arguments.Count == 1 && TryResolveIntValue(arguments[0], code, injectedInput, out int primeInput))
+                {
+                    result = ComputePrime(primeInput).ToString().ToLowerInvariant();
+                    return true;
+                }
+                break;
+
+            case "getFibonacci":
+                if (arguments.Count == 1 && TryResolveIntValue(arguments[0], code, injectedInput, out int fibonacciInput))
+                {
+                    result = ComputeFibonacci(fibonacciInput).ToString();
+                    return true;
+                }
+                break;
+
+            case "power":
+                if (arguments.Count == 2 &&
+                    TryResolveIntValue(arguments[0], code, injectedInput, out int baseValue) &&
+                    TryResolveIntValue(arguments[1], code, injectedInput, out int exponent))
+                {
+                    result = ComputePower(baseValue, exponent).ToString();
+                    return true;
+                }
+                break;
+        }
+
+        return false;
+    }
+
+    private bool TrySplitMethodArguments(string argumentsText, out List<string> arguments)
+    {
+        arguments = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(argumentsText))
+        {
+            return true;
+        }
+
+        int depth = 0;
+        int startIndex = 0;
+
+        for (int i = 0; i < argumentsText.Length; i++)
+        {
+            char current = argumentsText[i];
+
+            if (current == '(')
+            {
+                depth++;
+            }
+            else if (current == ')')
+            {
+                depth--;
+                if (depth < 0)
+                {
+                    return false;
+                }
+            }
+            else if (current == ',' && depth == 0)
+            {
+                arguments.Add(argumentsText.Substring(startIndex, i - startIndex).Trim());
+                startIndex = i + 1;
+            }
+        }
+
+        if (depth != 0)
+        {
+            return false;
+        }
+
+        string finalArgument = argumentsText.Substring(startIndex).Trim();
+        if (!string.IsNullOrWhiteSpace(finalArgument))
+        {
+            arguments.Add(finalArgument);
+        }
+
+        return true;
+    }
+
+    private bool TryResolveIntValue(string expression, string code, string injectedInput, out int value)
+    {
+        value = 0;
+
+        string trimmedExpression = expression.Trim();
+
+        if (int.TryParse(trimmedExpression, out value))
+        {
+            return true;
+        }
+
+        if (TryResolveNumericToken(trimmedExpression, code, injectedInput, out string resolvedToken) && int.TryParse(resolvedToken, out value))
+        {
+            return true;
+        }
+
+        if (TryEvaluateArithmeticExpression(trimmedExpression, code, injectedInput, out string arithmeticValue) && int.TryParse(arithmeticValue, out value))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool ComputePrime(int n)
+    {
+        if (n <= 1)
+        {
+            return false;
+        }
+
+        for (int i = 2; i < n; i++)
+        {
+            if (n % i == 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private int ComputeFibonacci(int n)
+    {
+        if (n <= 1)
+        {
+            return 0;
+        }
+
+        int a = 0;
+        int b = 1;
+
+        for (int i = 2; i < n; i++)
+        {
+            int next = a + b;
+            a = b;
+            b = next;
+        }
+
+        return b;
+    }
+
+    private int ComputePower(int baseValue, int exponent)
+    {
+        int result = 1;
+
+        for (int i = 0; i < exponent; i++)
+        {
+            result *= baseValue;
+        }
+
+        return result;
     }
 
     private bool TryEvaluateArithmeticExpression(string expr, string code, string injectedInput, out string result)
