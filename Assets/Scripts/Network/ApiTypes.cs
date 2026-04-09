@@ -47,6 +47,7 @@ public class UserProgressData
     public int totalTokens;
     public float totalPlayTime;
     public string equippedCharacter;
+    public int rewardTokens;
 }
 
 [System.Serializable]

@@ -13,6 +13,8 @@
 // ============================================================
 
 using System.Collections;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -30,7 +32,15 @@ public class LevelSelectionManager : MonoBehaviour
     [Tooltip("If true, automatically fetches latest progress from the backend before showing levels.")]
     public bool fetchProgressOnStart = true;
 
+    [Header("Locked State Visuals")]
+    [Tooltip("Locked buttons are tinted to this alpha after grayscale is applied.")]
+    [Range(0f, 1f)]
+    public float lockedButtonAlpha = 0.65f;
+
     private int _currentPlayableLevel = 1;
+    private readonly Dictionary<int, Color> _originalGraphicColors = new Dictionary<int, Color>();
+    private readonly Dictionary<int, Material> _originalGraphicMaterials = new Dictionary<int, Material>();
+    private static Material _lockedImageMaterial;
 
     private void OnEnable()
     {
@@ -147,12 +157,7 @@ public class LevelSelectionManager : MonoBehaviour
             bool isUnlocked = (levelNumber <= _currentPlayableLevel);
             btn.interactable = isUnlocked;
 
-            // Optional: change alpha or visual state of the button
-            CanvasGroup group = btn.GetComponent<CanvasGroup>();
-            if (group != null)
-            {
-                group.alpha = isUnlocked ? 1.0f : 0.5f;
-            }
+            ApplyButtonVisualState(btn, isUnlocked);
 
             // Clean up old listeners to prevent duplicates if we refresh multiple times
             btn.onClick.RemoveAllListeners();
@@ -165,15 +170,118 @@ public class LevelSelectionManager : MonoBehaviour
         }
     }
 
+    private void ApplyButtonVisualState(Button btn, bool isUnlocked)
+    {
+        Graphic[] graphics = btn.GetComponentsInChildren<Graphic>(true);
+        for (int i = 0; i < graphics.Length; i++)
+        {
+            Graphic graphic = graphics[i];
+            if (graphic == null) continue;
+
+            if (isUnlocked)
+            {
+                RestoreGraphicVisual(graphic);
+                continue;
+            }
+
+            ApplyLockedGraphicVisual(graphic);
+        }
+    }
+
+    private void CacheOriginalGraphicVisual(Graphic graphic)
+    {
+        int graphicId = graphic.GetInstanceID();
+
+        if (!_originalGraphicColors.ContainsKey(graphicId))
+        {
+            _originalGraphicColors[graphicId] = graphic.color;
+        }
+
+        if ((graphic is Image || graphic is RawImage) && !_originalGraphicMaterials.ContainsKey(graphicId))
+        {
+            _originalGraphicMaterials[graphicId] = graphic.material;
+        }
+    }
+
+    private void RestoreGraphicVisual(Graphic graphic)
+    {
+        CacheOriginalGraphicVisual(graphic);
+
+        int graphicId = graphic.GetInstanceID();
+        if (_originalGraphicColors.TryGetValue(graphicId, out Color originalColor))
+        {
+            graphic.color = originalColor;
+        }
+
+        if (_originalGraphicMaterials.TryGetValue(graphicId, out Material originalMaterial))
+        {
+            graphic.material = originalMaterial;
+        }
+    }
+
+    private void ApplyLockedGraphicVisual(Graphic graphic)
+    {
+        CacheOriginalGraphicVisual(graphic);
+
+        int graphicId = graphic.GetInstanceID();
+        Color originalColor = _originalGraphicColors[graphicId];
+
+        if (graphic is TMP_Text tmpText)
+        {
+            Color lockedTextColor = Color.Lerp(originalColor, new Color(0.78f, 0.80f, 0.86f, originalColor.a), 0.9f);
+            lockedTextColor.a = originalColor.a * lockedButtonAlpha;
+            tmpText.color = lockedTextColor;
+            return;
+        }
+
+        if (graphic is Image || graphic is RawImage)
+        {
+            Material lockedMaterial = GetLockedImageMaterial();
+            if (lockedMaterial != null)
+            {
+                graphic.material = lockedMaterial;
+            }
+
+            Color lockedColor = Color.Lerp(originalColor, new Color(0.62f, 0.62f, 0.62f, originalColor.a), 0.88f);
+            lockedColor.a = originalColor.a * lockedButtonAlpha;
+            graphic.color = lockedColor;
+            return;
+        }
+
+        Color fallbackColor = Color.Lerp(originalColor, Color.gray, 0.9f);
+        fallbackColor.a = originalColor.a * lockedButtonAlpha;
+        graphic.color = fallbackColor;
+    }
+
+    private static Material GetLockedImageMaterial()
+    {
+        if (_lockedImageMaterial != null)
+            return _lockedImageMaterial;
+
+        Shader shader = Shader.Find("Custom/UIGrayscale");
+        if (shader == null)
+        {
+            Debug.LogWarning("[LevelSelectionManager] Custom/UIGrayscale shader not found. Locked buttons will use tint only.");
+            return null;
+        }
+
+        _lockedImageMaterial = new Material(shader)
+        {
+            name = "UIGrayscale_Runtime"
+        };
+
+        return _lockedImageMaterial;
+    }
+
     /// <summary>
     /// Invoked dynamically when a specific Level button is clicked.
     /// Saves current game data globally, then loads the exact level scene.
     /// </summary>
     private void OnLevelButtonClicked(int levelNumber)
     {
-        // Update the 'CurrentLevel' in PlayerPrefs so other scripts 
-        // know what level the player is actively playing.
-        PlayerPrefs.SetInt("CurrentLevel", levelNumber);
+        // Keep the player's actual progress intact.
+        // SelectedLevel is only for the scene that will be opened.
+        PlayerPrefs.SetInt("SelectedLevel", levelNumber);
         PlayerPrefs.Save();
 
         string sceneName = levelScenePrefix + levelNumber;

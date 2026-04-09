@@ -335,13 +335,6 @@ public class TerminalLevelController : MonoBehaviour
                 : "Code validation passed. Completing level...";
         }
 
-        if (!hasCodeErrors)
-        {
-            // Ensure the next level is unlocked locally immediately, even if
-            // backend sync fails or is interrupted by a scene change.
-            UnlockNextLevelLocally();
-        }
-
         HandleRunResult(hasCodeErrors, string.Empty);
     }
 
@@ -434,8 +427,6 @@ public class TerminalLevelController : MonoBehaviour
             if (outputText != null)
                 outputText.text = "Data Injected Successfully! Validating...";
 
-            UnlockNextLevelLocally();
-
             string resultOutput = "";
             if (isWildcard)
             {
@@ -466,33 +457,6 @@ public class TerminalLevelController : MonoBehaviour
                 consoleInputField.ActivateInputField();
             }
         }
-    }
-
-    private void UnlockNextLevelLocally()
-    {
-        int completedLevel = activeLevelNumber > 0 ? activeLevelNumber : sceneLevelNumber;
-        if (completedLevel <= 0)
-            return;
-
-        // If keys don't exist yet, seed them from the completed level so
-        // progression continues naturally instead of using a hard-coded 1.
-        int current = PlayerPrefs.HasKey("CurrentLevel")
-            ? PlayerPrefs.GetInt("CurrentLevel")
-            : completedLevel;
-
-        int highest = PlayerPrefs.HasKey("HighestLevel")
-            ? PlayerPrefs.GetInt("HighestLevel")
-            : completedLevel;
-
-        int nextLevel = completedLevel + 1;
-        int newCurrent = Mathf.Max(current, nextLevel);
-        int newHighest = Mathf.Max(highest, nextLevel);
-
-        PlayerPrefs.SetInt("CurrentLevel", newCurrent);
-        PlayerPrefs.SetInt("HighestLevel", newHighest);
-        PlayerPrefs.Save();
-
-        Debug.Log($"[TerminalLevelController] Locally unlocked next level: CurrentLevel={newCurrent}, HighestLevel={newHighest} (completed {completedLevel}).");
     }
 
     private bool ValidateSubmittedCode(string submittedCode, out string message)
@@ -1047,7 +1011,9 @@ public class TerminalLevelController : MonoBehaviour
             return;
         }
 
-        int tokensEarned = activeLevelData != null ? activeLevelData.baseTokenReward : fallbackTokenReward;
+        int levelNumber = activeLevelNumber > 0 ? activeLevelNumber : sceneLevelNumber;
+        int baseRewardTokens = activeLevelData != null ? activeLevelData.baseTokenReward : fallbackTokenReward;
+        int rewardTokens = GetCompletionRewardTokens(levelNumber, baseRewardTokens);
 
         string predictedOutput = string.IsNullOrEmpty(providedOutput)
             ? ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty)
@@ -1059,28 +1025,23 @@ public class TerminalLevelController : MonoBehaviour
             predictedOutput = activeLevelData.expectedOutput;
         }
 
-        StartCoroutine(SuccessCountdownRoutine(predictedOutput));
+        StartCoroutine(SuccessCountdownRoutine(predictedOutput, baseRewardTokens, rewardTokens));
     }
 
-    private System.Collections.IEnumerator SuccessCountdownRoutine(string rawOutput)
+    private System.Collections.IEnumerator SuccessCountdownRoutine(string rawOutput, int baseRewardTokens, int rewardTokens)
     {
-        string baseSuccessText = "Success! Level completed.\n\n";
-
-        if (!string.IsNullOrWhiteSpace(rawOutput))
-        {
-            baseSuccessText += $"Output: {rawOutput}\n\n";
-        }
+        string successText = BuildSuccessMessage(rawOutput, rewardTokens);
 
         if (outputText != null)
         {
-            outputText.text = baseSuccessText + "Closing terminal in 3...";
+            outputText.text = successText + "Closing terminal in 8...";
         }
 
-        for (int i = 3; i > 0; i--)
+        for (int i = 8; i > 0; i--)
         {
             if (outputText != null)
             {
-                outputText.text = baseSuccessText + $"Closing terminal in {i}...";
+                outputText.text = successText + $"Closing terminal in {i}...";
             }
             yield return new WaitForSeconds(1f);
         }
@@ -1091,12 +1052,11 @@ public class TerminalLevelController : MonoBehaviour
         // whoever is logged in is the player currently playing this level.
         // The sync is non-blocking: if not logged in or the request fails,
         // the game flow still continues and the door still opens.
-        int tokensEarned = activeLevelData != null ? activeLevelData.baseTokenReward : fallbackTokenReward;
         bool syncDone = false;
         bool syncSuccess = false;
 
         if (outputText != null)
-            outputText.text = baseSuccessText + "Saving progress...";
+            outputText.text = successText + "Saving progress...";
 
         int levelToSync = activeLevelNumber > 0 ? activeLevelNumber : sceneLevelNumber;
 
@@ -1108,10 +1068,10 @@ public class TerminalLevelController : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[TerminalLevelController] Syncing progress to backend: level={levelToSync}, tokens={tokensEarned}");
+            Debug.Log($"[TerminalLevelController] Syncing progress to backend: level={levelToSync}, tokens={baseRewardTokens}");
             ProgressService.SyncAfterLevel(
                 levelNumber: levelToSync,
-                tokensEarned: tokensEarned,
+                tokensEarned: baseRewardTokens,
                 onSuccess: _ => { syncDone = true; syncSuccess = true; },
                 onError: _ => { syncDone = true; syncSuccess = false; }
             );
@@ -1127,9 +1087,9 @@ public class TerminalLevelController : MonoBehaviour
 
         if (outputText != null)
         {
-            outputText.text = syncSuccess
-                ? baseSuccessText + "Progress saved!"
-                : baseSuccessText + "Progress saved locally.";
+            outputText.text = successText + (syncSuccess
+                ? "Progress saved!"
+                : "Progress saved locally.");
         }
 
         yield return new WaitForSeconds(0.8f);
@@ -1137,6 +1097,38 @@ public class TerminalLevelController : MonoBehaviour
 
         onLevelSolved?.Invoke();
         CloseTerminalModal();
+    }
+
+    private string BuildSuccessMessage(string rawOutput, int tokensEarned)
+    {
+        string successColor = "#39D353";
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+        builder.AppendLine($"<color={successColor}><b>Success! Level Complete - Moving to the Next Level</b></color>");
+        builder.AppendLine();
+
+        if (!string.IsNullOrWhiteSpace(rawOutput))
+        {
+            builder.AppendLine($"Output: {rawOutput}");
+            builder.AppendLine();
+        }
+
+        builder.AppendLine($"Bonus Coins: {tokensEarned}");
+        builder.AppendLine($"Challenge cleared: you have successfully claimed {tokensEarned} Reward Token to add to your balance.");
+        builder.AppendLine();
+
+        return builder.ToString();
+    }
+
+    private int GetCompletionRewardTokens(int levelNumber, int firstClearRewardTokens)
+    {
+        int current = PlayerPrefs.HasKey("CurrentLevel") ? PlayerPrefs.GetInt("CurrentLevel") : 1;
+        int highest = PlayerPrefs.HasKey("HighestLevel") ? PlayerPrefs.GetInt("HighestLevel") : 1;
+        int currentPlayableLevel = Mathf.Max(current, highest);
+
+        // Levels below the current playable level are replays.
+        // Replays get the fixed reward, while the current playable level gets the original reward.
+        return levelNumber < currentPlayableLevel ? 30 : firstClearRewardTokens;
     }
 
     private bool ValidateExpectedOutput(string submittedCode, out string message)

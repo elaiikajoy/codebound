@@ -21,6 +21,14 @@ public class TokenManager : MonoBehaviour
 {
     // ─── Public API ───────────────────────────────────────────
 
+    private static bool _pendingSyncInFlight;
+
+    private static void SetAllTokenKeys(int amount)
+    {
+        PlayerPrefs.SetInt("PlayerTokens", amount);
+        PlayerPrefs.SetInt("TotalTokens", amount);
+    }
+
     /// <summary>
     /// Add <paramref name="amount"/> coins to the player's local total.
     /// Also queues them as pending so they get flushed to the backend on next Save.
@@ -30,13 +38,47 @@ public class TokenManager : MonoBehaviour
         if (amount <= 0) return;
 
         int current = PlayerPrefs.GetInt("PlayerTokens", 0);
-        PlayerPrefs.SetInt("PlayerTokens", current + amount);
+        int updated = current + amount;
+        SetAllTokenKeys(updated);
 
         // Also keep a running count of coins not yet pushed to the backend.
         int pending = PlayerPrefs.GetInt("PendingTokensToSync", 0);
         PlayerPrefs.SetInt("PendingTokensToSync", pending + amount);
 
         PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Pushes collected coin tokens to the backend as soon as possible.
+    /// Calls are serialized so multiple coin pickups do not race each other.
+    /// </summary>
+    public static void RequestPendingSync()
+    {
+        if (_pendingSyncInFlight)
+            return;
+
+        int pending = GetPending();
+        if (pending <= 0)
+            return;
+
+        if (ProgressService.Instance == null || GameApiManager.Instance == null || !GameApiManager.Instance.IsLoggedIn)
+            return;
+
+        _pendingSyncInFlight = true;
+        ProgressService.FlushPendingTokens(
+            onSuccess: _ =>
+            {
+                _pendingSyncInFlight = false;
+                if (GetPending() > 0)
+                {
+                    RequestPendingSync();
+                }
+            },
+            onError: _ =>
+            {
+                _pendingSyncInFlight = false;
+            }
+        );
     }
 
     /// <summary>
@@ -56,7 +98,7 @@ public class TokenManager : MonoBehaviour
             return false;
         }
 
-        PlayerPrefs.SetInt("PlayerTokens", current - amount);
+        SetAllTokenKeys(current - amount);
         PlayerPrefs.Save();
         Debug.Log($"[TokenManager] Spent {amount} token(s). Remaining: {current - amount}");
         return true;
@@ -67,7 +109,10 @@ public class TokenManager : MonoBehaviour
     /// </summary>
     public static int GetTokens()
     {
-        return PlayerPrefs.GetInt("PlayerTokens", 0);
+        if (PlayerPrefs.HasKey("PlayerTokens"))
+            return PlayerPrefs.GetInt("PlayerTokens", 0);
+
+        return PlayerPrefs.GetInt("TotalTokens", 0);
     }
 
     /// <summary>
@@ -94,7 +139,7 @@ public class TokenManager : MonoBehaviour
     /// </summary>
     public static void SyncFromBackend(int totalFromBackend)
     {
-        PlayerPrefs.SetInt("PlayerTokens", totalFromBackend);
+        SetAllTokenKeys(totalFromBackend);
         // Backend now has the ground truth — pending coins were included in this response.
         PlayerPrefs.SetInt("PendingTokensToSync", 0);
         PlayerPrefs.Save();
@@ -112,7 +157,7 @@ public class TokenManager : MonoBehaviour
     /// <summary>Resets both local total and pending counter to zero.</summary>
     public void ResetTokens()
     {
-        PlayerPrefs.SetInt("PlayerTokens", 0);
+        SetAllTokenKeys(0);
         PlayerPrefs.SetInt("PendingTokensToSync", 0);
         PlayerPrefs.Save();
         Debug.Log("[TokenManager] Tokens reset to 0.");

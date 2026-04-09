@@ -59,8 +59,9 @@ public class Coin : MonoBehaviour
 
         // ── Update unified token count ─────────────────────────────────
         // TokenManager.AddTokens also increments PendingTokensToSync so
-        // the batch is flushed to the backend on the next SaveGameData() call.
+        // the batch can be flushed to the backend immediately when logged in.
         TokenManager.AddTokens(tokenValue);
+        TokenManager.RequestPendingSync();
 
         Debug.Log($"[Coin] Collected! +{tokenValue} token(s). Total: {TokenManager.GetTokens()} | Pending: {TokenManager.GetPending()}");
 
