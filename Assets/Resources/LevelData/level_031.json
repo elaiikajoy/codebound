@@ -14,18 +14,23 @@
     ],
     "testCases": [
         {
-            "input": "",
-            "output": ""
+            "input": "5",
+            "output": "Positive"
         },
         {
-            "input": "",
-            "output": ""
+            "input": "-3",
+            "output": "Negative"
+        },
+        {
+            "input": "0",
+            "output": "Positive"
         }
     ],
     "requiredKeywords": [
         "if",
         "else",
-        "System.out.println"
+        "System.out.println",
+        "Scanner"
     ],
     "forbiddenKeywords": [
         "Scanner sc = new Scanner(System.in); int num = 10;"

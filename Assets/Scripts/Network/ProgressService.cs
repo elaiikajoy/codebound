@@ -101,16 +101,10 @@ public class ProgressService : MonoBehaviour
             yield break;
         }
 
-        // Attach any coins the player collected in the overworld/level
-        // before this sync was triggered. The backend will credit the full
-        // sum, and SyncFromBackend (called in the onSuccess below) will
-        // reset PendingTokensToSync to 0 — no double-counting.
-        int pendingCoins = TokenManager.GetPending();
-        if (pendingCoins > 0)
-        {
-            Debug.Log($"[ProgressService] Attaching {pendingCoins} pending coin(s) to level sync. New tokensEarned: {request.tokensEarned} + {pendingCoins} = {request.tokensEarned + pendingCoins}");
-            request.tokensEarned += pendingCoins;
-        }
+        // We no longer attach pendingCoins to request.tokensEarned because the backend
+        // might ignore tokensEarned on replay levels, causing those pending coins to be lost!
+        // Pending coins will remain in the local queue and get pushed safely via TokenManager.RequestPendingSync().
+        int pendingCoins = 0; // We pass 0 to SyncFromBackend so it doesn't deduct any pending coins.
 
         yield return StartCoroutine(ApiClient.Instance.Post(
         "/progress/update",
@@ -123,7 +117,7 @@ public class ProgressService : MonoBehaviour
                 // Mirror backend authoritative values into local PlayerPrefs.
                 // SyncFromBackend also clears PendingTokensToSync because
                 // the level-completion POST now includes the pending coins.
-                TokenManager.SyncFromBackend(resp.data.totalTokens);
+                TokenManager.SyncFromBackend(resp.data.totalTokens, pendingCoins);
                 PlayerPrefs.SetInt("CurrentLevel", resp.data.currentLevel);
                 PlayerPrefs.SetInt("HighestLevel", resp.data.highestLevel);
                 PlayerPrefs.Save();
@@ -329,7 +323,7 @@ public class ProgressService : MonoBehaviour
                 var resp = JsonUtility.FromJson<ProgressResponse>(json);
                 if (resp != null && resp.success && resp.data != null)
                 {
-                    TokenManager.SyncFromBackend(resp.data.totalTokens);
+                    TokenManager.SyncFromBackend(resp.data.totalTokens, pending);
                     PlayerPrefs.SetInt("CurrentLevel", resp.data.currentLevel);
                     PlayerPrefs.SetInt("HighestLevel", resp.data.highestLevel);
                     PlayerPrefs.Save();

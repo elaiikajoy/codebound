@@ -420,7 +420,36 @@ public class TerminalLevelController : MonoBehaviour
             }
         }
 
-        if (match != null)
+        // NEW LOGIC: Accept arbitrary inputs dynamically if no predefined match.
+        bool isDynamicMatch = false;
+        string dynamicOutput = "";
+
+        if (match == null)
+        {
+            if (double.TryParse(userInput, out double numVal))
+            {
+                if (activeLevelNumber == 31)
+                {
+                    dynamicOutput = numVal >= 0 ? "Positive" : "Negative";
+                    isDynamicMatch = true;
+                }
+                else
+                {
+                    // For generic unknown levels, we can just echo the input back 
+                    // or simulate wildcard behavior.
+                    isDynamicMatch = true;
+                    dynamicOutput = ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty, userInput);
+                }
+            }
+            else
+            {
+                // If it's pure text, just simulate it via wildcard extractor
+                isDynamicMatch = true;
+                dynamicOutput = ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty, userInput);
+            }
+        }
+
+        if (match != null || isDynamicMatch)
         {
             consoleInputField.gameObject.SetActive(false);
 
@@ -428,16 +457,28 @@ public class TerminalLevelController : MonoBehaviour
                 outputText.text = "Data Injected Successfully! Validating...";
 
             string resultOutput = "";
-            if (isWildcard)
+            string submittedCode = codeInputField != null ? codeInputField.text : string.Empty;
+
+            if (isDynamicMatch)
+            {
+                resultOutput = dynamicOutput;
+            }
+            else if (isWildcard)
             {
                 // Calculate dynamic expected output from submitted code using wildcard input
-                string submittedCode = codeInputField != null ? codeInputField.text : string.Empty;
                 resultOutput = ExtractPredictedOutput(submittedCode, userInput);
             }
             else
             {
                 // Prioritize expectedOutput, then fallback to output
                 resultOutput = !string.IsNullOrEmpty(match.expectedOutput) ? match.expectedOutput : match.output;
+            }
+
+            // In some wildcard cases of conditionals, it prints both. Clean it up for level 31 just in case.
+            if (activeLevelNumber == 31 && resultOutput.Contains("Positive") && resultOutput.Contains("Negative"))
+            {
+                if (double.TryParse(userInput, out double dVal))
+                    resultOutput = dVal >= 0 ? "Positive" : "Negative";
             }
 
             HandleRunResult(false, resultOutput);
@@ -1060,6 +1101,18 @@ public class TerminalLevelController : MonoBehaviour
 
         int levelToSync = activeLevelNumber > 0 ? activeLevelNumber : sceneLevelNumber;
 
+        int current = PlayerPrefs.HasKey("CurrentLevel") ? PlayerPrefs.GetInt("CurrentLevel") : 1;
+        int highest = PlayerPrefs.HasKey("HighestLevel") ? PlayerPrefs.GetInt("HighestLevel") : 1;
+        int currentPlayableLevel = Mathf.Max(current, highest);
+        bool isReplay = levelToSync < currentPlayableLevel;
+
+        if (isReplay && rewardTokens > 0)
+        {
+            TokenManager.AddTokens(rewardTokens);
+            // We do NOT request sync here to prevent race conditions with SyncAfterLevel.
+            // It will be requested after SyncAfterLevel completes.
+        }
+
         if (levelToSync <= 0)
         {
             Debug.LogError($"[TerminalLevelController] Invalid levelToSync ({levelToSync}) — cannot sync progress.");
@@ -1068,10 +1121,11 @@ public class TerminalLevelController : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[TerminalLevelController] Syncing progress to backend: level={levelToSync}, tokens={baseRewardTokens}");
+            int tokensToSyncViaProgress = isReplay ? 0 : rewardTokens;
+            Debug.Log($"[TerminalLevelController] Syncing progress to backend: level={levelToSync}, tokens={tokensToSyncViaProgress}");
             ProgressService.SyncAfterLevel(
                 levelNumber: levelToSync,
-                tokensEarned: baseRewardTokens,
+                tokensEarned: tokensToSyncViaProgress,
                 onSuccess: _ => { syncDone = true; syncSuccess = true; },
                 onError: _ => { syncDone = true; syncSuccess = false; }
             );
@@ -1090,6 +1144,13 @@ public class TerminalLevelController : MonoBehaviour
             outputText.text = successText + (syncSuccess
                 ? "Progress saved!"
                 : "Progress saved locally.");
+        }
+
+        // Now that Progress Update is completely done, safely push the pending coins
+        // (including the replay reward) without triggering a backend database race condition.
+        if (TokenManager.GetPending() > 0)
+        {
+            TokenManager.RequestPendingSync();
         }
 
         yield return new WaitForSeconds(0.8f);

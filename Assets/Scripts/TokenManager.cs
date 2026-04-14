@@ -137,13 +137,15 @@ public class TokenManager : MonoBehaviour
     /// Called by ProgressService after a successful /progress/update or /progress response.
     /// Replaces the local total with the authoritative backend value and clears pending.
     /// </summary>
-    public static void SyncFromBackend(int totalFromBackend)
+    public static void SyncFromBackend(int totalFromBackend, int amountSynced = 0)
     {
-        SetAllTokenKeys(totalFromBackend);
-        // Backend now has the ground truth — pending coins were included in this response.
-        PlayerPrefs.SetInt("PendingTokensToSync", 0);
+        int currentPending = PlayerPrefs.GetInt("PendingTokensToSync", 0);
+        int newPending = Mathf.Max(0, currentPending - amountSynced);
+
+        SetAllTokenKeys(totalFromBackend + newPending);
+        PlayerPrefs.SetInt("PendingTokensToSync", newPending);
         PlayerPrefs.Save();
-        Debug.Log($"[TokenManager] Synced from backend — TotalTokens={totalFromBackend}");
+        Debug.Log($"[TokenManager] Synced from backend — BackendTotal={totalFromBackend}, Synced={amountSynced}, NewPending={newPending}, LocalTotal={totalFromBackend + newPending}");
     }
 
     // ─── Legacy helpers (kept for compatibility) ───────────────
