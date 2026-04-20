@@ -545,7 +545,7 @@ public class TerminalLevelController : MonoBehaviour
                 {
                     resultOutput = (dVal % 5 == 0 && dVal % 11 == 0) ? "Yes" : "No";
                 }
-                else 
+                else
                 {
                     resultOutput = "No";
                 }
