@@ -1,16 +1,16 @@
 {
     "levelNumber": 80,
-    "levelName": "Level 80: Array Boss - Average Calculator",
+    "levelName": "Level 80: Array Boss - Smart Average",
     "category": "Arrays",
-    "difficulty": 8,
-    "puzzleDescription": "The final Array challenge! Calculate the average of all numbers in the array. Average = (Sum of all elements) / (Number of elements).",
-    "objective": "Given the array 'grades', calculate and print the average value.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] grades = {85, 90, 80, 95, 100};\n        int sum = 0;\n        \n        // 1. Write a loop to calculate the sum:\n        \n        // 2. Calculate the average and print it:\n        int average = sum / grades.length;\n        System.out.println(average);\n    }\n}",
+    "difficulty": 9,
+    "puzzleDescription": "The grading system is corrupted! You must calculate the average of the student's grades, but you must IGNORE any failing marks (below 75). If you include failing marks, the average will be skewed!",
+    "objective": "Given the array 'grades', iterate through it. Sum up only the grades that are 75 or higher. Then, divide that sum by the NUMBER of passing grades found to get the average. Print the final average.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int[] grades = {85, 60, 80, 95, 40, 100};\n        int sum = 0;\n        int passingCount = 0;\n        \n        // 1. Loop through the array\n        // 2. Use a conditional to check if grade >= 75\n        // 3. Update sum and passingCount\n        // 4. Calculate and print average\n        \n    }\n}",
     "expectedOutput": "90",
     "hints": [
-        "First, use a for loop to add every element of 'grades' to 'sum'.",
-        "The formula for average is 'sum / grades.length'.",
-        "Make sure the 'println' happens after the loop is completely finished."
+        "Use 'if (grades[i] >= 75)' inside your for loop.",
+        "Don't just divide by grades.length; you need a separate 'passingCount' variable to track how many grades passed the filter.",
+        "Formula: average = sum / passingCount;"
     ],
     "testCases": [
         {
@@ -20,17 +20,19 @@
     ],
     "requiredKeywords": [
         "for",
+        "if",
+        ">=",
         "sum +=",
-        "grades.length",
+        "++",
         "/"
     ],
-    "forbiddenKeywords": [
-        "average = 90"
-    ],
-    "baseTokenReward": 500,
+    "forbiddenKeywords": [],
+    "baseTokenReward": 300,
     "perfectBonus": 100,
     "speedBonus": 50,
-    "unlockedAchievements": ["Data Analyst"],
+    "unlockedAchievements": [
+        "Data Analyst"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

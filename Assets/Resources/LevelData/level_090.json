@@ -1,34 +1,39 @@
 {
     "levelNumber": 90,
-    "levelName": "Level 90: String Boss - Substring Extraction",
+    "levelName": "Level 90: String Boss - Dynamic Extractor",
     "category": "Strings",
-    "difficulty": 9,
-    "puzzleDescription": "The final String challenge! Use the .substring() method to extract a specific part of a text based on start and end indices.",
-    "objective": "Given the String 'filename' as 'Photo.jpg', extract only the extension '.jpg' and print it.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String filename = \"Photo.jpg\";\n        \n        // Use .substring() to get '.jpg' (starts at index 5):\n        String extension = \n        \n        System.out.println(extension);\n    }\n}",
-    "expectedOutput": ".jpg",
+    "difficulty": 10,
+    "puzzleDescription": "The system is flooded with files! You must build a scanner that iterates through an array of file paths. For every file, find the index of the dot ('.') and extract the extension. Constraint: Only print the extension if the total filename has more than 8 characters.",
+    "objective": "Given an array 'files', use a loop to check each String. Find the dot index using .indexOf('.'). Extract the substring from that dot to the end. Only print it if the original string's length is > 8.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String[] files = {\"System.dll\", \"Data.txt\", \"Run.exe\", \"Wallpaper.png\"};\n        \n        // 1. Loop through the array\n        // 2. Find the index of '.' for each string\n        // 3. Extract the extension\n        // 4. Use a conditional: if length > 8, print it\n        \n    }\n}",
+    "expectedOutput": ".dll\n.png",
     "hints": [
-        "The syntax is 'string.substring(startIndex)'.",
-        "Counting starts at 0: P(0), h(1), o(2), t(3), o(4), .(5).",
-        "If you only provide one number, it will take everything from that index to the end."
+        "Use 'files[i].indexOf(\".\")' to find where the extension starts dynamically.",
+        "Use 'files[i].substring(dotIndex)' to grab the extension.",
+        "The condition 'files[i].length() > 8' will filter out 'Data.txt' and 'Run.exe'.",
+        "The loop should run from 0 to 'files.length'."
     ],
     "testCases": [
         {
             "input": "",
-            "output": ".jpg"
+            "output": ".dll\n.png"
         }
     ],
     "requiredKeywords": [
-        ".substring(5)",
+        "for",
+        "if",
+        ".length()",
+        ".indexOf",
+        ".substring",
         "System.out.println"
     ],
-    "forbiddenKeywords": [
-        "extension = \".jpg\""
-    ],
+    "forbiddenKeywords": [],
     "baseTokenReward": 500,
     "perfectBonus": 100,
     "speedBonus": 50,
-    "unlockedAchievements": ["String Master"],
+    "unlockedAchievements": [
+        "String Master"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

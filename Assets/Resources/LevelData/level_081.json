@@ -1,39 +1,41 @@
 {
     "levelNumber": 81,
-    "levelName": "Level 81: Strings - Length of Text",
+    "levelName": "Level 81: String Boss - The Midpoint Decoder",
     "category": "Strings",
-    "difficulty": 6,
-    "puzzleDescription": "Learn how to use the .length() method to count how many characters are in a String, including spaces.",
-    "objective": "Given the String 'message', find its length and print the total number of characters.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String message = \"Hello TSU!\";\n        \n        // Use the .length() method to get the size of the String:\n        int size = \n        \n        System.out.println(size);\n    }\n}",
-    "expectedOutput": "10",
+    "difficulty": 7,
+    "puzzleDescription": "To unlock the next terminal, you must find the 'heart' of the message. Your task is to calculate the length of the string and then use that length to find and print the character exactly at the middle index.",
+    "objective": "Given the String 'message', find its length. Then, calculate the middle index (length / 2) and print the character at that position using .charAt().",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        String message = \"CodeBound!\"; // Length is 10\n        \n        // 1. Get the length of the string\n        // 2. Calculate the middle index (length / 2)\n        // 3. Use .charAt() to retrieve and print the middle character\n        \n    }\n}",
+    "expectedOutput": "o",
     "hints": [
-        "To get the length of a String, use 'variableName.length()'.",
-        "Don't forget the parentheses () after length, unlike in Arrays where it's just .length.",
-        "The count includes spaces and punctuation like the exclamation mark."
+        "Use 'message.length()' to get the total size.",
+        "The middle index can be found with 'int mid = size / 2;'.",
+        "Use 'message.charAt(mid)' to pick the specific character at that index."
     ],
     "testCases": [
         {
             "input": "",
-            "output": "10"
+            "output": "o"
         }
     ],
     "requiredKeywords": [
-        "message.length()",
-        "int"
+        ".length()",
+        "/",
+        ".charAt",
+        "System.out.println"
     ],
-    "forbiddenKeywords": [
-        "size = 10"
+    "forbiddenKeywords": [],
+    "baseTokenReward": 400,
+    "perfectBonus": 75,
+    "speedBonus": 30,
+    "unlockedAchievements": [
+        "String Specialist"
     ],
-    "baseTokenReward": 300,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 80
 }

@@ -401,6 +401,8 @@ public class TerminalLevelController : MonoBehaviour
         // Block empty submit
         if (string.IsNullOrWhiteSpace(userInput)) return;
 
+        userInput = userInput.Trim();
+
         // Find matching test case by input mapping
         LevelTestCase match = null;
         bool isWildcard = false;
@@ -433,6 +435,20 @@ public class TerminalLevelController : MonoBehaviour
                     dynamicOutput = numVal >= 0 ? "Positive" : "Negative";
                     isDynamicMatch = true;
                 }
+                else if (activeLevelNumber == 50)
+                {
+                    if (outputText != null)
+                    {
+                        outputText.text = "[Warning] Invalid input. Please enter a valid letter grade (A-F). Number inputs are not accepted.";
+                    }
+                    if (EventSystem.current != null)
+                    {
+                        EventSystem.current.SetSelectedGameObject(consoleInputField.gameObject);
+                        consoleInputField.Select();
+                        consoleInputField.ActivateInputField();
+                    }
+                    return;
+                }
                 else
                 {
                     // For generic unknown levels, we can just echo the input back 
@@ -443,9 +459,20 @@ public class TerminalLevelController : MonoBehaviour
             }
             else
             {
-                // If it's pure text, just simulate it via wildcard extractor
-                isDynamicMatch = true;
-                dynamicOutput = ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty, userInput);
+                if (activeLevelNumber == 50)
+                {
+                    string u = userInput.ToUpper();
+                    if (u == "A" || u == "B" || u == "C" || u == "D") dynamicOutput = "Passing";
+                    else if (u == "F") dynamicOutput = "Fail";
+                    else dynamicOutput = "Invalid";
+                    isDynamicMatch = true;
+                }
+                else
+                {
+                    // If it's pure text, just simulate it via wildcard extractor
+                    isDynamicMatch = true;
+                    dynamicOutput = ExtractPredictedOutput(codeInputField != null ? codeInputField.text : string.Empty, userInput);
+                }
             }
         }
 
@@ -474,11 +501,54 @@ public class TerminalLevelController : MonoBehaviour
                 resultOutput = !string.IsNullOrEmpty(match.expectedOutput) ? match.expectedOutput : match.output;
             }
 
+            if (activeLevelNumber == 70)
+            {
+                if (TryPredictEvenFibonacciOutput(submittedCode, userInput, out string fibonacciEvenOutput))
+                {
+                    resultOutput = fibonacciEvenOutput;
+                }
+                else
+                {
+                    if (outputText != null)
+                    {
+                        outputText.text = "[Validation Error] Could not evaluate Fibonacci filter output. Check your while-loop and try again.";
+                    }
+                    if (EventSystem.current != null)
+                    {
+                        consoleInputField.gameObject.SetActive(true);
+                        EventSystem.current.SetSelectedGameObject(consoleInputField.gameObject);
+                        consoleInputField.Select();
+                        consoleInputField.ActivateInputField();
+                    }
+                    return;
+                }
+            }
+
             // In some wildcard cases of conditionals, it prints both. Clean it up for level 31 just in case.
             if (activeLevelNumber == 31 && resultOutput.Contains("Positive") && resultOutput.Contains("Negative"))
             {
                 if (double.TryParse(userInput, out double dVal))
                     resultOutput = dVal >= 0 ? "Positive" : "Negative";
+            }
+            else if (activeLevelNumber == 33)
+            {
+                string[] inputs = userInput.Split(new[] { ' ', ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                if (inputs.Length >= 2 && double.TryParse(inputs[0], out double num1) && double.TryParse(inputs[1], out double num2))
+                {
+                    resultOutput = Math.Max(num1, num2).ToString();
+                }
+            }
+            else if (activeLevelNumber == 36)
+            {
+                string[] inputs = userInput.Split(new[] { ' ', ',', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                if (inputs.Length >= 1 && double.TryParse(inputs[0], out double dVal))
+                {
+                    resultOutput = (dVal % 5 == 0 && dVal % 11 == 0) ? "Yes" : "No";
+                }
+                else 
+                {
+                    resultOutput = "No";
+                }
             }
 
             HandleRunResult(false, resultOutput);
@@ -699,7 +769,7 @@ public class TerminalLevelController : MonoBehaviour
             identifiers.Add(mainArgs.Groups["name"].Value);
         }
 
-        MatchCollection declarationMatches = Regex.Matches(code, @"\b(?:final\s+)?(?<type>String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\s+(?<rest>[^;]+);");
+        MatchCollection declarationMatches = Regex.Matches(code, @"(?m)^\s*(?:final\s+)?(?<type>String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\s*(?:\[\s*\])?\s+(?<rest>[^;\r\n]+);");
         foreach (Match declaration in declarationMatches)
         {
             string rest = declaration.Groups["rest"].Value;
@@ -746,12 +816,73 @@ public class TerminalLevelController : MonoBehaviour
             }
         }
 
+        // Extract loop variables from for(...) statements
+        MatchCollection forLoopMatches = Regex.Matches(
+            code,
+            @"\bfor\s*\(\s*(?:int|long|float|double|char|boolean|String|var)\s+(?<loopVar>[A-Za-z_][A-Za-z0-9_]*)\s*=",
+            RegexOptions.Singleline);
+
+        foreach (Match forLoopMatch in forLoopMatches)
+        {
+            string loopVar = forLoopMatch.Groups["loopVar"].Value;
+            if (!string.IsNullOrWhiteSpace(loopVar))
+            {
+                identifiers.Add(loopVar);
+            }
+        }
+
+        // Extract variables declared anywhere with type assignments (e.g., "int r = ...", "String s = ...")
+        MatchCollection inlineVarMatches = Regex.Matches(
+            code,
+            @"\b(?:int|long|float|double|char|boolean|String|var)\s+(?<varName>[A-Za-z_][A-Za-z0-9_]*)\s*=",
+            RegexOptions.Singleline);
+
+        foreach (Match inlineVarMatch in inlineVarMatches)
+        {
+            string varName = inlineVarMatch.Groups["varName"].Value;
+            if (!string.IsNullOrWhiteSpace(varName))
+            {
+                identifiers.Add(varName);
+            }
+        }
+
+        // Extract variables declared without assignment (e.g., "int r;", "String op;")
+        MatchCollection declVarMatches = Regex.Matches(
+            code,
+            @"\b(?:int|long|float|double|char|boolean|String|var)\s+(?<varName>[A-Za-z_][A-Za-z0-9_]*)\s*[;,\)]",
+            RegexOptions.Singleline);
+
+        foreach (Match declVarMatch in declVarMatches)
+        {
+            string varName = declVarMatch.Groups["varName"].Value;
+            if (!string.IsNullOrWhiteSpace(varName))
+            {
+                identifiers.Add(varName);
+            }
+        }
+
+        // Fallback: Capture ANY identifier that appears after type keywords (most permissive)
+        MatchCollection typeFollowedByIdMatches = Regex.Matches(
+            code,
+            @"\b(?:int|long|float|double|char|boolean|String|var)\s+(?<varName>[A-Za-z_][A-Za-z0-9_]*)\b",
+            RegexOptions.Singleline);
+
+        foreach (Match typeIdMatch in typeFollowedByIdMatches)
+        {
+            string varName = typeIdMatch.Groups["varName"].Value;
+            if (!string.IsNullOrWhiteSpace(varName) && !IsKnownIdentifier(varName))
+            {
+                identifiers.Add(varName);
+            }
+        }
+
         return identifiers;
     }
 
     private bool ValidateReferencedIdentifiers(string code, HashSet<string> declaredIdentifiers, out string message)
     {
-        MatchCollection expressionMatches = Regex.Matches(code, @"System\.out\.(?:println|print)\s*\((?<expr>.*?)\)|\breturn\s+(?<expr>[^;]+);|\b(?:final\s+)?(?:String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\s+[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?<expr>[^;]+);", RegexOptions.Singleline);
+        // Extended regex to also capture method calls
+        MatchCollection expressionMatches = Regex.Matches(code, @"System\.out\.(?:println|print)\s*\((?<expr>.*?)\)|\breturn\s+(?<expr>[^;]+);|(?m)^\s*(?:final\s+)?(?:String|int|double|float|long|char|boolean|var|Scanner|StringBuilder)\s*(?:\[\s*\])?\s+[A-Za-z_][A-Za-z0-9_]*\s*=\s*(?<expr>[^;\r\n]+);|(?<expr>[A-Za-z_][A-Za-z0-9_]*)\s*\([^)]*\)", RegexOptions.Singleline);
 
         foreach (Match expressionMatch in expressionMatches)
         {
@@ -1362,6 +1493,78 @@ public class TerminalLevelController : MonoBehaviour
 
     private string ExtractPredictedOutput(string code, string injectedInput = "")
     {
+        if ((activeLevelData != null && activeLevelData.levelNumber == 52) || activeLevelNumber == 52)
+        {
+            if (TryPredictCountdownForLoopOutput(code, out string countdownOutput))
+            {
+                return countdownOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 61) || activeLevelNumber == 61)
+        {
+            if (TryPredictWhileCountUpOutput(code, out string whileCountUpOutput))
+            {
+                return whileCountUpOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 70) || activeLevelNumber == 70)
+        {
+            if (TryPredictEvenFibonacciOutput(code, injectedInput, out string fibonacciEvenOutput))
+            {
+                return fibonacciEvenOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 71) || activeLevelNumber == 71)
+        {
+            if (TryPredictArrayIndexOutput(code, out string arrayIndexOutput))
+            {
+                return arrayIndexOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 80) || activeLevelNumber == 80)
+        {
+            if (TryPredictPassingAverageOutput(code, out string passingAverageOutput))
+            {
+                return passingAverageOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 81) || activeLevelNumber == 81)
+        {
+            if (TryPredictStringMidpointOutput(code, out string midpointOutput))
+            {
+                return midpointOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 90) || activeLevelNumber == 90)
+        {
+            if (TryPredictStringExtensionOutput(code, out string extensionOutput))
+            {
+                return extensionOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 100) || activeLevelNumber == 100)
+        {
+            if (TryPredictEncodedInstructionsOutput(code, out string instructionsOutput))
+            {
+                return instructionsOutput;
+            }
+        }
+
+        if ((activeLevelData != null && activeLevelData.levelNumber == 60) || activeLevelNumber == 60)
+        {
+            if (TryPredictNestedStarTriangleOutput(code, out string starTriangleOutput))
+            {
+                return starTriangleOutput;
+            }
+        }
+
         var matches = Regex.Matches(
             code,
             @"System\.out\.(?:println|print)\s*\(\s*(?<expr>(?:[^()]|\((?<open>)|\)(?<-open>))*(?(open)(?!)))\)",
@@ -1389,6 +1592,696 @@ public class TerminalLevelController : MonoBehaviour
 
         // Return all combined lines
         return finalOutput.ToString().TrimEnd();
+    }
+
+    private bool TryPredictCountdownForLoopOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        Match loopMatch = Regex.Match(
+            code,
+            @"for\s*\(\s*(?:int\s+)?(?<var>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?<start>-?\d+)\s*;\s*(?<condVar>[A-Za-z_][A-Za-z0-9_]*)\s*>=\s*(?<end>-?\d+)\s*;\s*(?<stepVar>[A-Za-z_][A-Za-z0-9_]*)\s*--\s*\)",
+            RegexOptions.Singleline);
+
+        if (!loopMatch.Success)
+        {
+            return false;
+        }
+
+        string loopVar = loopMatch.Groups["var"].Value;
+        string condVar = loopMatch.Groups["condVar"].Value;
+        string stepVar = loopMatch.Groups["stepVar"].Value;
+        if (!loopVar.Equals(condVar, System.StringComparison.Ordinal) || !loopVar.Equals(stepVar, System.StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(loopMatch.Groups["start"].Value, out int start) ||
+            !int.TryParse(loopMatch.Groups["end"].Value, out int end))
+        {
+            return false;
+        }
+
+        if (start < end)
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, $@"System\.out\.(?:println|print)\s*\(\s*{Regex.Escape(loopVar)}\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+        int safety = 0;
+        for (int i = start; i >= end; i--)
+        {
+            builder.AppendLine(i.ToString());
+            safety++;
+            if (safety > 1000)
+            {
+                return false;
+            }
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return true;
+    }
+
+    private bool TryPredictWhileCountUpOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        Match whileMatch = Regex.Match(
+            code,
+            @"while\s*\(\s*(?<condVar>[A-Za-z_][A-Za-z0-9_]*)\s*<=\s*(?<end>-?\d+)\s*\)",
+            RegexOptions.Singleline);
+
+        if (!whileMatch.Success)
+        {
+            return false;
+        }
+
+        string loopVar = whileMatch.Groups["condVar"].Value;
+        if (!int.TryParse(whileMatch.Groups["end"].Value, out int end))
+        {
+            return false;
+        }
+
+        Match initMatch = Regex.Match(
+            code,
+            $@"\b(?:int|long|float|double|var)?\s*{Regex.Escape(loopVar)}\s*=\s*(?<start>-?\d+)\s*;",
+            RegexOptions.Singleline);
+
+        if (!initMatch.Success || !int.TryParse(initMatch.Groups["start"].Value, out int start))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, $@"System\.out\.(?:println|print)\s*\(\s*{Regex.Escape(loopVar)}\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, $@"(?:\+\+\s*{Regex.Escape(loopVar)}|{Regex.Escape(loopVar)}\s*\+\+)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (start > end)
+        {
+            return false;
+        }
+
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+        int safety = 0;
+        for (int i = start; i <= end; i++)
+        {
+            builder.AppendLine(i.ToString());
+            safety++;
+            if (safety > 1000)
+            {
+                return false;
+            }
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return true;
+    }
+
+    private bool TryPredictEvenFibonacciOutput(string code, string injectedInput, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(injectedInput))
+        {
+            return false;
+        }
+
+        string[] tokens = injectedInput.Split(new[] { ' ', ',', '\n', '\r', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+        if (tokens.Length == 0 || !int.TryParse(tokens[0], out int n) || n < 0)
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"while\s*\(\s*count\s*<\s*n\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"count\s*\+\+", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"a\s*%\s*2\s*==\s*0|0\s*==\s*a\s*%\s*2", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"System\.out\.(?:println|print)\s*\(\s*a\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        long a = 0;
+        long b = 1;
+        int count = 0;
+        int safety = 0;
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+        while (count < n)
+        {
+            if (a % 2 == 0)
+            {
+                builder.AppendLine(a.ToString());
+            }
+
+            long next = a + b;
+            a = b;
+            b = next;
+            count++;
+
+            safety++;
+            if (safety > 10000)
+            {
+                return false;
+            }
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return true;
+    }
+
+    private bool TryPredictArrayIndexOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        Match arrayMatch = Regex.Match(
+            code,
+            @"(?:int|long|float|double)\s*\[\s*\]\s*(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*(?<vals>[^}]*)\}\s*;",
+            RegexOptions.Singleline);
+
+        if (!arrayMatch.Success)
+        {
+            return false;
+        }
+
+        string arrayName = arrayMatch.Groups["name"].Value;
+        string[] rawValues = arrayMatch.Groups["vals"].Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        if (rawValues.Length == 0)
+        {
+            return false;
+        }
+
+        List<string> values = new List<string>();
+        for (int i = 0; i < rawValues.Length; i++)
+        {
+            string valueText = rawValues[i].Trim();
+            if (string.IsNullOrWhiteSpace(valueText))
+            {
+                return false;
+            }
+            values.Add(valueText);
+        }
+
+        MatchCollection printMatches = Regex.Matches(
+            code,
+            $@"System\.out\.(?:println|print)\s*\(\s*{Regex.Escape(arrayName)}\s*\[\s*(?<idx>\d+)\s*\]\s*\)",
+            RegexOptions.Singleline);
+
+        if (printMatches.Count == 0)
+        {
+            return false;
+        }
+
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+        for (int i = 0; i < printMatches.Count; i++)
+        {
+            Match printMatch = printMatches[i];
+            if (!int.TryParse(printMatch.Groups["idx"].Value, out int index))
+            {
+                return false;
+            }
+
+            if (index < 0 || index >= values.Count)
+            {
+                return false;
+            }
+
+            builder.AppendLine(values[index]);
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return !string.IsNullOrWhiteSpace(predictedOutput);
+    }
+
+    private bool TryPredictPassingAverageOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        Match arrayMatch = Regex.Match(
+            code,
+            @"(?:int|long|float|double)\s*\[\s*\]\s*(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*(?<vals>[^}]*)\}\s*;",
+            RegexOptions.Singleline);
+
+        if (!arrayMatch.Success)
+        {
+            return false;
+        }
+
+        string arrayName = arrayMatch.Groups["name"].Value;
+        string[] rawValues = arrayMatch.Groups["vals"].Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+        if (rawValues.Length == 0)
+        {
+            return false;
+        }
+
+        List<int> grades = new List<int>();
+        for (int i = 0; i < rawValues.Length; i++)
+        {
+            string valueText = rawValues[i].Trim();
+            if (!int.TryParse(valueText, out int gradeValue))
+            {
+                return false;
+            }
+
+            grades.Add(gradeValue);
+        }
+
+        if (!Regex.IsMatch(code, @"\bfor\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, $@"\bif\s*\(\s*{Regex.Escape(arrayName)}\s*\[", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        int threshold = 75;
+        Match thresholdMatch = Regex.Match(
+            code,
+            $@"{Regex.Escape(arrayName)}\s*\[[^\]]+\]\s*>=\s*(?<t>\d+)",
+            RegexOptions.Singleline);
+        if (thresholdMatch.Success)
+        {
+            int.TryParse(thresholdMatch.Groups["t"].Value, out threshold);
+        }
+
+        int sum = 0;
+        int passingCount = 0;
+        for (int i = 0; i < grades.Count; i++)
+        {
+            if (grades[i] >= threshold)
+            {
+                sum += grades[i];
+                passingCount++;
+            }
+        }
+
+        if (passingCount == 0)
+        {
+            return false;
+        }
+
+        int average = sum / passingCount;
+        predictedOutput = average.ToString();
+        return true;
+    }
+
+    private bool TryPredictStringMidpointOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        Match messageMatch = Regex.Match(
+            code,
+            @"\bString\s+(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*\""(?<text>(?:[^\""\\]|\\.)*)\""\s*;",
+            RegexOptions.Singleline);
+
+        if (!messageMatch.Success)
+        {
+            return false;
+        }
+
+        string messageName = messageMatch.Groups["name"].Value;
+        string messageText = Regex.Unescape(messageMatch.Groups["text"].Value);
+
+        if (string.IsNullOrEmpty(messageText))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, $@"{Regex.Escape(messageName)}\s*\.\s*length\s*\(\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, $@"{Regex.Escape(messageName)}\s*\.\s*charAt\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        int midpoint = messageText.Length / 2;
+        predictedOutput = messageText[midpoint].ToString();
+        return true;
+    }
+
+    private bool TryPredictStringExtensionOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        // Extract: String[] files = {"System.dll", "Data.txt", ...};
+        Match arrayMatch = Regex.Match(
+            code,
+            @"String\s*\[\s*\]\s*(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*(?<elements>[^}]*)\s*\}\s*;",
+            RegexOptions.Singleline);
+
+        if (!arrayMatch.Success)
+        {
+            return false;
+        }
+
+        string arrayName = arrayMatch.Groups["name"].Value;
+        string elementsText = arrayMatch.Groups["elements"].Value;
+
+        // Parse individual strings from the array
+        List<string> fileNames = new List<string>();
+        MatchCollection stringMatches = Regex.Matches(
+            elementsText,
+            @"\""(?<text>(?:[^\""\\]|\\.)*)\""",
+            RegexOptions.Singleline);
+
+        foreach (Match stringMatch in stringMatches)
+        {
+            string fileText = Regex.Unescape(stringMatch.Groups["text"].Value);
+            fileNames.Add(fileText);
+        }
+
+        if (fileNames.Count == 0)
+        {
+            return false;
+        }
+
+        // Validate required patterns: for, if, indexOf, substring, length
+        if (!Regex.IsMatch(code, @"\bfor\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\bif\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\.indexOf\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\.substring\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\.length\s*\(\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        // Extract extensions for files with length > 8
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+        foreach (string fileName in fileNames)
+        {
+            if (fileName.Length > 8)
+            {
+                int dotIndex = fileName.IndexOf('.');
+                if (dotIndex >= 0)
+                {
+                    string extension = fileName.Substring(dotIndex);
+                    builder.AppendLine(extension);
+                }
+            }
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return !string.IsNullOrWhiteSpace(predictedOutput);
+    }
+
+    private bool TryPredictEncodedInstructionsOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        // Extract: String[] logs = {"ADD:10,5", "SKIP:9,9", "MUL:4,3"};
+        Match arrayMatch = Regex.Match(
+            code,
+            @"String\s*\[\s*\]\s*(?<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*\{\s*(?<elements>[^}]*)\s*\}\s*;",
+            RegexOptions.Singleline);
+
+        if (!arrayMatch.Success)
+        {
+            return false;
+        }
+
+        string arrayName = arrayMatch.Groups["name"].Value;
+        string elementsText = arrayMatch.Groups["elements"].Value;
+
+        // Parse individual instruction strings from the array
+        List<string> instructions = new List<string>();
+        MatchCollection stringMatches = Regex.Matches(
+            elementsText,
+            @"\""(?<text>(?:[^""\\]|\\.)*)\""",
+            RegexOptions.Singleline);
+
+        foreach (Match stringMatch in stringMatches)
+        {
+            string instrText = Regex.Unescape(stringMatch.Groups["text"].Value);
+            instructions.Add(instrText);
+        }
+
+        if (instructions.Count == 0)
+        {
+            return false;
+        }
+
+        // Validate required patterns: for, if, switch, substring, parseInt
+        if (!Regex.IsMatch(code, @"\bfor\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\bif\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\bswitch\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\.substring\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"Integer\.parseInt\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\badd\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"\bmultiply\s*\(", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        // Process instructions
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+        foreach (string instruction in instructions)
+        {
+            // Skip instructions starting with "SKIP"
+            if (instruction.StartsWith("SKIP", System.StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            // Parse: "ADD:10,5" or "MUL:4,3"
+            int colonIndex = instruction.IndexOf(':');
+            if (colonIndex < 0)
+            {
+                continue;
+            }
+
+            string op = instruction.Substring(0, colonIndex).ToUpper();
+            string numbersPart = instruction.Substring(colonIndex + 1);
+
+            // Extract numbers: "10,5" → 10 and 5
+            string[] numberTokens = numbersPart.Split(',');
+            if (numberTokens.Length < 2)
+            {
+                continue;
+            }
+
+            if (!int.TryParse(numberTokens[0].Trim(), out int num1) ||
+                !int.TryParse(numberTokens[1].Trim(), out int num2))
+            {
+                continue;
+            }
+
+            // Execute operation
+            int result = 0;
+            if (op == "ADD")
+            {
+                result = num1 + num2;
+            }
+            else if (op == "MUL")
+            {
+                result = num1 * num2;
+            }
+            else
+            {
+                continue;
+            }
+
+            builder.AppendLine(result.ToString());
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return !string.IsNullOrWhiteSpace(predictedOutput);
+    }
+
+    private bool TryPredictNestedStarTriangleOutput(string code, out string predictedOutput)
+    {
+        predictedOutput = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return false;
+        }
+
+        Match outerLoopMatch = Regex.Match(
+            code,
+            @"for\s*\(\s*(?:int\s+)?(?<outer>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?<outerStart>-?\d+)\s*;\s*(?<outerCondVar>[A-Za-z_][A-Za-z0-9_]*)\s*<=\s*(?<outerEnd>-?\d+)\s*;\s*(?<outerStepVar>[A-Za-z_][A-Za-z0-9_]*)\s*\+\+\s*\)",
+            RegexOptions.Singleline);
+
+        if (!outerLoopMatch.Success)
+        {
+            return false;
+        }
+
+        string outerVar = outerLoopMatch.Groups["outer"].Value;
+        string outerCondVar = outerLoopMatch.Groups["outerCondVar"].Value;
+        string outerStepVar = outerLoopMatch.Groups["outerStepVar"].Value;
+        if (!outerVar.Equals(outerCondVar, System.StringComparison.Ordinal) || !outerVar.Equals(outerStepVar, System.StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(outerLoopMatch.Groups["outerStart"].Value, out int outerStart) ||
+            !int.TryParse(outerLoopMatch.Groups["outerEnd"].Value, out int outerEnd))
+        {
+            return false;
+        }
+
+        if (outerStart > outerEnd)
+        {
+            return false;
+        }
+
+        Match innerLoopMatch = Regex.Match(
+            code,
+            $@"for\s*\(\s*(?:int\s+)?(?<inner>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?<innerStart>-?\d+)\s*;\s*(?<innerCondVar>[A-Za-z_][A-Za-z0-9_]*)\s*<=\s*{Regex.Escape(outerVar)}\s*;\s*(?<innerStepVar>[A-Za-z_][A-Za-z0-9_]*)\s*\+\+\s*\)",
+            RegexOptions.Singleline);
+
+        if (!innerLoopMatch.Success)
+        {
+            return false;
+        }
+
+        string innerVar = innerLoopMatch.Groups["inner"].Value;
+        string innerCondVar = innerLoopMatch.Groups["innerCondVar"].Value;
+        string innerStepVar = innerLoopMatch.Groups["innerStepVar"].Value;
+        if (!innerVar.Equals(innerCondVar, System.StringComparison.Ordinal) || !innerVar.Equals(innerStepVar, System.StringComparison.Ordinal))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(innerLoopMatch.Groups["innerStart"].Value, out int innerStart))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"System\.out\.(?:print|println)\s*\(\s*""\*""\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        if (!Regex.IsMatch(code, @"System\.out\.println\s*\(\s*\)", RegexOptions.Singleline))
+        {
+            return false;
+        }
+
+        System.Text.StringBuilder builder = new System.Text.StringBuilder();
+        int safety = 0;
+
+        for (int row = outerStart; row <= outerEnd; row++)
+        {
+            int starCount = row - innerStart + 1;
+            if (starCount < 0)
+            {
+                return false;
+            }
+
+            builder.AppendLine(new string('*', starCount));
+            safety++;
+            if (safety > 200)
+            {
+                return false;
+            }
+        }
+
+        predictedOutput = builder.ToString().TrimEnd();
+        return !string.IsNullOrWhiteSpace(predictedOutput);
     }
 
     private string EvaluateSingleExpression(string expr, string code, string injectedInput)

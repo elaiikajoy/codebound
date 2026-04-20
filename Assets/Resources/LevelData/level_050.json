@@ -1,51 +1,45 @@
 {
     "levelNumber": 50,
-    "levelName": "Level 50: Switch Boss - Grade Descriptor",
+    "levelName": "Level 50: The Switch Labyrinth",
     "category": "Conditionals",
     "difficulty": 5,
-    "puzzleDescription": "The final test for Switch Statements! Convert a letter grade (A, B, C, F) into a performance description.",
-    "objective": "Input a grade (A, B, C, or F). Print 'Excellent' for A, 'Good' for B, 'Average' for C, and 'Fail' for F. For any other character, print 'Invalid Grade'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        char grade = sc.next().charAt(0);\n        \n        // Final Switch Logic below:\n        \n    }\n}",
-    "expectedOutput": "Excellent",
+    "puzzleDescription": "The Switch Controller is malfunctioning! You must output the correct descriptions, but the 'break' key is partially broken. You are only allowed to use exactly TWO 'break' statements to handle all 4 passing grades (A, B, C, D) and one 'default' case.",
+    "objective": "Input a grade (A, B, C, D, or F). Use fall-through logic to print 'Passing' for A, B, C, and D. Print 'Fail' for F, and 'Invalid' for anything else. Constraint: Use minimal breaks.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        char grade = sc.next().toUpperCase().charAt(0);\n        \n        // Solve the labyrinth using fall-through logic:\n        switch(grade) {\n            \n        }\n    }\n}",
+    "expectedOutput": "Passing",
     "hints": [
-        "Use 'switch(grade) { ... }'.",
-        "Remember to use single quotes for char cases: case 'A':",
-        "Include a 'default:' case to handle 'Invalid Grade' for letters not in the list.",
-        "Don't forget the 'break;' after each description!"
+        "If you stack cases (e.g., case 'A': case 'B':), they will all execute the same next line of code. This is 'fall-through'.",
+        "You only need one 'System.out.println(\"Passing\");' to cover four different letters.",
+        "The 'default' case handles anything that isn't A, B, C, D, or F."
     ],
     "testCases": [
         {
-            "input": "A",
-            "output": "Excellent"
+            "input": "B",
+            "output": "Passing"
         },
         {
-            "input": "C",
-            "output": "Average"
+            "input": "F",
+            "output": "Fail"
         },
         {
-            "input": "Z",
-            "output": "Invalid Grade"
+            "input": "X",
+            "output": "Invalid"
         }
     ],
     "requiredKeywords": [
         "switch",
         "case",
-        "break",
-        "default"
+        "default",
+        "break"
     ],
     "forbiddenKeywords": [
         "if",
         "else"
     ],
-    "baseTokenReward": 350,
-    "perfectBonus": 100,
-    "speedBonus": 50,
-    "unlockedAchievements": ["Condition Grandmaster"],
-    "sceneName": "GameScene_Template",
-    "requiredMechanics": [
-        "terminal"
-    ],
-    "tokensToCollect": 5,
-    "isLocked": true,
-    "requiredLevel": 49
+    "baseTokenReward": 500,
+    "perfectBonus": 150,
+    "unlockedAchievements": [
+        "Logic Architect",
+        "Efficiency Expert"
+    ]
 }

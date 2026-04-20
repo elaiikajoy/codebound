@@ -1,40 +1,46 @@
 {
     "levelNumber": 100,
-    "levelName": "Level 100: Final Boss - The Menu System",
-    "category": "Methods",
+    "levelName": "Level 100: The Architect's Terminal",
+    "category": "Capstone",
     "difficulty": 10,
-    "puzzleDescription": "Create a simple calculator menu. Call the correct method based on the 'choice' variable (1 for Add, 2 for Multiply).",
-    "objective": "Use a switch statement inside main to call add(a, b) or multiply(a, b) based on the given 'choice'.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int choice = 1; // 1 = Add, 2 = Multiply\n        int x = 10, y = 5;\n        \n        // Write a switch statement to call the methods:\n        \n    }\n\n    public static void add(int a, int b) {\n        System.out.println(a + b);\n    }\n\n    public static void multiply(int a, int b) {\n        System.out.println(a * b);\n    }\n}",
-    "expectedOutput": "15",
+    "puzzleDescription": "The system core is offline! To reboot it, you must process an array of 'Encoded Instructions'. Each instruction is a String formatted as 'OP:VAL1,VAL2' (e.g., 'ADD:10,5'). You must loop through the array, extract the numbers, and call the corresponding method. Constraint: If an instruction starts with 'SKIP', do not process it.",
+    "objective": "Iterate through the 'logs' array. For each valid string, use .substring() and .indexOf() to get the operator and numbers. Use a switch statement to call the add() or multiply() methods. Print the results.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // 7. Arrays & 8. Strings\n        String[] logs = {\"ADD:10,5\", \"SKIP:9,9\", \"MUL:4,3\"};\n        \n        // 6. Loops\n        for (int i = 0; i < logs.length; i++) {\n            // 4. Conditions\n            if (logs[i].startsWith(\"SKIP\")) continue;\n\n            // Logic to parse 'ADD' or 'MUL' and the integers x and y\n            // 5. Switch to call 9. Methods\n        }\n    }\n\n    public static void add(int a, int b) {\n        System.out.println(a + b); // 1. Output\n    }\n\n    public static void multiply(int a, int b) {\n        System.out.println(a * b);\n    }\n}",
+    "expectedOutput": "15\n12",
     "hints": [
-        "Use 'switch(choice)' to decide which method to call.",
-        "For 'case 1:', call 'add(x, y);'. Don't forget the 'break;'.",
-        "For 'case 2:', call 'multiply(x, y);'.",
-        "This structure is the foundation of every interactive terminal application."
+        "Use logs[i].substring(0, 3) to get 'ADD' or 'MUL'.",
+        "Use Integer.parseInt() to convert the extracted substrings into actual 2. Variables (int).",
+        "The command 'ADD:10,5' means a=10 and b=5.",
+        "This level combines every single skill you have unlocked in CodeBound!"
     ],
     "testCases": [
         {
             "input": "",
-            "output": "15"
+            "output": "15\n12"
         }
     ],
     "requiredKeywords": [
+        "for",
+        "if",
         "switch",
-        "case 1",
-        "add(",
-        "break"
+        "substring",
+        "add",
+        "multiply",
+        "static void"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(15)"
-    ],
+    "forbiddenKeywords": [],
     "baseTokenReward": 1000,
-    "perfectBonus": 200,
-    "speedBonus": 100,
-    "unlockedAchievements": ["Logic Legend", "Capstone Ready"],
-    "sceneName": "GameScene_Template",
+    "perfectBonus": 500,
+    "speedBonus": 200,
+    "unlockedAchievements": [
+        "Logic Legend",
+        "CodeBound Architect",
+        "Capstone Ready"
+    ],
+    "sceneName": "GameScene_FinalBoss",
     "requiredMechanics": [
-        "terminal"
+        "terminal",
+        "system_reboot"
     ],
     "tokensToCollect": 10,
     "isLocked": true,

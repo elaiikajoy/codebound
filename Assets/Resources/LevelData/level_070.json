@@ -1,40 +1,41 @@
 {
     "levelNumber": 70,
-    "levelName": "Level 70: While Loop Boss - Fibonacci Sequence",
+    "levelName": "Level 70: While Loop Boss - Fibonacci Filter",
     "category": "Loops",
-    "difficulty": 7,
-    "puzzleDescription": "The final While Loop challenge! Generate the Fibonacci sequence up to a certain number of terms. Each number is the sum of the two preceding ones (0, 1, 1, 2, 3, 5...).",
-    "objective": "Input a number N and print the first N terms of the Fibonacci sequence, starting with 0 and 1.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int first = 0, second = 1, count = 0;\n        \n        // Write your Fibonacci logic using a while loop below:\n        \n    }\n}",
-    "expectedOutput": "0\n1\n1\n2\n3",
+    "difficulty": 8,
+    "puzzleDescription": "The final While Loop challenge! You must calculate the Fibonacci sequence for N terms, but the display terminal is glitched and only accepts EVEN numbers. If a calculated number is odd, skip the print but continue the sequence logic.",
+    "objective": "Input a number N. Print only the EVEN numbers found within the first N terms of the Fibonacci sequence (starting 0, 1).",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int a = 0, b = 1, count = 0;\n        \n        // Write your filtered Fibonacci logic below:\n        while (count < n) {\n            \n        }\n    }\n}",
+    "expectedOutput": "0\n2\n8",
     "hints": [
-        "The loop condition should be 'while (count < n)'.",
-        "Inside the loop: 1. Print 'first'. 2. Calculate 'next = first + second'. 3. Update 'first = second'. 4. Update 'second = next'. 5. Increment 'count++'.",
-        "This is called 'variable swapping' or 'sliding window' logic."
+        "Use 'if (a % 2 == 0)' to filter for even numbers.",
+        "The Fibonacci update logic (next = a + b) must happen every loop, regardless of the 'if' condition.",
+        "Remember: count++ must run every iteration so the loop eventually stops at N."
     ],
     "testCases": [
         {
-            "input": "5",
-            "output": "0\n1\n1\n2\n3"
+            "input": "7",
+            "output": "0\n2\n8"
         },
         {
-            "input": "3",
-            "output": "0\n1\n1"
+            "input": "4",
+            "output": "0\n2"
         }
     ],
     "requiredKeywords": [
         "while",
-        "count <",
-        "first + second",
+        "if",
+        "%",
+        "==",
         "count++"
     ],
-    "forbiddenKeywords": [
-        "for"
-    ],
-    "baseTokenReward": 450,
+    "forbiddenKeywords": [],
+    "baseTokenReward": 250,
     "perfectBonus": 100,
     "speedBonus": 50,
-    "unlockedAchievements": ["While Loop Grandmaster"],
+    "unlockedAchievements": [
+        "While Loop Grandmaster"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
