@@ -1,41 +1,82 @@
 {
     "levelNumber": 27,
-    "levelName": "Level 27: Practical Arithmetic - Area Calculation",
+    "levelName": "Level 27: Geometry & Budget Logic",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Apply your multiplication skills to calculate the area of a rectangle (Length × Width).",
-    "objective": "Input numeric values for length and width (int or double) and calculate the area.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
-    "hints": [
-        "Use sc.nextInt() or sc.nextDouble() twice depending on whether you want whole numbers or decimals.",
-        "Multiply the length by the width to get the area.",
-        "Example: double area = length * width;"
-    ],
-    "testCases": [
+    "difficulty": 3,
+    "puzzleDescription": "Calculate the area of a room and determine if the total flooring cost is within a $500 budget.",
+    "objective": "1. Create prompts 'Length: ' and 'Width: ' in the console, then input a double value for each.\n2. Calculate the length * width area.\n3. Calculate cost (area * $15.0 per sq meter).\n4. Create a boolean 'isAffordable' checking if cost <= 1000.\n5. Print Area, Total Cost, and the boolean.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Input Length and Width\n        \n        // 2. Calculate Area (L * W)\n        \n        // 3. Calculate Cost (Area * 15.0)\n        \n        // 4. Boolean Check: Is cost <= 500?\n        \n        // 5. Print results\n    }\n}",
+    "outputMode": "geometry-budget",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "",
-            "output": ""
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "countCall",
+            "value": "nextDouble",
+            "count": 2
+        },
+        {
+            "type": "containsOperator",
+            "value": "*",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "<=",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "double",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "boolean",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Length: "
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Width: "
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Area: "
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Total Cost: "
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Affordable: "
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "*",
-        "System.out.println"
+    "forbiddenAstRules": [],
+    "hints": [
+        "Area = length * width.",
+        "Total Cost = area * 15.0.",
+        "To check affordability, use: boolean isAffordable = cost <= 500;"
     ],
-    "requiredCodePattern": "(?s).*sc\\.(?:nextInt|nextDouble)\\s*\\(\\s*\\)\\s*;.*sc\\.(?:nextInt|nextDouble)\\s*\\(\\s*\\)\\s*;.*",
-    "forbiddenKeywords": [
-        "System.out.println(50)"
+    "baseTokenReward": 300,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Master Architect"
     ],
-    "baseTokenReward": 180,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 26
 }

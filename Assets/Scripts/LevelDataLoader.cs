@@ -10,12 +10,19 @@
 using UnityEngine;
 
 [System.Serializable]
+public class TerminalAstRule
+{
+    public string type;
+    public string value;
+    public int count = 1;
+}
+
+[System.Serializable]
 public class LevelTestCase
 {
     public string input;
     public string output; // Compatible with existing JSON data using "output"
     public string expectedOutput; // Compatible with JSON data using "expectedOutput"
-    public string[] requiredKeywords;
 }
 
 [System.Serializable]
@@ -29,13 +36,16 @@ public class LevelData
     public string objective;
     public string expectedOutput;
     public string expectedOutputPattern;
-    public int requiredPrintlnCount;
-    public string requiredCodePattern;
     public string starterCode;
     public string[] hints;
     public LevelTestCase[] testCases;
+    public TerminalAstRule[] requiredAstRules;
+    public TerminalAstRule[] forbiddenAstRules;
     public string[] requiredKeywords;
     public string[] forbiddenKeywords;
+    public int requiredPrintlnCount;
+    public string requiredCodePattern;
+    public string outputMode;
     public string[] unlockedAchievements;
     public string[] requiredMechanics;
     public int baseTokenReward;

@@ -1,41 +1,75 @@
 {
     "levelNumber": 30,
-    "levelName": "Level 30: Time Conversion - Modulo Operator",
+    "levelName": "Level 30: The Chronos Engine",
     "category": "Basics",
     "difficulty": 3,
-    "puzzleDescription": "Learn how to use division (/) to get hours and the modulo operator (%) to get the remaining minutes from a total number of minutes.",
-    "objective": "Convert the value of 130 into hours and remaining minutes.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
-    "hints": [
-        "Divide the total minutes by 60 to get the hours (int hours = total / 60;).",
-        "Use the % operator to get the leftover minutes (int mins = total % 60;).",
-        "Print it in this format: hours + \" hours and \" + mins + \" minutes\""
-    ],
-    "testCases": [
+    "puzzleDescription": "As a Cyber-Engineer, you must convert raw seconds into a readable [HH:MM:SS] format. Use nested math logic to breakdown time into three components.",
+    "objective": "1. Create a prompt 'Raw Seconds: ' in the console then an integer value must be input. \n2. Calculate hours (seconds / 3600), remaining minutes ((seconds % 3600) / 60) and remaining seconds (seconds % 60).\n3. Print 'System Time: [H]h [M]m [S]s' for the converted time.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Capture total raw seconds\n        int seconds = sc.nextInt();\n        // 2. Math breakdown: Hours, Minutes, and remaining Seconds\n        // 3. Print the formatted System Time\n    }\n}",
+    "outputMode": "chronos-engine",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "130",
-            "output": "2 hours and 10 minutes"
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "countCall",
+            "value": "nextInt",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "int",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "/",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "%",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "3600"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "60"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Raw Seconds:"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "System Time:"
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "/",
-        "%",
-        "System.out.println"
+    "forbiddenAstRules": [],
+    "hints": [
+        "1 Hour = 3600 seconds. Use '/' to get the whole hours.",
+        "To get minutes from what's left, use (seconds % 3600) / 60.",
+        "To get the final remaining seconds, use (seconds % 60).",
+        "Concatenate carefully to match the 'h m s' format."
     ],
-    "forbiddenKeywords": [
-        "2 hours and 10 minutes"
+    "baseTokenReward": 500,
+    "perfectBonus": 200,
+    "speedBonus": 100,
+    "unlockedAchievements": [
+        "Time Lord",
+        "Basics Graduate"
     ],
-    "baseTokenReward": 250,
-    "perfectBonus": 100,
-    "speedBonus": 50,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 10,
     "isLocked": true,
     "requiredLevel": 29
 }

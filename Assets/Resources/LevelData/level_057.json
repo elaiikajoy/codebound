@@ -4,7 +4,7 @@
     "category": "Loops",
     "difficulty": 5,
     "puzzleDescription": "Calculate the factorial of a number N. Remember: Factorial is the product of all positive integers from 1 to N.",
-    "objective": "Input a number N and calculate its factorial (e.g., if N=5, 1*2*3*4*5 = 120).",
+    "objective": "Input a number and calculate its factorial (e.g., if N=5, 1*2*3*4*5 = 120).",
     "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int fact = 1; // Accumulator starts at 1\n        \n        // Write your loop to calculate factorial below:\n        \n        System.out.println(fact);\n    }\n}",
     "expectedOutput": "120",
     "hints": [

@@ -1,46 +1,36 @@
 {
     "levelNumber": 21,
-    "levelName": "Level 21: Interactive Input-Output Flow",
+    "levelName": "Level 21: The Data Injection Core",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how data travels from the terminal into a variable, and back to the screen using the 4-step Interactive Input-Output Flow.",
-    "objective": "Use the terminalInput Scanner to read a number, then print it out with the prefix 'Output: '.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        // --- STEP 1: Coding Phase ---\n        // Define an empty variable (box) to hold the future value\n        int playerValue;\n\n        // --- STEP 2: Execution Phase ---\n        // The program creates a Scanner to \"listen\" for user input\n        Scanner terminalInput = new Scanner(System.in);\n        System.out.println(\"Status: Waiting for Data Injection...\");\n\n        // --- STEP 3: Data Injection ---\n        // Type your answer below to inject the terminalInput into playerValue:\n        \n\n        // --- STEP 4: Result Phase ---\n        // Display playerValue back to the screen\n        \n    }\n}",
-    "expectedOutput": "",
+    "difficulty": 3,
+    "puzzleDescription": "Master the flow of data. You must capture an integer, then a double, and combine them in a final output. This mimics how real apps process user settings.",
+    "objective": "1. Use 'terminalInput' to read an integer and a double variable then put a value on each of them.\n2. Print them in the format: 'ID: (number) | Price: (decimal)'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner terminalInput = new Scanner(System.in);\n        System.out.println(\"Status: Waiting for Data Injection...\");\n        \n        // 1. Declare and read an int named 'id'\n        System.out.print(\"ID: \");\n        int id = terminalInput.nextInt();\n        \n        // 2. Declare and read a double named 'price'\n        System.out.print(\"Price: \");\n        double price = terminalInput.nextDouble();\n        \n        // 3. Print the result: \"ID: [id] | Price: [price]\"\n        System.out.println(\"ID: \" + id + \" | Price: \" + price);\n    }\n}",
+    "expectedOutputPattern": "",
     "hints": [
-        "Use 'playerValue = terminalInput.nextInt();' to capture the number.",
-        "Print the variable using 'System.out.println(\"Output: \" + playerValue);'"
+        "Order matters! If you call nextInt() but the user types a decimal, the program will crash (InputMismatchException).",
+        "Use 'terminalInput.nextInt()' for the ID and 'terminalInput.nextDouble()' for the Price.",
+        "Combine them with: \"ID: \" + id + \" | Price: \" + price"
     ],
-    "testCases": [
+    "requiredAstRules": [
         {
-            "input": "",
-            "output": "",
-            "expectedOutput": "",
-            "requiredKeywords": []
-        },
-        {
-            "input": "",
-            "output": "",
-            "expectedOutput": "",
-            "requiredKeywords": []
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
         }
     ],
-    "requiredKeywords": [
-        "terminalInput.nextInt()",
-        "System.out.println"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 220,
+    "perfectBonus": 80,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "Data Streamer"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(\"Output: 10\")"
-    ],
-    "baseTokenReward": 160,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 20
 }

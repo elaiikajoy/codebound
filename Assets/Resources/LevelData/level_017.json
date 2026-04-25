@@ -1,32 +1,36 @@
 {
     "levelNumber": 17,
-    "levelName": "Level 17: Basic Arithmetic - Multiplication",
+    "levelName": "Level 17: Float & Char Mechanics",
     "category": "Basics",
-    "difficulty": 1,
-    "puzzleDescription": "Learn how to use the '*' operator to multiply two numbers and display the product.",
-    "objective": "Create two numbers and print their product.",
+    "difficulty": 3,
+    "puzzleDescription": "Characters in Java have numeric values (ASCII). Learn how to multiply a float by a character's value and handle type precision.",
+    "objective": "1. Declare a char that has any letter value. 2. Declare a float set a value of 2.5f. 3. Calculate the product of the character's ASCII value and the float value. 4. Print the result.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
+    "expectedOutputPattern": "165.0",
     "hints": [
-        "Use the '*' symbol to multiply variables.",
-        "Example: int result = a * b;",
-        "You can use either 'int' or 'double' for the numbers."
+        "In Java, 'char' can be used in math equations; it uses its ASCII value (A=65, B=66, etc.).",
+        "Floats MUST have an 'f' at the end (e.g., 2.5f). Without it, Java thinks it is a double.",
+        "When you multiply a char by a float, the result becomes a float."
     ],
-    "testCases": [],
     "requiredKeywords": [
+        "char",
+        "float",
+        "2.5f",
         "*",
-        "System.out.println"
+        "System.out.println()"
     ],
     "forbiddenKeywords": [],
-    "baseTokenReward": 140,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "baseTokenReward": 200,
+    "perfectBonus": 80,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "ASCII Alchemist"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 16
 }

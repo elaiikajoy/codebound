@@ -1,28 +1,30 @@
 {
     "levelNumber": 14,
-    "levelName": "Level 14: Variables Pt 13",
+    "levelName": "Level 14: The Security Gate",
     "category": "Basics",
-    "difficulty": 1,
-    "puzzleDescription": "Learn how to use the 'boolean' data type to store values that can only be either 'true' or 'false'.",
-    "objective": "Create a boolean variable called `isStudent` and print its value.",
+    "difficulty": 2,
+    "puzzleDescription": "Booleans are often the result of a comparison. Use logic to determine if a user is allowed entry.",
+    "objective": "1. Declare an int variable that holds the value of your age.\n2. Then, declare a boolean that checks if age is greater than or equal to 18.\n3. Print the result.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
     "expectedOutput": "",
     "hints": [
-        "Use the 'boolean' keyword for true or false values.",
-        "Assign the value 'true' or 'false' to the variable.",
-        "Example: boolean isJavaFun = true;"
+        "You can assign a comparison to a boolean",
+        "The operator >= checks for 'greater than or equal to'"
     ],
     "testCases": [],
     "requiredKeywords": [
-        "boolean isStudent",
-        "isStudent =",
-        "System.out.println(isStudent);"
+        "int",
+        "boolean",
+        "System.out.print;",
+        ">="
     ],
     "forbiddenKeywords": [],
-    "baseTokenReward": 120,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "baseTokenReward": 160,
+    "perfectBonus": 60,
+    "speedBonus": 30,
+    "unlockedAchievements": [
+        "Logic Gatekeeper"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

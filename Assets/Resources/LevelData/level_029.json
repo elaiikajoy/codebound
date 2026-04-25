@@ -1,45 +1,101 @@
 {
     "levelNumber": 29,
-    "levelName": "Level 29: Practical Arithmetic - Temp Conversion",
+    "levelName": "Level 29: Logical Range & Conversion",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to convert temperature from Celsius to Fahrenheit using the formula: (Celsius * 9/5) + 32.",
-    "objective": "Convert Celsius input into Fahrenheit.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
-    "hints": [
-        "Use 'sc.nextDouble()' to get the Celsius value.",
-        "Multiply Celsius by 1.8 (or 9/5) and then add 32.",
-        "Store the result in a double variable for precision."
-    ],
-    "testCases": [
+    "difficulty": 3,
+    "puzzleDescription": "Convert Celsius to Fahrenheit and determine if the weather is 'Extreme'. Weather is extreme if it is below 32°F or above 100°F.",
+    "objective": "1. Print a prompt 'Celsius: ' in the console then create a sc.NextDouble(); for a double value to be input.\n2. Convert the celsius to Fahrenheit (celsius * 1.8) then add 32.\n3. Print the text 'Fahrenheit: ' with the calculated fahrenheit value.\n4. Use a boolean 'isExtreme' to check if fahrenheit is less than 32 or greater than 100. \n5. Print the text 'Extreme: ' with the boolean value.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Capture Celsius input\n        \n        // 2. Convert to Fahrenheit using 1.8 instead of 9/5 for precision\n        \n        // 3. Logic check: is it < 32 or > 100? (Use || operator)\n        \n        // 4. Print results\n    }\n}",
+    "outputMode": "celsius-conversion",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "",
-            "output": ""
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
         },
         {
-            "input": "",
-            "output": ""
+            "type": "countCall",
+            "value": "nextDouble",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "double",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "boolean",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "*",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "+",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "||",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "<",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": ">",
+            "count": 1
+        },
+        {
+            "type": "containsIdentifier",
+            "value": "isExtreme"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "1.8"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "32"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Celsius:"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Fahrenheit:"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Extreme:"
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "nextDouble()",
-        "32",
-        "*"
+    "forbiddenAstRules": [],
+    "hints": [
+        "In Java, (9/5) is 1 (integer division). Use 1.8 or 9.0/5.0 to get decimals.",
+        "The Logical OR operator is '||'.",
+        "Example: boolean extreme = (f < 32) || (f > 100);"
     ],
-    "forbiddenKeywords": [
-        "212.0"
+    "baseTokenReward": 300,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Climate Scientist"
     ],
-    "baseTokenReward": 200,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 28
 }

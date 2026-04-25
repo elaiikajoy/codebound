@@ -1,28 +1,33 @@
 {
     "levelNumber": 12,
-    "levelName": "Level 12: Variables Pt 11",
+    "levelName": "Level 12: The Cashier's Math",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Learn how to use the 'double' data type to store and display decimal numbers (floating-point values).",
-    "objective": "Declare a `double` variable called `price` and print it.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
+    "puzzleDescription": "Learn how decimals behave differently from whole numbers. If you use 'int' for prices, you lose the cents!",
+    "objective": "1. Declare a double variable for original price at 19.99.\n2. Add a 5.50 for tax.\n3. Print the total sum.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n       // Type your answer below:        \n    }\n}",
+    "expectedOutput": "25.49",
     "hints": [
-        "Use the 'double' keyword for numbers with decimals.",
-        "Assign a decimal value (e.g., 19.99) to your variable.",
-        "Use System.out.println(price); to see the output."
+        "Integers (int) round down and drop decimals. Doubles keep them.",
+        "You can add two double variables just like integers: var1 + var2.",
+        "The final output should be 19.99 + 5.50 = 25.49."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "double price",
-        "price =",
-        "System.out.println(price);"
+        "double",
+        "System.out.print",
+        "+",
+        "="
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 120,
+    "forbiddenKeywords": [
+        "int"
+    ],
+    "baseTokenReward": 150,
     "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "speedBonus": 30,
+    "unlockedAchievements": [
+        "Penny Pincher"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

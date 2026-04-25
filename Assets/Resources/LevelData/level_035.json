@@ -1,46 +1,60 @@
 {
     "levelNumber": 35,
-    "levelName": "Level 35: Conditionals - Divisibility Check",
+    "levelName": "Level 35: Divisibility Mastery",
     "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Learn how to check if a number is divisible by 5 (i.e., when divided by 5, the remainder is 0).",
-    "objective": "Check if a number is divisible by 5. Print 'Divisible' if it is, otherwise print 'Not divisible'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your logic below:\n        \n    }\n}",
-    "expectedOutput": "Divisible",
+    "puzzleDescription": "Determine if a batch of items can be perfectly packed into boxes of 5. If there is a remainder, the batch is considered 'Incomplete'.",
+    "objective": "1. Prompt a Enter item count: and put an integer value on it.\n2. Check if it is divisible by 5 using '%'.\n3. Print 'Status: Perfect Match' if divisible, otherwise print 'Status: Incomplete'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Enter item count: \");\n        int num = sc.nextInt();\n\n        // Write your divisibility logic below:\n\n    }\n}",
+    "expectedOutputPattern": "^Enter item count: .*\\nStatus: (Perfect Match|Incomplete)$",
     "hints": [
-        "Use the modulo operator: 'num % 5 == 0' checks if there is no remainder.",
-        "Use an if-else structure to handle both outcomes.",
-        "Print exactly 'Divisible' or 'Not divisible' (case sensitive)."
+        "Divisibility means the remainder is zero: num % 5 == 0.",
+        "The modulo operator (%) is your best friend for 'perfect fit' logic.",
+        "Case sensitivity matters! Ensure your output starts with 'Status: '."
     ],
-    "testCases": [
+    "requiredAstRules": [
         {
-            "input": "25",
-            "output": "Divisible"
+            "type": "containsNode",
+            "value": "scanner"
         },
         {
-            "input": "12",
-            "output": "Not divisible"
+            "type": "countCall",
+            "value": "nextInt",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if"
+        },
+        {
+            "type": "containsNode",
+            "value": "else"
+        },
+        {
+            "type": "containsOperator",
+            "value": "%"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: Perfect Match"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: Incomplete"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "else",
-        "%",
-        "=="
+    "forbiddenAstRules": [],
+    "baseTokenReward": 250,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Efficiency Expert"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(\"Divisible\")",
-        "System.out.println(\"Not divisible\")"
-    ],
-    "baseTokenReward": 220,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 34
 }

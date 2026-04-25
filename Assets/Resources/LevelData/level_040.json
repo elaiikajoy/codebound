@@ -1,42 +1,66 @@
 {
     "levelNumber": 40,
-    "levelName": "Level 40: Conditionals - Final Exam",
+    "levelName": "Level 40: Nested Logic Gatekeeper",
     "category": "Conditionals",
-    "difficulty": 4,
-    "puzzleDescription": "The final test for conditionals! Determine if a student passed or failed based on the standard passing mark of 75.",
-    "objective": "Print 'Pass' if the grade is 75 or higher, otherwise print 'Fail'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int grade = sc.nextInt();\n        \n        // Write your final if-else logic here:\n        \n    }\n}",
-    "expectedOutput": "Pass",
-    "hints": [
-        "Use 'if (grade >= 75)' to check the passing condition.",
-        "The 'else' block should handle any grade below 75.",
-        "Make sure to capitalize 'Pass' and 'Fail' exactly as requested."
-    ],
-    "testCases": [
+    "difficulty": 9,
+    "puzzleDescription": "Combine everything! Use nested if-else statements to validate age first, then evaluate income and membership status using logical operators.",
+    "objective": "1. Prompt 'Enter Age: ', 'Enter Income: ', and 'Is VIP (true/false): '.\n2. If age < 18, print 'Status: Access Denied'.\n3. If 18+, evaluate: Income >= 50000 && VIP -> 'Status: Gold', Income >= 50000 && !VIP -> 'Status: Silver', others -> 'Status: Standard'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        \n        System.out.print(\"Enter Age: \");\n        int age = sc.nextInt();\n        System.out.print(\"Enter Income: \");\n        double income = sc.nextDouble();\n        System.out.print(\"Is VIP (true/false): \");\n        boolean isVip = sc.nextBoolean();\n\n        // Write your nested logic below:\n\n    }\n}",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "85",
-            "output": "Pass"
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
         },
         {
-            "input": "75",
-            "output": "Pass"
+            "type": "containsNode",
+            "value": "if",
+            "count": 2
         },
         {
-            "input": "70",
-            "output": "Fail"
+            "type": "containsOperator",
+            "value": "&&",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": ">=",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "<",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: Gold",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: Silver",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: Standard",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: Access Denied",
+            "count": 1
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "else",
-        ">=",
-        "System.out.println"
-    ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 300,
+    "forbiddenAstRules": [],
+    "baseTokenReward": 700,
     "perfectBonus": 100,
     "speedBonus": 50,
-    "unlockedAchievements": ["Condition Master"],
+    "unlockedAchievements": [
+        "Condition Master"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

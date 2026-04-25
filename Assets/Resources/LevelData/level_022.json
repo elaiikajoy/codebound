@@ -1,42 +1,35 @@
 {
     "levelNumber": 22,
-    "levelName": "Level 22: User Input - Strings",
+    "levelName": "Level 22: Advanced String Buffers",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to use sc.nextLine() to capture a full line of text from the user and combine it with a greeting.",
-    "objective": "Ask the user for their name and print a greeting.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
-    "expectedOutputPattern": "^Hello .+$",
-    "requiredCodePattern": "String\\s+name\\s*=\\s*sc\\.nextLine\\s*\\(\\s*\\)\\s*;[\\s\\S]*System\\.out\\.println\\s*\\(\\s*\"Hello \"\\s*\\+\\s*name\\s*\\)\\s*;",
+    "difficulty": 3,
+    "puzzleDescription": "Strings are complex. Capturing a single word is easy, but capturing a full phrase requires the nextLine buffer. Create a short bio based on user input.",
+    "objective": "1. Input your full name.\n2. Input your favorite programming language.\n3. Print: '[Name] loves coding in [Language]!'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Capture full name using sc.nextLine()\n        \n        // 2. Capture favorite language using sc.next()\n        \n        // 3. Print the formatted bio\n    }\n}",
+    "testCases": [],
     "hints": [
-        "Use 'sc.nextLine()' to get a String input.",
-        "Combine the greeting 'Hello ' and the variable using the '+' operator.",
-        "Example: System.out.println(\"Hello \" + name);"
-    ],
-    "testCases": [
-        {
-            "input": "*",
-            "output": ""
-        }
+        "sc.nextLine() reads everything until you press Enter.",
+        "sc.next() only reads until the first space it finds.",
+        "To add an exclamation point at the end, use + \"!\" in your println."
     ],
     "requiredKeywords": [
-        "Scanner",
         "sc.nextLine()",
-        "System.out.println"
+        "sc.next()",
+        "String",
+        "+"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(\"Hello Joy\")"
+    "forbiddenKeywords": [],
+    "baseTokenReward": 200,
+    "perfectBonus": 75,
+    "speedBonus": 35,
+    "unlockedAchievements": [
+        "Wordsmith"
     ],
-    "baseTokenReward": 160,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 21
 }

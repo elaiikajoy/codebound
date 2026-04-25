@@ -27,6 +27,7 @@ public class UserProfileUIManager : MonoBehaviour
     public Button renameButton;
     public Button changePassButton;
     public Button deleteButton;
+    public Button logoutButton;
     public Button mainOkButton;
 
     [Header("Rename Panel Buttons")]
@@ -48,6 +49,13 @@ public class UserProfileUIManager : MonoBehaviour
 
     private void Start()
     {
+        // I-set ang password input sa Password mode (asterisks/dots)
+        if (changePasswordInput != null)
+        {
+            changePasswordInput.contentType = TMP_InputField.ContentType.Password;
+            changePasswordInput.ForceLabelUpdate();
+        }
+
         if (autoFindByHierarchyNames)
             TryAutoFindReferences();
 
@@ -65,6 +73,7 @@ public class UserProfileUIManager : MonoBehaviour
     public void Rename() => OpenRenamePanel();
     public void ChangePassword() => OpenChangePassPanel();
     public void Delete() => ClickDeleteAccount();
+    public void Logout() => ClickLogout();
     public void Ok() => ReturnToMainMenu();
 
     public void OpenMainPanel()
@@ -251,6 +260,19 @@ public class UserProfileUIManager : MonoBehaviour
         );
     }
 
+    public void ClickLogout()
+    {
+        if (_busy) return;
+
+        if (GameApiManager.Instance != null)
+        {
+            GameApiManager.Instance.Logout();
+        }
+
+        ShowFeedback("Logged out successfully.");
+        ReturnToLoginPanel();
+    }
+
     private void BindButtons()
     {
         if (renameButton != null)
@@ -269,6 +291,12 @@ public class UserProfileUIManager : MonoBehaviour
         {
             deleteButton.onClick.RemoveListener(ClickDeleteAccount);
             deleteButton.onClick.AddListener(ClickDeleteAccount);
+        }
+
+        if (logoutButton != null)
+        {
+            logoutButton.onClick.RemoveListener(ClickLogout);
+            logoutButton.onClick.AddListener(ClickLogout);
         }
 
         if (mainOkButton != null)
@@ -337,6 +365,7 @@ public class UserProfileUIManager : MonoBehaviour
         if (renameButton == null && mainProfilePanel != null) renameButton = FindButtonByName(mainProfilePanel.transform, "RenameButton");
         if (changePassButton == null && mainProfilePanel != null) changePassButton = FindButtonByName(mainProfilePanel.transform, "ChangePassButton");
         if (deleteButton == null && mainProfilePanel != null) deleteButton = FindButtonByName(mainProfilePanel.transform, "DeleteButton");
+        if (logoutButton == null && mainProfilePanel != null) logoutButton = FindButtonByName(mainProfilePanel.transform, "LogoutButton");
         if (mainOkButton == null && mainProfilePanel != null) mainOkButton = FindButtonByName(mainProfilePanel.transform, "OK");
 
         if (renameOkButton == null && renamePanel != null) renameOkButton = FindButtonByName(renamePanel.transform, "OK");

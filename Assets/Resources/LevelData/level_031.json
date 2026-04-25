@@ -1,49 +1,60 @@
 {
     "levelNumber": 31,
-    "levelName": "Level 31: If Statements - Positive or Negative",
+    "levelName": "Level 31: The Gatekeeper's Decision",
     "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Learn how to use 'if' and 'else' to check if a number is Positive (greater than 0) or Negative (less than 0).",
-    "objective": "Input a number and print 'Positive' if it's 0 or more, otherwise print 'Negative'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your if-else logic below:\n        \n    }\n}",
-    "expectedOutput": "",
+    "puzzleDescription": "The security gate only opens for non-negative energy levels. Program the bot to identify if the input energy is 'Stable' (0 or positive) or 'Unstable' (negative).",
+    "objective": "1. Create a prompt 'Enter Energy Level: ' in the console then an integer value must be input. \n2. Use an 'if-else' statement to check the value.\n3. Print 'System: Stable' if the number is >= 0, otherwise print 'System: Unstable'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Enter Energy Level: \");\n        int energy = sc.nextInt();\n\n        // Write your logic below:\n\n    }\n}",
+    "expectedOutputPattern": "^Enter Energy Level: .*\\nSystem: (Stable|Unstable)$",
     "hints": [
-        "Use 'if (num >= 0)' to check if a number is positive.",
-        "Use 'else' to handle the case where the condition is false.",
-        "Don't forget the curly braces {} for your blocks of code."
+        "The syntax is: if (condition) { // code } else { // code }",
+        "A number is stable if it is 0 or greater (energy >= 0).",
+        "Make sure the output strings 'System: Stable' and 'System: Unstable' are exact."
     ],
-    "testCases": [
+    "requiredAstRules": [
         {
-            "input": "5",
-            "output": "Positive"
+            "type": "containsNode",
+            "value": "scanner"
         },
         {
-            "input": "-3",
-            "output": "Negative"
+            "type": "countCall",
+            "value": "nextInt",
+            "count": 1
         },
         {
-            "input": "0",
-            "output": "Positive"
+            "type": "containsNode",
+            "value": "if"
+        },
+        {
+            "type": "containsNode",
+            "value": "else"
+        },
+        {
+            "type": "containsOperator",
+            "value": ">="
+        },
+        {
+            "type": "containsLiteral",
+            "value": "System: Stable"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "System: Unstable"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "else",
-        "System.out.println",
-        "Scanner"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 250,
+    "perfectBonus": 80,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "Logic Initiate"
     ],
-    "forbiddenKeywords": [
-        "Scanner sc = new Scanner(System.in); int num = 10;"
-    ],
-    "baseTokenReward": 200,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 30
 }

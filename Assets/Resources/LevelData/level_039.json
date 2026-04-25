@@ -1,50 +1,84 @@
 {
     "levelNumber": 39,
-    "levelName": "Level 39: Conditionals - Range Validation",
+    "levelName": "Level 39: Range Validation & Boundaries",
     "category": "Conditionals",
-    "difficulty": 3,
-    "puzzleDescription": "Learn how to use logical operators to check if a number falls within a specific range (1 to 100 inclusive).",
-    "objective": "Check if a number is between 1 and 100. Print 'In range' if it is, otherwise print 'Out of range'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your range check logic below:\n        \n    }\n}",
-    "expectedOutput": "In range",
+    "difficulty": 6,
+    "puzzleDescription": "Range validation ensures data stays within safe limits. You need to check if a value is at least 1 and no more than 100. This is an 'inclusive' range.",
+    "objective": "1. Prompt the user with 'Check value: ' then input a value.\n2. Declare a boolean variable 'isWithinRange'.\n3. Assign the condition result to it and,\n4. print 'Status: In Range' or 'Status: Out of Range'.",
+    "starterCode": "import java.util.Scanner    ;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        \n        // 1. Prompt the user with \"Check value: \"\n        \n        // 2. Declare boolean 'isWithinRange' using && logic\n        \n        // 3. Print the result using the boolean variable\n        \n    }\n}",
+    "expectedOutputPattern": "",
     "hints": [
-        "A number is in range if it is >= 1 AND <= 100.",
-        "Use the '&&' operator to join these two conditions.",
-        "Example: if (num >= 1 && num <= 100)"
+        "Use >= for 'greater than or equal to' and <= for 'less than or equal to'.",
+        "The && operator is necessary because BOTH conditions must be true for the number to be in range.",
+        "A common mistake is using ||. If you use OR, every number would technically be 'in range' of one of the conditions!"
     ],
     "testCases": [
         {
-            "input": "50",
-            "output": "In range"
-        },
-        {
-            "input": "150",
-            "output": "Out of range"
-        },
-        {
             "input": "1",
-            "output": "In range"
+            "output": "Check value: Status: In Range"
+        },
+        {
+            "input": "100",
+            "output": "Check value: Status: In Range"
+        },
+        {
+            "input": "0",
+            "output": "Check value: Status: Out of Range"
+        },
+        {
+            "input": "101",
+            "output": "Check value: Status: Out of Range"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "&&",
-        ">=",
-        "<="
+    "requiredAstRules": [
+        {
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "containsKeyword",
+            "value": "boolean",
+            "count": 1
+        },
+        {
+            "type": "containsIdentifier",
+            "value": "isWithinRange",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "&&",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": ">=",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "<=",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Status: In Range",
+            "count": 1
+        }
     ],
-    "forbiddenKeywords": [
-        "System.out.println(\"In range\")",
-        "System.out.println(\"Out of range\")"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 450,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Boundary Guard"
     ],
-    "baseTokenReward": 240,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
-    "sceneName": "GameScene_Template",
+    "sceneName": "GameScene_Terminal_Advanced",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 7,
     "isLocked": true,
     "requiredLevel": 38
 }

@@ -1,40 +1,62 @@
 {
     "levelNumber": 26,
-    "levelName": "Level 26: Input Arithmetic - Division",
+    "levelName": "Level 26: Division & Safety Logic",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to divide two numbers provided by the user using the forward slash (/) operator.",
-    "objective": "Input two numbers 20 and 10 then print the division result.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "2",
-    "hints": [
-        "Use 'sc.nextInt()' to get the two numbers.",
-        "Use the '/' operator for division.",
-        "Example: System.out.println(num1 / num2);"
-    ],
-    "testCases": [
+    "difficulty": 3,
+    "puzzleDescription": "Calculate how many kilometers a car can travel per liter. You must ensure the fuel amount is not zero to prevent a system crash!",
+    "objective": "1. Print a prompt 'Kilometers: ' and 'Liters: ' in the console then input a double value for each.\n2. If Liters is 0, print 'Error: Division by Zero'.\n3. Otherwise, calculate the kilometer and price then print it with the result of 'Efficiency: (km/liters)'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Prompt and capture distance (double) and fuel (double)\n        \n        // 2. Logic: Check if fuel is 0.0 before dividing\n        \n        // 3. Print the result or the error message\n    }\n}",
+    "outputMode": "efficiency-division",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "20 10",
-            "output": "2"
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
         },
         {
-            "input": "10 20",
-            "output": "0"
+            "type": "countCall",
+            "value": "nextDouble",
+            "count": 2
+        },
+        {
+            "type": "containsNode",
+            "value": "if",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "else",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "/",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "==",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "double",
+            "count": 1
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "nextInt()",
-        "System.out.println",
-        "/"
+    "forbiddenAstRules": [],
+    "hints": [
+        "In Java, dividing an integer by zero causes an ArithmeticException, but dividing a double by zero results in 'Infinity'.",
+        "Use an 'if' statement to check if liters == 0.",
+        "The formula is: double efficiency = distance / liters;"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(5)"
+    "baseTokenReward": 250,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Safety Engineer"
     ],
-    "baseTokenReward": 180,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

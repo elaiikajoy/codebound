@@ -1,50 +1,95 @@
 {
     "levelNumber": 38,
-    "levelName": "Level 38: Conditionals - Simple Calculator",
+    "levelName": "Level 38: The Else-If Ladder Calculator",
     "category": "Conditionals",
-    "difficulty": 3,
-    "puzzleDescription": "Build a simple calculator that performs addition, subtraction, multiplication, or division based on the character input (+, -, *, /).",
-    "objective": "Perform + − × ÷ depending on user choice.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        char op = sc.next().charAt(0);\n        \n        // Write your else-if logic below:\n        \n    }\n}",
-    "expectedOutput": "15",
+    "difficulty": 6,
+    "puzzleDescription": "Time to build! A simple calculator needs to decide which operation to perform based on a character symbol. You will use an 'else if' chain to handle +, -, *, and /.",
+    "objective": "1. Prompt for two numbers and an operator (+, -, *, /).\n2. Declare an integer 'result'.\n3. Use an if-else if-else chain to calculate the value.\n4. Print 'Final Result: ' followed by the answer.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        \n        System.out.print(\"Enter first number: \");\n        int a = sc.nextInt();\n        System.out.print(\"Enter second number: \");\n        int b = sc.nextInt();\n        System.out.print(\"Enter operator (+, -, *, /): \");\n        char op = sc.next().charAt(0);\n        \n        int result = 0;\n        \n        // Write your else-if logic below:\n        \n    }\n}",
+    "expectedOutput": "",
     "hints": [
-        "Use 'if (op == '+')' for addition.",
-        "Use 'else if (op == '-')' for subtraction, and so on.",
-        "Print the result of the operation directly (e.g., System.out.println(a + b);)."
+        "Use 'if (op == '+')' for the first check.",
+        "Use 'else if' for the remaining operators so the program stops checking once it finds a match.",
+        "Store the calculation in the 'result' variable before printing at the end."
     ],
     "testCases": [
         {
             "input": "10 5 +",
-            "output": "15"
-        },
-        {
-            "input": "10 5 *",
-            "output": "50"
+            "output": "Enter first number: Enter second number: Enter operator (+, -, *, /): Final Result: 15"
         },
         {
             "input": "20 4 /",
-            "output": "5"
+            "output": "Enter first number: Enter second number: Enter operator (+, -, *, /): Final Result: 5"
+        },
+        {
+            "input": "12 3 *",
+            "output": "Enter first number: Enter second number: Enter operator (+, -, *, /): Final Result: 36"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "else if",
-        "==",
-        "System.out.println"
+    "requiredAstRules": [
+        {
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "else",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "==",
+            "count": 1
+        },
+        {
+            "type": "containsIdentifier",
+            "value": "result",
+            "count": 1
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Final Result: ",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "+",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "-",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "*",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "/",
+            "count": 1
+        }
     ],
-    "forbiddenKeywords": [
-        "System.out.println(15)",
-        "System.out.println(50)"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 400,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Math Wizard"
     ],
-    "baseTokenReward": 250,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
-    "sceneName": "GameScene_Template",
+    "sceneName": "GameScene_Terminal_Advanced",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 8,
     "isLocked": true,
     "requiredLevel": 37
 }

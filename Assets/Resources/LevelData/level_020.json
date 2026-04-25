@@ -1,33 +1,25 @@
 {
     "levelNumber": 20,
-    "levelName": "Level 20: Type Casting - Int to Double",
+    "levelName": "Level 20: Manual Type Casting",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to convert a whole number (int) into a decimal number (double). This is called widening casting in Java.",
-    "objective": "Convert an `int` value to `double` and print the result.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        int myInt = 9;\n        // Convert 'myInt' to a double below:\n        \n        System.out.println(); \n    }\n}",
-    "expectedOutput": "9.0",
+    "difficulty": 3,
+    "puzzleDescription": "Widening casting (int to double) is automatic, but Narrowing casting (double to int) requires manual effort. Help the shopkeeper round down a decimal price to a whole number.",
+    "objective": "1. Declare a double for a price at 19.99.\n2. Manually cast the price to an int variable for the value of the rounded price.\n3. Print: 'Original: 19.99'\n4. Print: 'Rounded: (rounded price)'",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        double price = 19.99;\n        \n        // 1. Manually cast price to int (Narrowing Casting)\n        // Hint: int roundedPrice = (int) price;\n        \n        // 2. Print the original and the rounded values\n        \n    }\n}",
+    "expectedOutput": "Original: 19.99\nRounded: 19",
     "hints": [
-        "Declare a double variable (e.g., double myDouble = myInt;).",
-        "Java automatically converts int to double since double is larger.",
-        "Pass the new double variable into the System.out.println() method."
+        "Narrowing casting is done by placing the target type in parentheses, e.g., (int).",
+        "Note: Casting a double to an int does not 'round' to the nearest number; it 'truncates' or cuts off the decimals.",
+        "Use concatenation to match the expected output string."
     ],
-    "testCases": [
-        {
-            "input": "",
-            "output": "9.0"
-        }
-    ],
-    "requiredKeywords": [
-        "double",
-        "myInt",
-        "System.out.println"
-    ],
+    "requiredKeywords": [],
     "forbiddenKeywords": [],
-    "baseTokenReward": 150,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "baseTokenReward": 180,
+    "perfectBonus": 60,
+    "speedBonus": 30,
+    "unlockedAchievements": [
+        "Data Squeezer"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

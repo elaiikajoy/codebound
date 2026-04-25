@@ -1,46 +1,65 @@
 {
     "levelNumber": 37,
-    "levelName": "Level 37: Conditionals - Logical OR",
+    "levelName": "Level 37: Logical OR - The Vowel Detector",
     "category": "Conditionals",
-    "difficulty": 3,
-    "puzzleDescription": "Learn how to use the logical OR (||) operator to check if a character is a vowel (a, e, i, o, u).",
-    "objective": "Input a character and print 'Vowel' if it's a vowel, otherwise print 'Consonant'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        char ch = sc.next().charAt(0);\n        \n        // Write your logic below (assume lowercase input for now):\n        \n    }\n}",
-    "expectedOutput": "Vowel",
+    "difficulty": 5,
+    "puzzleDescription": "Master the Logical OR (||) operator. Unlike AND, the OR operator returns true if at least ONE condition is met. You'll need to check if a character is 'a', 'e', 'i', 'o', or 'u'.",
+    "objective": "1. Prompt the user with 'Enter character: '. Declare a boolean 'isVowel'.\n2. If the input is a vowel, set 'isVowel' to true.\n3. Then, print 'Result: Vowel' or 'Result: Consonant'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        \n        // 1. Prompt: 'Enter character: ' \n        \n        // 2. Declare boolean 'isVowel' using || operators\n        \n        // 3. Print 'Result: Vowel' or 'Result: Consonant'\n        \n    }\n}",
+    "expectedOutput": "",
     "hints": [
-        "Use '||' to check multiple conditions: if (ch == 'a' || ch == 'e' || ...)",
-        "Remember that characters use single quotes (e.g., 'a'), not double quotes.",
-        "Print 'Vowel' if any of the conditions are true, otherwise use 'else' for 'Consonant'."
+        "Logical OR is written as '||'. Example: (x == 1 || x == 2).",
+        "Characters must be in single quotes: 'a', not \"a\".",
+        "Make sure to handle all 5 lowercase vowels."
     ],
     "testCases": [
         {
-            "input": "a",
-            "output": "Vowel"
+            "input": "e",
+            "output": "Enter character: Result: Vowel"
         },
         {
-            "input": "z",
-            "output": "Consonant"
+            "input": "b",
+            "output": "Enter character: Result: Consonant"
+        },
+        {
+            "input": "u",
+            "output": "Enter character: Result: Vowel"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "||",
-        "==",
-        "else"
+    "requiredAstRules": [
+        {
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "containsKeyword",
+            "value": "boolean",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "||",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if",
+            "count": 1
+        }
     ],
-    "forbiddenKeywords": [
-        "System.out.println(\"Vowel\")",
-        "System.out.println(\"Consonant\")"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 350,
+    "perfectBonus": 75,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "Vowel Hunter"
     ],
-    "baseTokenReward": 230,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
-    "sceneName": "GameScene_Template",
+    "sceneName": "GameScene_Terminal_Advanced",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 36
 }

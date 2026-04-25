@@ -1,43 +1,64 @@
 {
     "levelNumber": 32,
-    "levelName": "Level 32: If Statements - Even or Odd",
+    "levelName": "Level 32: The Modulo Logic Gate",
     "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Learn how to use the modulo operator (%) with an if statement to determine if a number is Even or Odd.",
-    "objective": "Check if a number is even or odd.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your if-else logic below:\n        \n    }\n}",
-    "expectedOutput": "Even",
+    "puzzleDescription": "Binary systems rely on 0s and 1s. Use the Modulo operator (%) to determine if a packet ID is 'Even' (divisible by 2) or 'Odd'.",
+    "objective": "1. Create a prompt 'Packet ID: ' in the console then an integer value must be input.\n2. If the ID is divisible by 2 with no remainder, print 'Classification: EVEN'.\n3. Otherwise, print 'Classification: ODD'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Packet ID: \");\n        int id = sc.nextInt();\n\n        // Write your Even/Odd logic below:\n\n    }\n}",
+    "expectedOutputPattern": "^Packet ID: .*\\nClassification: (EVEN|ODD)$",
     "hints": [
-        "A number is even if 'num % 2 == 0'.",
-        "Use '==' to compare values in an if statement.",
-        "Print 'Even' for true and 'Odd' for the else block."
+        "The Modulo operator (%) returns the remainder of a division. For even numbers, 'number % 2' is always 0.",
+        "Remember to use the double equals '==' for comparison inside the if condition.",
+        "Example: if (id % 2 == 0) { ... }"
     ],
-    "testCases": [
+    "requiredAstRules": [
         {
-            "input": "10",
-            "output": "Even"
+            "type": "containsNode",
+            "value": "scanner"
         },
         {
-            "input": "7",
-            "output": "Odd"
+            "type": "countCall",
+            "value": "nextInt",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if"
+        },
+        {
+            "type": "containsNode",
+            "value": "else"
+        },
+        {
+            "type": "containsOperator",
+            "value": "%"
+        },
+        {
+            "type": "containsOperator",
+            "value": "=="
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Classification: EVEN"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Classification: ODD"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "==",
-        "%",
-        "else"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 250,
+    "perfectBonus": 80,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "Binary Thinker"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 210,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 31
 }

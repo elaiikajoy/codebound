@@ -1,45 +1,49 @@
 {
     "levelNumber": 25,
-    "levelName": "Level 25: Input Arithmetic - Multiplication",
+    "levelName": "Level 25: Multiplication & Remainders",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to multiply two numbers provided by the user using the asterisk (*) operator.",
-    "objective": "Input two numbers 5 and 10 then print their product.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "50",
-    "hints": [
-        "Capture two integers using sc.nextInt().",
-        "Use the '*' symbol to multiply the two variables.",
-        "Print the final product to the console."
-    ],
-    "testCases": [
+    "difficulty": 3,
+    "puzzleDescription": "Calculate the total slices from multiple pizzas, then find out how many slices are left over after sharing them equally among 4 friends.",
+    "objective": "1. Print a 'Pizzas: ' with any int value of it,\n2. Print a 'Slices per pizza: ' and with total amount per slice pizza.\n3. Calculate total slices of pizza using the multiplication operator.\n4. Calculate the leftOver then divide it with 4 with value inputted in 'Number of friends:'.\n5. Print 'Total Slices: (total)' and 'Leftover: (leftover)'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Capture number of pizzas and slices per pizza\n        \n        // 2. Calculate total slices using '*'\n        \n        // 3. Find the remainder using '%' when divided by 4 friends\n        \n        // 4. Print results\n    }\n}",
+    "outputMode": "pizza-leftover",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "5 10",
-            "output": "50"
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
         },
         {
-            "input": "10 5",
-            "output": "50"
+            "type": "containsOperator",
+            "value": "*",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "%",
+            "count": 1
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "nextInt()",
-        "System.out.println",
-        "*"
+    "forbiddenAstRules": [],
+    "hints": [
+        "Multiplication is '*', but the Remainder operator is '%'.",
+        "Example: 10 % 4 is 2, because 4 goes into 10 twice with 2 left over.",
+        "Ensure you prompt the user exactly as requested."
     ],
-    "forbiddenKeywords": [
-        "System.out.println(50)"
+    "requiredKeywords": [],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 300,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Party Planner"
     ],
-    "baseTokenReward": 180,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 24
 }

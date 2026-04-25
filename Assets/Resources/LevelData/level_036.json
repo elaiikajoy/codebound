@@ -1,43 +1,72 @@
 {
     "levelNumber": 36,
-    "levelName": "Level 36: Conditionals - Logical AND",
+    "levelName": "Level 36: Boolean Logic & User Prompting",
     "category": "Conditionals",
-    "difficulty": 3,
-    "puzzleDescription": "Learn how to use the logical AND (&&) operator to check if a number is divisible by both 5 AND 11.",
-    "objective": "Check if a number is divisible by both. Print 'Yes' if it is, otherwise print 'No'.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int num = sc.nextInt();\n        \n        // Write your logic below:\n        \n    }\n}",
-    "expectedOutput": "Yes",
+    "difficulty": 5,
+    "puzzleDescription": "Step up your game! You must now prompt the user for input, declare a boolean variable to store the result of a logical AND (&&) check, and then use that variable to display the final status.",
+    "objective": "1. Prompt the user with 'Enter number: '. Check if the number is divisible by 5 AND 11.\n2. Store this in a boolean variable 'isValid'.\n3. Print 'Divisible: true' or 'Divisible: false'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        \n        // 1. Prompt the user for input\n        \n        // 2. Declare a boolean named 'isValid' to store the condition\n        \n        // 3. Use an if-else statement to print the result\n        \n    }\n}",
+    "expectedOutput": "Enter number: Divisible: true",
     "hints": [
-        "Use '&&' to combine two conditions.",
-        "Check 'num % 5 == 0' AND 'num % 11 == 0'.",
-        "Both conditions must be true for the 'if' block to run."
+        "Use System.out.print(\"Enter number: \"); to prompt the user.",
+        "Declare your boolean like this: boolean isValid = (num % 5 == 0 && num % 11 == 0);",
+        "The final output must strictly follow the format 'Divisible: ' followed by the boolean value."
     ],
     "testCases": [
         {
             "input": "55",
-            "output": "Yes"
+            "output": "Enter number: Divisible: true"
         },
         {
-            "input": "25",
-            "output": "No"
+            "input": "22",
+            "output": "Enter number: Divisible: false"
+        },
+        {
+            "input": "110",
+            "output": "Enter number: Divisible: true"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "&&",
-        "%",
-        "else"
+    "requiredAstRules": [
+        {
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "containsKeyword",
+            "value": "boolean",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "&&",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "%",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if",
+            "count": 1
+        }
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 230,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
-    "sceneName": "GameScene_Template",
+    "forbiddenAstRules": [],
+    "baseTokenReward": 350,
+    "perfectBonus": 75,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "Logic Master",
+        "Clean Coder"
+    ],
+    "sceneName": "GameScene_Terminal_Advanced",
     "requiredMechanics": [
-        "terminal"
+        "terminal",
+        "variable_monitoring"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 35
 }

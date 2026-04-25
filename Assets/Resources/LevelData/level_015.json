@@ -1,32 +1,31 @@
 {
     "levelNumber": 15,
-    "levelName": "Level 15: Variables Mastery",
+    "levelName": "Level 15: Fitness Tracker Mastery",
     "category": "Basics",
     "difficulty": 2,
-    "puzzleDescription": "Combine what you've learned! Practice declaring multiple variables with different data types (String, int, and double) to represent a person's profile.",
-    "objective": "Create variables for name, age, and height then print them.",
+    "puzzleDescription": "Mastery means using data to generate new information. Create a profile and calculate a future milestone.",
+    "objective": "1. Declare variables for your name, age, and weight.\n2. Then, print a sentence showing your name/age, and another line showing what your weight would be if it increased by 2.5kg.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
-    "expectedOutputPattern": "^.+\\n.+\\n.+$",
-    "requiredPrintlnCount": 3,
-    "requiredCodePattern": "System\\.out\\.println\\s*\\(.*name.*\\).*System\\.out\\.println\\s*\\(.*age.*\\).*System\\.out\\.println\\s*\\(.*height.*\\)",
+    "expectedOutputPattern": "^User: .+ Age: [0-9]+\\nNew Weight: [0-9]+\\.[0-9]+$",
     "hints": [
-        "Use String for name, int for age, and double for height.",
-        "Example structure: String name = \"Alex\";",
-        "Print each variable using System.out.println(variableName);"
+        "String concatenation uses '+' to join text and variables.",
+        "To update a double, use: weight = weight + 2.5;",
+        "Make sure the 'New Weight' print includes the updated variable."
     ],
-    "testCases": [],
     "requiredKeywords": [
-        "String name",
-        "int age",
-        "double height",
-        "System.out.println"
+        "String",
+        "int",
+        "double",
+        "+",
+        "="
     ],
     "forbiddenKeywords": [],
-    "baseTokenReward": 150,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "baseTokenReward": 200,
+    "perfectBonus": 75,
+    "speedBonus": 40,
+    "unlockedAchievements": [
+        "Data Architect"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

@@ -1,36 +1,31 @@
 {
     "levelNumber": 23,
-    "levelName": "Level 23: Input Arithmetic - Addition",
+    "levelName": "Level 23: The Billing Logic",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to collect two different integer inputs from a user and calculate their sum.",
-    "objective": "Input two numbers 10 and 20 then print the sum.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
+    "difficulty": 3,
+    "puzzleDescription": "Combine interactive prompts with math. Calculate the total cost of an item including a fixed shipping fee.",
+    "objective": "1. Prompt 'Enter Price: ' and capture a double.\n2. Prompt 'Enter Quantity: ' and capture an int.\n3. Calculate total (price * quantity + 50.0 shipping).\n4. Print 'Total Bill: ' followed by the result.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Prompt and capture Price (double)\n        \n        // 2. Prompt and capture Quantity (int)\n        \n        // 3. Calculate: (price * quantity) + 50.0\n        \n        // 4. Print result as \"Total Bill: [result]\"\n    }\n}",
+    "testCases": [],
     "hints": [
-        "Use 'sc.nextInt()' twice to get two different numbers.",
-        "Store them in variables (e.g., int x = sc.nextInt(); int y = sc.nextInt();).",
-        "Print the sum using System.out.println(x + y);"
-    ],
-    "testCases": [
-        {
-            "input": "10 20",
-            "output": "30"
-        }
+        "Use System.out.print() for prompts to keep the input on the same line.",
+        "The formula is: (price * quantity) + 50.0. Java follows PEMDAS.",
+        "Make sure to concatenate the string 'Total Bill: ' with your calculation."
     ],
     "requiredKeywords": [
-        "Scanner",
-        "nextInt()",
-        "System.out.println",
+        "sc.nextDouble()",
+        "sc.nextInt()",
+        "Total Bill:",
+        "*",
         "+"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(30)"
+    "forbiddenKeywords": [],
+    "baseTokenReward": 250,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Store Manager"
     ],
-    "baseTokenReward": 180,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

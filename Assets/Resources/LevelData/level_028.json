@@ -1,45 +1,87 @@
 {
     "levelNumber": 28,
-    "levelName": "Level 28: Practical Arithmetic - Circle Area",
+    "levelName": "Level 28: Constants & Math Precision",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Calculate the area of a circle using the formula: Area = 3.14 * radius * radius.",
-    "objective": "Ask for a numeric radius (int or double) and calculate the area of a circle.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
-    "hints": [
-        "Use 'sc.nextInt()' or 'sc.nextDouble()' to capture the radius.",
-        "The formula is: 3.14 * radius * radius.",
-        "Store the result in a double variable (e.g., double area = ...);"
-    ],
-    "testCases": [
+    "difficulty": 3,
+    "puzzleDescription": "Calculate the area of a circular space station hatch. To pass, you must use a constant for PI and ensure the radius is positive.",
+    "objective": "1. Create prompts 'Radius: ' in the console then input a double value. Print 'Radius:' as the prompt.\n2. Use 'final double PI = 3.14159;' as a constant.\n3. If radius is negative, print 'Invalid Radius'.\n4. Otherwise, calculate Area (PI * r * r) and print 'Hatch Area:' with the calculated area.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // 1. Declare a constant PI = 3.14159\n        \n        // 2. Capture radius and check if it is > 0\n        \n        // 3. Calculate and print area or error message\n    }\n}",
+    "outputMode": "hatch-area",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "",
-            "output": ""
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
         },
         {
-            "input": "",
-            "output": ""
+            "type": "countCall",
+            "value": "nextDouble",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "else",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "*",
+            "count": 1
+        },
+        {
+            "type": "containsDeclaredType",
+            "value": "final double",
+            "count": 1
+        },
+        {
+            "type": "containsIdentifier",
+            "value": "PI"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "3.14159"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Invalid Radius"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Hatch Area:"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Radius:"
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "3.14",
-        "*"
+    "forbiddenAstRules": [
+        {
+            "type": "containsLiteral",
+            "value": "3.14"
+        }
     ],
-    "requiredCodePattern": "(?s).*sc\\.(?:nextInt|nextDouble)\\s*\\(\\s*\\)\\s*;.*",
-    "forbiddenKeywords": [
-        "78.5"
+    "hints": [
+        "A constant in Java uses the 'final' keyword.",
+        "Area formula: PI * radius * radius.",
+        "Use an if-else statement to handle negative inputs."
     ],
-    "baseTokenReward": 200,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "baseTokenReward": 300,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Rocket Scientist"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 27
 }

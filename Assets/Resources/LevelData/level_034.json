@@ -1,46 +1,52 @@
 {
     "levelNumber": 34,
-    "levelName": "Level 34: Conditionals - Max of Three",
+    "levelName": "Level 34: Triple Logic Comparison",
     "category": "Conditionals",
-    "difficulty": 3,
-    "puzzleDescription": "Learn how to find the largest value among three different numbers using logical operators or nested if statements.",
-    "objective": "Input three numbers and print the largest number.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        int c = sc.nextInt();\n        \n        // Write your logic below:\n        \n    }\n}",
-    "expectedOutput": "100",
+    "difficulty": 4,
+    "puzzleDescription": "Monitor three energy sensors (A, B, C). Your system must identify and print only the value of the highest reading to prevent an overload.",
+    "objective": "1. Prompt three values 'a', 'b', and 'c' in the console and put an integer value on it.\n2. Use logical AND (&&) to compare if one is greater than or equal to the others.\n3. Print only the highest number.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"Sensor A: \");\n        int a = sc.nextInt();\n        System.out.print(\"Sensor B: \");\n        int b = sc.nextInt();\n        System.out.print(\"Sensor C: \");\n        int c = sc.nextInt();\n\n        // Write your logic below using if, else if, and &&\n\n    }\n}",
+    "expectedOutputPattern": "^[0-9]+$",
     "hints": [
-        "Use logical AND (&&) to check if 'a' is greater than both 'b' and 'c'.",
-        "Example: if (a >= b && a >= c) { System.out.println(a); }",
-        "Repeat the logic for 'b' and 'c' using 'else if' or nested conditions."
+        "To check if 'a' is the largest, use: if (a >= b && a >= c).",
+        "The '&&' operator means BOTH conditions must be true.",
+        "Use 'else if' to check for 'b' and 'c' respectively."
     ],
-    "testCases": [
+    "requiredAstRules": [
         {
-            "input": "10 50 100",
-            "output": "100"
+            "type": "containsNode",
+            "value": "scanner"
         },
         {
-            "input": "45 10 20",
-            "output": "45"
+            "type": "countCall",
+            "value": "nextInt",
+            "count": 3
+        },
+        {
+            "type": "containsNode",
+            "value": "if"
+        },
+        {
+            "type": "containsOperator",
+            "value": "&&"
+        },
+        {
+            "type": "containsOperator",
+            "value": ">="
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "else",
-        ">",
-        "System.out.println"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 300,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Master Logician"
     ],
-    "forbiddenKeywords": [
-        "System.out.println(100)",
-        "System.out.println(45)"
-    ],
-    "baseTokenReward": 230,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 5,
+    "tokensToCollect": 6,
     "isLocked": true,
     "requiredLevel": 33
 }

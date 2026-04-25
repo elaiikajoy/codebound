@@ -1,43 +1,64 @@
 {
     "levelNumber": 33,
-    "levelName": "Level 33: If Statements - Max of Two",
+    "levelName": "Level 33: Multi-Path Comparison",
     "category": "Conditionals",
     "difficulty": 3,
-    "puzzleDescription": "Learn how to compare two numbers and display the larger one using an if-else statement.",
-    "objective": "Input two numbers and print the larger number.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int a = sc.nextInt();\n        int b = sc.nextInt();\n        \n        // Write your logic below:\n        \n    }\n}",
-    "expectedOutput": "50",
+    "puzzleDescription": "Two warriors enter the arena. Compare their Power Levels to determine a winner, or declare a draw if they are equal.",
+    "objective": "1. Create a prompt P1 and P2 Power Level in the console then a value must be input.\n2. If p1 is greater than p2, print 'Winner: Player 1'.\n3. If p2 is greater than p1, print 'Winner: Player 2'.\n4. If they are equal, print 'Result: Draw'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        System.out.print(\"P1 Power: \");\n        int p1 = sc.nextInt();\n        System.out.print(\"P2 Power: \");\n        int p2 = sc.nextInt();\n\n        // Write your multi-path logic (if, else if, else) below:\n\n    }\n}",
+    "expectedOutputPattern": "^P1 Power: .*\\nP2 Power: .*\\n(Winner: Player 1|Winner: Player 2|Result: Draw)$",
     "hints": [
-        "Compare the two numbers: 'if (a > b)'.",
-        "If the condition is true, print 'a'. Otherwise, print 'b'.",
-        "Make sure your if and else blocks are properly closed with braces {}."
+        "Use 'else if' to check for a second condition if the first one fails.",
+        "To check if they are equal, use 'else if (p1 == p2)'.",
+        "The 'else' block serves as the final fallback."
     ],
-    "testCases": [
+    "requiredAstRules": [
         {
-            "input": "50 20",
-            "output": "50"
+            "type": "containsNode",
+            "value": "scanner"
         },
         {
-            "input": "15 100",
-            "output": "100"
+            "type": "countCall",
+            "value": "nextInt",
+            "count": 2
+        },
+        {
+            "type": "containsNode",
+            "value": "if"
+        },
+        {
+            "type": "containsNode",
+            "value": "else"
+        },
+        {
+            "type": "containsOperator",
+            "value": ">"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Winner: Player 1"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Winner: Player 2"
+        },
+        {
+            "type": "containsLiteral",
+            "value": "Result: Draw"
         }
     ],
-    "requiredKeywords": [
-        "if",
-        "else",
-        ">",
-        "System.out.println"
+    "forbiddenAstRules": [],
+    "baseTokenReward": 280,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Arena Master"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 220,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 4,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 32
 }

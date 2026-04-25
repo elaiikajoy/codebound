@@ -1,36 +1,54 @@
 {
     "levelNumber": 24,
-    "levelName": "Level 24: Input Arithmetic - Subtraction",
+    "levelName": "Level 24: ATM Transaction Logic",
     "category": "Basics",
-    "difficulty": 2,
-    "puzzleDescription": "Learn how to subtract one user-inputted number from another and display the difference.",
-    "objective": "Input two numbers 20 and 10 then print the difference.",
-    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "10",
-    "hints": [
-        "Use 'sc.nextInt()' twice to store two different numbers.",
-        "Use the '-' operator to find the difference (e.g., a - b).",
-        "Make sure to print the result using System.out.println();"
-    ],
-    "testCases": [
+    "difficulty": 3,
+    "puzzleDescription": "Simulate an ATM withdrawal. Subtract the withdrawal amount from the balance, but only if the user has enough money!",
+    "objective": "1. Declare a variable for the balance that have a value of 1000.\n2. Prompt a 'Withdraw: ' with the int value amount of it.\n3. If amount <= balance, subtract it and then print 'New Balance: (result)'.\n4. Else, print 'Insufficient Funds'.",
+    "starterCode": "import java.util.Scanner;\n\npublic class Solution {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int balance = 1000;\n        \n        // 1. Prompt and capture 'amount'\n        \n        // 2. Logic: If amount is valid, subtract and print. Else, print error.\n    }\n}",
+    "outputMode": "atm-withdrawal",
+    "testCases": [],
+    "requiredAstRules": [
         {
-            "input": "20 10",
-            "output": "10"
+            "type": "containsNode",
+            "value": "scanner",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "if",
+            "count": 1
+        },
+        {
+            "type": "containsNode",
+            "value": "else",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "<=",
+            "count": 1
+        },
+        {
+            "type": "containsOperator",
+            "value": "-",
+            "count": 1
         }
     ],
-    "requiredKeywords": [
-        "Scanner",
-        "nextInt()",
-        "System.out.println",
-        "-"
+    "forbiddenAstRules": [],
+    "hints": [
+        "Use an 'if' statement to check if amount <= balance.",
+        "The subtraction is: balance - amount.",
+        "Remember to use System.out.print() for the prompt 'Withdraw: '."
     ],
-    "forbiddenKeywords": [
-        "System.out.println(10)"
+    "requiredKeywords": [],
+    "forbiddenKeywords": [],
+    "baseTokenReward": 250,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Banker"
     ],
-    "baseTokenReward": 180,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

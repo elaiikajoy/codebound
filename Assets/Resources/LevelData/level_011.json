@@ -1,28 +1,28 @@
 {
     "levelNumber": 11,
-    "levelName": "Level 11: Variables Pt 10",
+    "levelName": "Level 11: The Dynamic Score",
     "category": "Basics",
     "difficulty": 1,
-    "puzzleDescription": "Learn how to store whole numbers using the 'int' data type and display them in the console.",
-    "objective": "Declare an integer variable called `score` and print number 55.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "puzzleDescription": "Learn that variables are 'mutable' meaning their values can change while the program is running.",
+    "objective": "1. Declare an int variable named `score` with a starting value of 100, then subtract 45 from it.\n2. Then, print the final output.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // 1. Declare int score and set to 100\n        \n        // 2. Subtract 45 from score (score = score - 45)\n        \n        // 3. Print the variable score\n        \n    }\n}",
     "expectedOutput": "55",
     "hints": [
-        "Use the keyword 'int' for integer variables.",
-        "Set the score to 55.",
-        "Make sure your variable name is exactly 'score'."
+        "Variables can be updated using the assignment operator (=).",
+        "Example: score = score - 10; updates the value of score.",
+        "To get 55 from 100, you need to subtract 45."
     ],
     "testCases": [],
     "requiredKeywords": [
-        "int score",
-        "55",
-        "System.out.println(score);"
+        "System.out.print();"
     ],
     "forbiddenKeywords": [],
-    "baseTokenReward": 120,
+    "baseTokenReward": 100,
     "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "speedBonus": 30,
+    "unlockedAchievements": [
+        "State Changer"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"

@@ -100,6 +100,12 @@ public class AchievementRowView : MonoBehaviour
             return;
         }
 
+        // Local Override for Welcome Gift
+        if (achievement.id == "welcome_gift")
+        {
+            achievement.description = "Welcome Gift Unlocked! Enjoy 1,000 Free Tokens as a CodeBound new user.";
+        }
+
         if (titleText != null)
             titleText.text = achievement.title;
 

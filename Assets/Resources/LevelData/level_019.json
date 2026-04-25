@@ -1,33 +1,33 @@
 {
     "levelNumber": 19,
-    "levelName": "Level 19: Basic Arithmetic - Multi-Addition",
+    "levelName": "Level 19: Precision Averaging",
     "category": "Basics",
-    "difficulty": 1,
-    "puzzleDescription": "Learn how to calculate the total sum of three different integer variables.",
-    "objective": "Store three integers and print their total.",
-    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
+    "difficulty": 3,
+    "puzzleDescription": "Adding numbers is easy, but getting an accurate average requires understanding how Java handles division between different types.",
+    "objective": "1. Declare three integers that has value for math, science, and english.\n 2. Calculate their average.\n 3. The final result must be a double to keep the decimal precision.\n 4. Print the result.",
+    "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // 1. Declare math, science, and english as integers\n        \n        // 2. Calculate the average and store it in a double\n        // Hint: You must divide the sum by 3.0, not 3!\n        \n        // 3. Print the average\n        \n    }\n}",
     "expectedOutput": "",
     "hints": [
-        "Declare three separate 'int' variables (e.g., int a, b, c;).",
-        "Assign values to each variable so that their sum equals 60.",
-        "Use System.out.println(a + b + c);"
+        "In Java, (int + int + int) / 3 will remove decimals because of Integer Division.",
+        "To get a double result, divide the total sum by 3.0 instead of 3.",
+        "Use parentheses to make sure the addition happens before the division: (a + b + c) / 3.0"
     ],
     "testCases": [],
     "requiredKeywords": [
-        "int",
-        "+",
-        "System.out.println"
+        "double"
     ],
     "forbiddenKeywords": [],
-    "baseTokenReward": 140,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "baseTokenReward": 180,
+    "perfectBonus": 70,
+    "speedBonus": 35,
+    "unlockedAchievements": [
+        "Precision Analyst"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 4,
     "isLocked": true,
     "requiredLevel": 18
 }

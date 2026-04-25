@@ -1,33 +1,40 @@
 {
     "levelNumber": 16,
-    "levelName": "Level 16: Basic Arithmetic - Addition",
+    "levelName": "Level 16: Arithmetic & Logic Fusion",
     "category": "Basics",
-    "difficulty": 1,
-    "puzzleDescription": "Learn how to use the '+' operator to add two integer variables together and display the result.",
-    "objective": "Create two integers and print their sum.",
+    "difficulty": 3,
+    "puzzleDescription": "Combine math and logic! Calculate a total price with a multiplier, then check if it exceeds a certain budget using a boolean.",
+    "objective": "1. Declare a variable for the quantity that has a value\n2. Declare price as 15.50, then calculate total by multiplying quantity and price of the item, then adding 5.0 for shipping.\n3. Declare a boolean 'isExpensive' that checks if 'total' is greater than 100.\n4. Print 'total' then 'isExpensive'.",
     "starterCode": "public class Solution {\n    public static void main(String[] args) {\n        // Type your answer below:\n        \n    }\n}",
-    "expectedOutput": "",
+    "expectedOutputPattern": "^51\\.5\\ntrue$",
     "hints": [
-        "Declare two 'int' variables (e.g., int a = 5; int b = 10;).",
-        "Use the '+' sign to add them together.",
-        "Print the result using System.out.println(a + b);"
+        "Multiplication uses the '*' symbol.",
+        "Order of operations (PEMDAS) applies in Java: multiplication happens before addition.",
+        "A boolean can store the result of 'total > 50'."
     ],
-    "testCases": [],
     "requiredKeywords": [
-        "int",
+        "*",
         "+",
-        "System.out.println"
+        "double total",
+        "boolean isExpensive",
+        ">"
     ],
-    "forbiddenKeywords": [],
-    "baseTokenReward": 140,
-    "perfectBonus": 50,
-    "speedBonus": 25,
-    "unlockedAchievements": [],
+    "forbiddenKeywords": [
+        "51.5",
+        "true"
+    ],
+    "baseTokenReward": 250,
+    "perfectBonus": 100,
+    "speedBonus": 50,
+    "unlockedAchievements": [
+        "Math Wizard",
+        "Logic Ninja"
+    ],
     "sceneName": "GameScene_Template",
     "requiredMechanics": [
         "terminal"
     ],
-    "tokensToCollect": 3,
+    "tokensToCollect": 5,
     "isLocked": true,
     "requiredLevel": 15
 }

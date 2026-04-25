@@ -72,6 +72,13 @@ public class AuthUIManager : MonoBehaviour
 
     private void Start()
     {
+        // I-set ang password input sa Password mode (asterisks/dots)
+        if (passwordInput != null)
+        {
+            passwordInput.contentType = TMP_InputField.ContentType.Password;
+            passwordInput.ForceLabelUpdate();
+        }
+
         EnsureGameApiReady();
 
         if (autoFindSceneReferences)
